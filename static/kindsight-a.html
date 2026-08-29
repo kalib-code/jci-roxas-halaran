@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JCI Roxas Halaran — Variation A “Evergreen”</title>
+  <meta name="description" content="JCI Roxas Halaran — young active citizens creating positive change in Roxas City, Capiz.">
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #2b3a21;
+      --green-deep: #222f1a;
+      --cream: #f4efe6;
+      --card: #fffdf8;
+      --line: #e2dac9;
+      --ink: #23291e;
+      --ink-soft: #5c6353;
+      --chartreuse: #d9f154;
+      --coral: #e8613c;
+      --radius: 18px;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "Instrument Sans", system-ui, sans-serif;
+      --pad: clamp(1.25rem, 4vw, 4.5rem);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    .serif { font-family: var(--serif); font-weight: 420; letter-spacing: -0.01em; }
+    em { font-family: var(--serif); font-style: italic; font-weight: 480; }
+
+    .btn {
+      display: inline-block;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 0.8em 1.7em;
+      border-radius: 999px;
+      transition: transform 0.2s, background 0.25s, color 0.25s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn--coral { background: var(--coral); color: #fff; }
+    .btn--coral:hover { background: #d14e2c; }
+    .btn--chartreuse { background: var(--chartreuse); color: var(--green-deep); }
+    .btn--ghost { border: 1px solid rgba(255,255,255,0.35); color: #fff; }
+    .btn--ghost:hover { border-color: var(--chartreuse); color: var(--chartreuse); }
+
+    /* nav */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; gap: 2rem;
+      padding: 0.9rem var(--pad);
+      background: rgba(244, 239, 230, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav img { height: 34px; }
+    .nav__links { display: flex; gap: 1.6rem; font-size: 0.92rem; font-weight: 500; }
+    .nav__links a:hover { color: var(--coral); }
+    .nav .btn { margin-left: auto; }
+    @media (max-width: 760px) { .nav__links { display: none; } }
+
+    /* hero */
+    .hero {
+      background: var(--green);
+      color: var(--cream);
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+      padding: clamp(4rem, 9vw, 7rem) var(--pad);
+      border-radius: 0 0 28px 28px;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 380;
+      font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+      line-height: 1.06;
+      letter-spacing: -0.015em;
+      color: #eef3d8;
+    }
+    .hero h1 em { color: var(--chartreuse); font-weight: 420; }
+    .hero p.lead {
+      margin: 1.6rem 0 2.2rem;
+      max-width: 44ch;
+      color: rgba(238, 243, 216, 0.82);
+      font-size: 1.05rem;
+    }
+    .hero__cta { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+    .hero__meta { margin-top: 2.8rem; display: flex; gap: 2.5rem; font-size: 0.85rem; color: rgba(238,243,216,0.65); }
+
+    .hero__collage {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .hero__collage figure {
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+    }
+    .hero__collage img { width: 100%; height: 100%; object-fit: cover; }
+    .hero__collage figure:nth-child(1) { aspect-ratio: 4/5; margin-top: 2.2rem; }
+    .hero__collage figure:nth-child(2) { aspect-ratio: 4/5; }
+    .hero__collage figure:nth-child(3) { aspect-ratio: 5/3.4; grid-column: 1 / 3; }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero__collage figure:nth-child(1) { margin-top: 0; }
+    }
+
+    /* trust strip */
+    .trust {
+      text-align: center;
+      padding: clamp(3.5rem, 8vw, 6rem) var(--pad) clamp(2.5rem, 6vw, 4rem);
+    }
+    .trust h2 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    }
+    .trust__badges {
+      margin-top: 2.5rem;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .badge {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      max-width: 200px;
+    }
+    .badge span { display: block; color: var(--ink-soft); font-weight: 400; font-size: 0.75rem; margin-top: 0.3rem; }
+
+    /* sections */
+    .section { padding: clamp(3.5rem, 8vw, 6.5rem) var(--pad); }
+    .section__kicker {
+      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--coral); margin-bottom: 1rem;
+    }
+    .section__title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(1.9rem, 3.8vw, 3rem);
+      line-height: 1.15;
+      max-width: 26ch;
+    }
+    .section__title.center { margin-inline: auto; text-align: center; }
+
+    /* pillars cards */
+    .cards {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 2.2rem 2rem;
+      display: flex; flex-direction: column; gap: 0.9rem;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(43, 58, 33, 0.1); }
+    .card h3 { font-family: var(--serif); font-weight: 480; font-size: 1.45rem; line-height: 1.2; }
+    .card p { color: var(--ink-soft); font-size: 0.97rem; }
+    .card .num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--chartreuse); color: var(--green-deep);
+      display: grid; place-items: center;
+      font-weight: 600; font-size: 0.85rem;
+    }
+
+    /* stats band */
+    .stats {
+      margin: 0 var(--pad);
+      background: var(--green);
+      color: var(--cream);
+      border-radius: 24px;
+      padding: clamp(2.5rem, 6vw, 4.5rem);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      text-align: center;
+    }
+    .stats .v { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 4.5rem); line-height: 1; color: var(--chartreuse); }
+    .stats .l { margin-top: 0.6rem; font-size: 0.9rem; color: rgba(238,243,216,0.75); }
+
+    /* quote */
+    .quote { text-align: center; max-width: 860px; margin-inline: auto; }
+    .quote blockquote {
+      font-family: var(--serif);
+      font-weight: 380;
+      font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+      line-height: 1.3;
+    }
+    .quote blockquote em { color: var(--coral); }
+    .quote__who { margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 1rem; }
+    .quote__who img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: top; }
+    .quote__who strong { display: block; font-size: 0.95rem; }
+    .quote__who span { font-size: 0.82rem; color: var(--ink-soft); }
+    .quote__who div { text-align: left; }
+
+    /* officers */
+    .officers {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 1.2rem;
+    }
+    .officer { text-align: center; }
+    .officer figure {
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 3/4;
+      margin-bottom: 0.8rem;
+      background: var(--line);
+    }
+    .officer img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .officer:hover img { transform: scale(1.04); }
+    .officer strong { font-size: 0.92rem; font-weight: 600; display: block; line-height: 1.3; }
+    .officer span { font-size: 0.78rem; color: var(--ink-soft); }
+
+    /* projects */
+    .projects {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .project {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .project:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(43,58,33,0.1); }
+    .project figure { aspect-ratio: 16/10; }
+    .project img { width: 100%; height: 100%; object-fit: cover; }
+    .project div { padding: 1.4rem 1.5rem 1.6rem; }
+    .project h3 { font-family: var(--serif); font-weight: 480; font-size: 1.25rem; line-height: 1.25; }
+    .project p { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.4rem; }
+
+    /* faq */
+    .faq { max-width: 780px; margin-inline: auto; }
+    .faq details {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-top: 0.8rem;
+      padding: 0 1.5rem;
+    }
+    .faq summary {
+      cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      padding: 1.15rem 0;
+      font-weight: 600; font-size: 0.98rem;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; font-family: var(--serif); font-size: 1.4rem; color: var(--coral); transition: transform 0.25s; }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { padding: 0 0 1.3rem; color: var(--ink-soft); font-size: 0.95rem; }
+
+    /* cta */
+    .cta {
+      margin: clamp(3rem, 8vw, 5rem) var(--pad);
+      background: var(--green);
+      border-radius: 24px;
+      color: var(--cream);
+      text-align: center;
+      padding: clamp(3.5rem, 8vw, 6rem) var(--pad);
+    }
+    .cta h2 {
+      font-family: var(--serif); font-weight: 380;
+      font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1;
+      color: #eef3d8;
+    }
+    .cta h2 em { color: var(--chartreuse); }
+    .cta p { max-width: 46ch; margin: 1.4rem auto 2.2rem; color: rgba(238,243,216,0.8); }
+
+    /* footer */
+    .footer {
+      background: var(--green-deep);
+      color: rgba(238,243,216,0.75);
+      padding: clamp(3rem, 7vw, 5rem) var(--pad) 2rem;
+      border-radius: 28px 28px 0 0;
+    }
+    .footer__logo { font-family: var(--serif); font-size: 1.9rem; color: var(--chartreuse); margin-bottom: 2.5rem; }
+    .footer__cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 2rem; padding-bottom: 2.5rem; }
+    .footer__cols strong { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 0.8rem; }
+    .footer__cols a { display: block; padding: 0.2rem 0; font-size: 0.9rem; }
+    .footer__cols a:hover { color: var(--chartreuse); }
+    .footer__base { border-top: 1px solid rgba(238,243,216,0.15); padding-top: 1.4rem; font-size: 0.8rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <img src="assets/img/logo.png" alt="JCI Roxas Halaran">
+    <div class="nav__links">
+      <a href="#about">About</a>
+      <a href="#leadership">Leadership</a>
+      <a href="#projects">Projects</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a class="btn btn--coral" href="#join">Become a Member</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <h1>Young active citizens creating <em>positive change</em></h1>
+      <p class="lead">
+        We are a Capiz-based JCI chapter — connecting members worldwide through shared
+        values and empowering them to create positive change and opportunities on a
+        global scale.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--chartreuse" href="#join">Become a Member</a>
+        <a class="btn btn--ghost" href="#about">See what we do</a>
+      </div>
+      <div class="hero__meta">
+        <span>Roxas City, Capiz, 5800</span>
+        <span>Available all around worldwide</span>
+      </div>
+    </div>
+    <div class="hero__collage">
+      <figure><img src="assets/img/president-lemuel-capa.jpg" alt="Lemuel J. Capa, chapter president"></figure>
+      <figure><img src="assets/img/award-section-man.jpg" alt="JCI Halaran member at an event"></figure>
+      <figure><img src="assets/img/project-friends-x-jci-roxas-halaran.jpg" alt="FRIENDS x JCI Roxas Halaran gathering"></figure>
+    </div>
+  </header>
+
+  <section class="trust">
+    <h2 class="serif">Recognized. Awarded. Community <em>certified</em>.</h2>
+    <div class="trust__badges">
+      <div class="badge">Top 5 Best LO Website<span>Temiong Awards · 2024</span></div>
+      <div class="badge">Top 5 Most Outstanding LO<span>Quardro Awards · 2024</span></div>
+      <div class="badge">Star Local President<span>Lemuel Capa · 2025</span></div>
+      <div class="badge">Star Local President<span>John Paul Sorongon · 2024</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <p class="section__kicker">What we do</p>
+    <h2 class="section__title">Three pillars, one mission — leadership that <em>serves</em></h2>
+    <div class="cards">
+      <div class="card">
+        <span class="num">01</span>
+        <h3>Leadership Development</h3>
+        <p>Training and hands-on activities to strengthen leadership skills — no prior experience required.</p>
+      </div>
+      <div class="card">
+        <span class="num">02</span>
+        <h3>Community Projects</h3>
+        <p>We organize local projects to address community needs, from youth programs to city-wide campaigns.</p>
+      </div>
+      <div class="card">
+        <span class="num">03</span>
+        <h3>Global Outreach</h3>
+        <p>We engage in global JCI initiatives to learn and share best practices with chapters worldwide.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div><div class="v">50+</div><div class="l">Initiated local projects</div></div>
+    <div><div class="v">25+</div><div class="l">Current active members</div></div>
+    <div><div class="v">2023</div><div class="l">Operating &amp; active since</div></div>
+  </div>
+
+  <section class="section quote" id="leadership">
+    <blockquote>
+      “Leadership is not a title, it’s a mission — <em>Lead</em> with purpose,
+      <em>Excel</em> with passion, <em>Motivate</em> with heart.”
+    </blockquote>
+    <div class="quote__who">
+      <img src="assets/img/president-lemuel-capa.jpg" alt="Lemuel J. Capa">
+      <div>
+        <strong>Lemuel J. Capa</strong>
+        <span>2025 Local Organization President</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <p class="section__kicker">The board</p>
+    <h2 class="section__title">The officers behind the <em>mission</em></h2>
+    <div class="officers">
+      <div class="officer"><figure><img src="assets/img/officer-mark-vincent-bernas.jpg" alt="Mark Vincent Bernas" loading="lazy"></figure><strong>Mark Vincent Bernas</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-john-moses-aposaga.jpg" alt="John Moses Aposaga" loading="lazy"></figure><strong>John Moses Aposaga</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-jaime-cortes-altavas.jpg" alt="Jaime Cortes Altavas" loading="lazy"></figure><strong>Jaime Cortes Altavas</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-gian-carlo-velado.jpg" alt="Gian Carlo Velado" loading="lazy"></figure><strong>Gian Carlo Velado</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-joshua-kenneth-anas.jpg" alt="Joshua Kenneth Anas" loading="lazy"></figure><strong>Joshua Kenneth Anas</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-elmer-jimenez-jr.jpg" alt="Elmer Jimenez Jr." loading="lazy"></figure><strong>Elmer Jimenez Jr.</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-miko-miguel-ramos.jpg" alt="Miko Miguel Ramos" loading="lazy"></figure><strong>Miko Miguel Ramos</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-christopher-bernas.jpg" alt="Christopher Bernas" loading="lazy"></figure><strong>Christopher Bernas</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-jasper-sayo.jpg" alt="Jasper Sayo" loading="lazy"></figure><strong>Jasper Sayo</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-eugenio-dalida-jr.jpg" alt="Eugenio Dalida Jr." loading="lazy"></figure><strong>Eugenio Dalida Jr.</strong><span>Officer</span></div>
+      <div class="officer"><figure><img src="assets/img/officer-raymark-bigcas.jpg" alt="Raymark Bigcas" loading="lazy"></figure><strong>Raymark Bigcas</strong><span>Officer</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="projects">
+    <p class="section__kicker">Recent projects</p>
+    <h2 class="section__title">What we’ve been <em>building</em> lately</h2>
+    <div class="projects">
+      <article class="project">
+        <figure><img src="assets/img/project-ironmen-awards-2025.jpg" alt="Ironmen Awards 2025" loading="lazy"></figure>
+        <div><h3>Ironmen Awards 2025</h3><p>July 08, 2025</p></div>
+      </article>
+      <article class="project">
+        <figure><img src="assets/img/project-be-a-friend-not-a-bully.jpg" alt="Be a Friend, Not a Bully" loading="lazy"></figure>
+        <div><h3>“Be a Friend, Not a Bully”</h3><p>July 04, 2025</p></div>
+      </article>
+      <article class="project">
+        <figure><img src="assets/img/project-friends-x-jci-roxas-halaran.jpg" alt="FRIENDS x JCI Roxas Halaran" loading="lazy"></figure>
+        <div><h3>FRIENDS x JCI Roxas Halaran</h3><p>June 07, 2025</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <h2 class="section__title center">Questions, <em>answered</em></h2>
+    <div class="faq">
+      <details><summary>What is JCI?</summary><p>JCI (Junior Chamber International) is a global organization of young active citizens committed to developing leadership skills and making positive change in communities.</p></details>
+      <details><summary>Who can join JCI?</summary><p>Membership is open to young people aged 18 to 40 who are interested in leadership, personal growth, and community service.</p></details>
+      <details><summary>How do I become a member?</summary><p>You can join by reaching out to our chapter through our contact page or attending one of our events to learn more about the application process.</p></details>
+      <details><summary>What are the benefits of joining JCI?</summary><p>Members gain access to leadership training, networking opportunities, community projects, and personal development programs.</p></details>
+      <details><summary>Is there a membership fee?</summary><p>Yes, there is an annual membership fee which helps fund chapter activities and programs. Please contact us for current rates.</p></details>
+      <details><summary>What projects does JCI organize?</summary><p>We organize a variety of projects including leadership seminars, community service initiatives, youth development programs, and international exchanges.</p></details>
+      <details><summary>How can I participate?</summary><p>Follow our website and social media pages for event announcements, or contact us directly to get involved.</p></details>
+      <details><summary>Can I join without leadership experience?</summary><p>Absolutely! JCI is designed to help members develop leadership skills, regardless of previous experience.</p></details>
+      <details><summary>How can businesses partner with JCI?</summary><p>Contact us through our partnership inquiry form or email to discuss collaboration opportunities.</p></details>
+    </div>
+  </section>
+
+  <section class="cta" id="join">
+    <h2>Ready to lead with <em>purpose?</em></h2>
+    <p>Open to young people aged 18–40 in Roxas City and beyond. No leadership experience required — that’s what we’re here for.</p>
+    <!-- TODO(client): replace with the chapter's real email / contact form -->
+    <a class="btn btn--chartreuse" href="mailto:hello@jcihalaran.org">Get in touch</a>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__logo">JCI Roxas Halaran</div>
+    <div class="footer__cols">
+      <div>
+        <strong>Chapter</strong>
+        <a href="#about">About</a>
+        <a href="#leadership">Leadership</a>
+        <a href="#projects">Projects</a>
+      </div>
+      <div>
+        <strong>Join</strong>
+        <a href="#join">Become a Member</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div>
+        <strong>Find us</strong>
+        <a href="#">Roxas City, Capiz, 5800<br>Philippines</a>
+      </div>
+    </div>
+    <div class="footer__base">
+      <span>© 2026 JCI Roxas Halaran. All rights reserved.</span>
+      <span>Part of JCI Philippines — the first nationally organized leadership development organization in Asia.</span>
+    </div>
+  </footer>
+
+</body>
+</html>
