@@ -31,13 +31,19 @@ describe("article import", () => {
     expect(() => parseArticleFile(file.replace("category: holidays\n", ""))).toThrow('"category"');
   });
 
-  it("adds a sanitized draft, marks the plan row drafting, and skips it on re-run", async () => {
-    expect(await importArticles(db, [parseArticleFile(file)])).toEqual({ added: ["rizal-day"], skipped: [] });
+  it("adds a sanitized draft, refreshes it while untouched, and never overwrites an officer's edit", async () => {
+    expect(await importArticles(db, [parseArticleFile(file)])).toEqual({ added: ["rizal-day"], refreshed: [], skipped: [] });
     const [a] = await db.select().from(articles).where(eq(articles.slug, "rizal-day"));
     expect(a).toMatchObject({ status: "draft", bodyHtml: "<p>José Rizal.</p>" });
     const [plan] = await db.select().from(seoPlan).where(eq(seoPlan.keyword, "rizal day"));
     expect(plan).toMatchObject({ status: "drafting", articleId: a.id });
-    expect(await importArticles(db, [parseArticleFile(file)])).toEqual({ added: [], skipped: ["rizal-day"] });
+    const edited = parseArticleFile(file.replace("<p>José Rizal.</p>", "<p>Updated.</p>"));
+    expect(await importArticles(db, [edited])).toEqual({ added: [], refreshed: ["rizal-day"], skipped: [] });
+    expect((await db.select().from(articles).where(eq(articles.id, a.id)))[0].bodyHtml).toBe("<p>Updated.</p>");
+
+    await db.update(articles).set({ bodyHtml: "<p>Officer edit.</p>", updatedBy: "user_1" }).where(eq(articles.id, a.id));
+    expect(await importArticles(db, [parseArticleFile(file)])).toEqual({ added: [], refreshed: [], skipped: ["rizal-day"] });
+    expect((await db.select().from(articles).where(eq(articles.id, a.id)))[0].bodyHtml).toBe("<p>Officer edit.</p>");
   });
 
   it("ships one publishable draft per planned keyword", () => {

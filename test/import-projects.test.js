@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { eq } from "drizzle-orm";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
-import { projects } from "@/db/schema.js";
+import { projects, projectMetrics } from "@/db/schema.js";
 import { parseProjectFile, importProjects } from "@/db/import-projects.js";
 
 const file = (slug, extra = "") => `---
@@ -26,6 +26,20 @@ describe("project import", () => {
   it("rejects bad dates and unknown pillars", () => {
     expect(() => parseProjectFile(file("x", "startDate: June 20\n").replace("startDate: 2026-06-20\n", ""))).toThrow("startDate");
     expect(() => parseProjectFile(file("x", "pillar: sports\n"))).toThrow("pillar");
+    expect(() => parseProjectFile(file("x", "location: 40.7, -74.0\n"))).toThrow("Philippines");
+    expect(() => parseProjectFile(file("x", "metrics: smiles=5\n"))).toThrow("smiles");
+  });
+
+  it("puts a project on the map with its metrics, keeping metrics already entered", async () => {
+    const extra = "location: 11.5853, 122.7511\nmetrics: people_reached=120, volunteers=15\n";
+    await importProjects(db, [parseProjectFile(file("oplan-kaagapay", extra))]);
+    const [p] = await db.select().from(projects).where(eq(projects.slug, "oplan-kaagapay"));
+    expect(p).toMatchObject({ lat: 11.5853, lng: 122.7511 });
+
+    await db.update(projectMetrics).set({ value: 150 }).where(eq(projectMetrics.metric, "people_reached"));
+    await importProjects(db, [parseProjectFile(file("oplan-kaagapay", extra.replace("15", "15, meals_served=300")))]);
+    const rows = await db.select().from(projectMetrics).where(eq(projectMetrics.projectId, p.id));
+    expect(Object.fromEntries(rows.map((r) => [r.metric, r.value]))).toEqual({ people_reached: 150, volunteers: 15, meals_served: 300 });
   });
 
   it("adds new projects and fills only empty fields on existing ones", async () => {

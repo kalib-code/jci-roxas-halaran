@@ -19,6 +19,6 @@ const parsed = await Promise.all(
   }),
 );
 
-const { added, skipped } = await importArticles(createDb(), parsed);
-console.log(`Added ${added.length} drafts, skipped ${skipped.length} existing.`);
+const { added, refreshed, skipped } = await importArticles(createDb(), parsed);
+console.log(`Added ${added.length} drafts, refreshed ${refreshed.length} untouched drafts, skipped ${skipped.length} edited or published.`);
 for (const slug of skipped) console.log(`  skipped ${slug}`);

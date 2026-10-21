@@ -25,40 +25,43 @@ export function parseFrontMatter(text, fields, required) {
 
 export const parseArticleFile = (text) => parseFrontMatter(text, FIELDS, REQUIRED);
 
-// Adds each article as a draft. Slugs that already exist are skipped, so
-// re-running never overwrites edits made in the admin. The matching SEO plan
-// row moves from "idea" to "drafting"; publishing in the admin does the rest.
+// Adds each article as a draft. A draft nobody has saved since the import is
+// refreshed from its file; anything an officer has touched (or published) is
+// skipped, so re-running never overwrites edits made in the admin. The matching
+// SEO plan row moves from "idea" to "drafting"; publishing in the admin does the rest.
 export async function importArticles(db, parsed, { now = new Date().toISOString() } = {}) {
   const projectIds = new Map(
     (await db.select({ id: projects.id, slug: projects.slug }).from(projects)).map((p) => [p.slug, p.id]),
   );
-  const result = { added: [], skipped: [] };
+  const result = { added: [], refreshed: [], skipped: [] };
 
   for (const a of parsed) {
-    const [taken] = await db.select({ id: articles.id }).from(articles).where(eq(articles.slug, a.slug));
+    if (a.project && !projectIds.has(a.project)) throw new Error(`${a.slug}: unknown project "${a.project}"`);
+    const values = {
+      title: a.title,
+      metaDescription: a.metaDescription,
+      targetKeyword: a.targetKeyword,
+      category: a.category,
+      bodyHtml: cleanHtml(a.bodyHtml),
+      coverUrl: a.coverUrl || null,
+      coverAlt: a.coverAlt || null,
+      projectId: a.project ? projectIds.get(a.project) : null,
+      updatedAt: now,
+      updatedBy: "import",
+    };
+
+    const [taken] = await db.select().from(articles).where(eq(articles.slug, a.slug));
     if (taken) {
-      result.skipped.push(a.slug);
+      if (taken.status === "draft" && taken.updatedBy === "import") {
+        await db.update(articles).set(values).where(eq(articles.id, taken.id));
+        result.refreshed.push(a.slug);
+      } else {
+        result.skipped.push(a.slug);
+      }
       continue;
     }
-    if (a.project && !projectIds.has(a.project)) throw new Error(`${a.slug}: unknown project "${a.project}"`);
 
-    const [row] = await db
-      .insert(articles)
-      .values({
-        slug: a.slug,
-        title: a.title,
-        metaDescription: a.metaDescription,
-        targetKeyword: a.targetKeyword,
-        category: a.category,
-        bodyHtml: cleanHtml(a.bodyHtml),
-        coverUrl: a.coverUrl || null,
-        coverAlt: a.coverAlt || null,
-        projectId: a.project ? projectIds.get(a.project) : null,
-        status: "draft",
-        updatedAt: now,
-        updatedBy: "import",
-      })
-      .returning();
+    const [row] = await db.insert(articles).values({ slug: a.slug, status: "draft", ...values }).returning();
     await db
       .update(seoPlan)
       .set({ status: "drafting", articleId: row.id })
