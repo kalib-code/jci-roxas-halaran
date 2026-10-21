@@ -4,6 +4,7 @@ import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
 import ArticleCard from "@/components/ArticleCard.jsx";
 import EventRow from "@/components/EventRow.jsx";
+import HeroWaves from "@/components/HeroWaves.jsx";
 import CountUp from "@/components/CountUp.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
@@ -56,6 +57,7 @@ export default async function HomePage({ lang = "en" }) {
             </span>
           </div>
         </div>
+        <HeroWaves />
       </header>
 
       {stats.length > 0 && (
