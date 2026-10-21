@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { checkUpload } from "@/lib/uploads.js";
 
-export default function FileUpload({ accept, requireAlt = false, label, onUploaded }) {
+export default function FileUpload({ accept, requireAlt = false, label, onUploaded, handleUploadUrl = "/api/upload" }) {
   const id = useId();
   const [file, setFile] = useState(null);
   const [alt, setAlt] = useState("");
@@ -22,7 +22,7 @@ export default function FileUpload({ accept, requireAlt = false, label, onUpload
     setBusy(true);
     setError(null);
     try {
-      const blob = await upload(file.name, file, { access: "public", handleUploadUrl: "/api/upload" });
+      const blob = await upload(file.name, file, { access: "public", handleUploadUrl });
       onUploaded({ url: blob.url, alt: alt.trim(), name: file.name });
       setFile(null);
       setAlt("");

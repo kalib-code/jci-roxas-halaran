@@ -473,3 +473,17 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .campaign__qr { margin: 0; background: #fff; padding: 12px; }
 .campaign__how { margin-top: 16px; color: rgba(237, 232, 223, 0.8); white-space: pre-line; }
 @media (max-width: 760px) { .campaign__grid { grid-template-columns: 1fr; } .campaign__qr { max-width: 260px; } }
+
+/* ============================================================
+   Members area (Phase 4)
+   ============================================================ */
+.members-home { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; }
+.members-home section { margin-bottom: 28px; }
+@media (max-width: 760px) { .members-home { grid-template-columns: 1fr; } }
+.member-card figure { height: 300px; }
+.member-card__skills { font-size: 0.85rem; color: rgba(237, 232, 223, 0.7); }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge { border: 1px solid var(--ochre); color: var(--ochre); padding: 4px 10px; font-family: var(--font-space-grotesk), monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.passport__points strong { font-family: var(--font-syne), sans-serif; font-size: 3rem; color: var(--ochre); }
+.passport__timeline { list-style: none; padding: 0; margin: 0; }
+.passport__timeline li { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid rgba(237, 232, 223, 0.12); }
