@@ -110,3 +110,12 @@ describe("admin link control", () => {
     expect(r.member.clerkUserId).toBe("user_j");
   });
 });
+
+describe("directory card links", () => {
+  it("tells the directory which members have a published card", async () => {
+    const id = (await judy()).id;
+    await updateProfile(db, id, { profession: "Teacher", inDirectory: true, cardPublished: true, cardConsent: true });
+    const [row] = await listDirectory(db, { q: "teacher" });
+    expect(row).toMatchObject({ slug: "judy-daliva", cardPublished: true });
+  });
+});

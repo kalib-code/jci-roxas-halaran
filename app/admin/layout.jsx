@@ -3,7 +3,8 @@ import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { adminNav } from "@/lib/admin/nav.js";
 import { safeAdminCounts } from "@/lib/admin/counts.js";
-import AdminSidebar from "@/components/admin/AdminSidebar.jsx";
+import Link from "next/link";
+import SideNav from "@/components/SideNav.jsx";
 
 // Second gate behind middleware.js: the admin area never renders for
 // someone without an admin-area role, even if middleware is bypassed.
@@ -13,7 +14,10 @@ export default async function AdminLayout({ children }) {
   return (
     <ClerkProvider>
       <div className="admin-shell">
-        <AdminSidebar groups={adminNav(role, counts)} role={role} />
+        <SideNav groups={adminNav(role, counts)} ariaLabel="Admin">
+          <Link href="/">View site</Link>
+          <span>Signed in as {role}</span>
+        </SideNav>
         <div className="admin-main">{children}</div>
       </div>
     </ClerkProvider>

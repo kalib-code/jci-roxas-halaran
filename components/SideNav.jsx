@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isCurrent } from "@/lib/admin/nav.js";
 
-export default function AdminSidebar({ groups, role }) {
+// Grouped sidebar shared by the admin and members areas; children render in its footer.
+export default function SideNav({ groups, ariaLabel, children }) {
   const pathname = usePathname() ?? "";
   return (
-    <nav className="admin-side" aria-label="Admin">
+    <nav className="admin-side" aria-label={ariaLabel}>
       {groups.map((g) => (
         <div className="admin-side__group" key={g.label ?? "main"}>
           {g.label && <span className="admin-side__label">{g.label}</span>}
@@ -22,10 +23,7 @@ export default function AdminSidebar({ groups, role }) {
           })}
         </div>
       ))}
-      <div className="admin-side__foot">
-        <Link href="/">View site</Link>
-        <span>Signed in as {role}</span>
-      </div>
+      {children && <div className="admin-side__foot">{children}</div>}
     </nav>
   );
 }

@@ -19,6 +19,14 @@ export const members = sqliteTable("members", {
     .default("active"),
   inDirectory: integer("in_directory", { mode: "boolean" }).notNull().default(false),
   feePaidYear: integer("fee_paid_year"),
+  phone: text("phone"),
+  websiteUrl: text("website_url"),
+  facebookUrl: text("facebook_url"),
+  linkedinUrl: text("linkedin_url"),
+  instagramUrl: text("instagram_url"),
+  cardPublished: integer("card_published", { mode: "boolean" }).notNull().default(false),
+  cardShowPhone: integer("card_show_phone", { mode: "boolean" }).notNull().default(false),
+  cardShowEmail: integer("card_show_email", { mode: "boolean" }).notNull().default(true),
 });
 
 export const officerTerms = sqliteTable(

@@ -14,7 +14,7 @@ export default async function AdminMembers() {
       <h1>Members</h1>
       <p>A member's email links their sign-in account to this record on their first sign-in.</p>
       <table className="admin-table">
-        <thead><tr><th>Member</th><th>Email</th><th>Status</th><th>Directory</th><th></th></tr></thead>
+        <thead><tr><th>Member</th><th>Email</th><th>Status</th><th>Directory</th><th>Card</th><th></th></tr></thead>
         <tbody>{list.map((m) => <MemberRow key={m.id} member={m} />)}</tbody>
       </table>
     </div>
