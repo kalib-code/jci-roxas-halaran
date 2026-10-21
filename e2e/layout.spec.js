@@ -40,3 +40,12 @@ test("the admin sidebar sticks on desktop and leaves no gap on phones", async ({
   await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
   expect(Math.round((await page.locator(".admin-side").boundingBox()).y)).toBe(81);
 });
+
+test("members can reach Sign out on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.setContent(`<!doctype html><style>${css}</style><body><div class="wrap"><div class="admin-shell members-area">
+    <nav class="admin-side"><div class="admin-side__group"><a href="#">Home</a></div>
+      <div class="admin-side__foot"><a href="/">View site</a><button type="button" class="tool">Sign out</button></div></nav>
+    <div class="admin-main"><div class="admin"><h1>Welcome</h1></div></div></div></div></body>`);
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+});

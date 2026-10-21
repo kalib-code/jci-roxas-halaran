@@ -91,3 +91,11 @@ describe("qr helpers", () => {
     expect(originFrom(new Map([["x-forwarded-host", "jci.ph"], ["x-forwarded-proto", "https"], ["host", "internal"]]))).toBe("https://jci.ph");
   });
 });
+
+describe("vcard line safety", () => {
+  it("escapes a bare carriage return so it can't start a new property", () => {
+    const text = vcard(cardView({ ...base, business: "Studio\rTEL:+14155550100" }, []), "https://site.ph/card/ana-cruz");
+    expect(text.split(/\r\n|\r|\n/).some((l) => l.startsWith("TEL"))).toBe(false);
+    expect(text).toContain("ORG:Studio\\nTEL:+14155550100");
+  });
+});

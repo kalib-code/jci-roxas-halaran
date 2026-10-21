@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import FileUpload from "@/components/admin/FileUpload.jsx";
 import ECard from "@/components/members/ECard.jsx";
-import { cardView } from "@/lib/members/card-view.js";
+import { cardView, cardIsPublic } from "@/lib/members/card-view.js";
 import { normalizePhone } from "@/lib/members/card.js";
 import { updateProfileAction } from "@/app/members/actions.js";
 
@@ -75,7 +75,7 @@ export default function ProfileForm({ member, positions = [] }) {
       </form>
       <aside className="profile-editor__preview" aria-label="Card preview">
         <span className="label">Live preview</span>
-        <ECard card={card} />
+        <ECard card={card} live={cardIsPublic(member)} />
       </aside>
     </div>
   );

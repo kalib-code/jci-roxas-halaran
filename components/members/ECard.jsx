@@ -3,7 +3,8 @@ import { SITE } from "@/lib/site.js";
 import { initials } from "@/lib/format.js";
 
 // One card design for the public page, the member's own card page and the live editor preview.
-export default function ECard({ card, qrSvg = null, nameAs = "p" }) {
+// `live` is false for an unpublished card: its vCard link would 404, so Save contact is shown as text.
+export default function ECard({ card, qrSvg = null, nameAs = "p", live = true }) {
   const Name = nameAs;
   return (
     <article className="ecard" aria-label={`${card.name}, e-calling card`}>
@@ -24,7 +25,7 @@ export default function ECard({ card, qrSvg = null, nameAs = "p" }) {
         {card.phone && <a href={`tel:${card.phone}`}>Call</a>}
         {card.phone && <a href={`sms:${card.phone}`}>Text</a>}
         {card.email && <a href={`mailto:${card.email}`}>Email</a>}
-        <a className="ecard__save" href={`/card/${card.slug}/vcard`}>Save contact</a>
+        {live ? <a className="ecard__save" href={`/card/${card.slug}/vcard`}>Save contact</a> : <span className="ecard__save">Save contact</span>}
       </nav>
       {card.links.length > 0 && (
         <ul className="ecard__links">
