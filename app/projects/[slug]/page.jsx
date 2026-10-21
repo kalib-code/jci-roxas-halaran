@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ArticleCard from "@/components/ArticleCard.jsx";
+import { SafeHtml } from "@/components/SafeHtml.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -50,7 +51,7 @@ export default async function ProjectPage({ params }) {
         </figure>
       )}
       <section className="section">
-        {project.body ? <div className="article-body" dangerouslySetInnerHTML={{ __html: project.body }} /> : <p>The full story of this project is coming soon.</p>}
+        {project.body ? <SafeHtml className="article-body" html={project.body} /> : <p>The full story of this project is coming soon.</p>}
       </section>
       {project.photos.length > 0 && (
         <section className="section">

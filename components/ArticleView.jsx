@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ArticleCard from "@/components/ArticleCard.jsx";
+import { SafeHtml } from "@/components/SafeHtml.jsx";
 import { formatDate } from "@/lib/format.js";
 import { CATEGORY_LABELS } from "@/lib/content/validation.js";
 
@@ -21,7 +22,7 @@ export default function ArticleView({ article, related, project }) {
         </figure>
       )}
       <div className="section">
-        <div className="article-body" dangerouslySetInnerHTML={{ __html: article.bodyHtml ?? "" }} />
+        <SafeHtml className="article-body" html={article.bodyHtml} />
         {project && (
           <p className="article__project">Part of our project <Link href={`/projects/${project.slug}`}>{project.title}</Link>.</p>
         )}
