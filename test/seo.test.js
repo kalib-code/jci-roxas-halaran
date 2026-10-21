@@ -111,3 +111,11 @@ describe("buildSitemap with events", () => {
     expect(entries[0].url).toBe(`${SITE.url}/events/ga`);
   });
 });
+
+describe("pageMetadata languages", () => {
+  it("adds hreflang alternates and a locale when given", () => {
+    const m = pageMetadata({ title: "Mangin miyembro", description: "d", path: "/hil/join", languages: { en: "/join", hil: "/hil/join" }, locale: "hil_PH" });
+    expect(m.alternates).toEqual({ canonical: "/hil/join", languages: { en: "/join", hil: "/hil/join" } });
+    expect(m.openGraph.locale).toBe("hil_PH");
+  });
+});
