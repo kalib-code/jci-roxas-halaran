@@ -22,6 +22,13 @@
       "when": 1792557143493,
       "tag": "0002_engagement",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792558238470,
+      "tag": "0003_rejected_payments_free_reference",
+      "breakpoints": true
     }
   ]
 }

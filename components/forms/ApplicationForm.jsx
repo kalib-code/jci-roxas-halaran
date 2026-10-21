@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import Turnstile from "./Turnstile.jsx";
+import { useEffect, useState } from "react";
+import Turnstile, { turnstileEnabled } from "./Turnstile.jsx";
 import FormStatus from "./FormStatus.jsx";
 import { useSubmit } from "./useSubmit.js";
 import { applyAction } from "@/app/actions/engagement.js";
@@ -12,6 +12,10 @@ export default function ApplicationForm() {
   const [form, setForm] = useState(EMPTY);
   const [token, setToken] = useState("");
   const { submit, pending, result } = useSubmit(applyAction);
+  const [resetKey, setResetKey] = useState(0);
+  // The server used up the token; get a fresh one so a retry can pass.
+  useEffect(() => { if (result && !result.ok) setResetKey((k) => k + 1); }, [result]);
+  const waitingForCheck = turnstileEnabled() && !token;
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
 
   if (result?.ok) return <p className="form-ok" role="status">{result.message}</p>;
@@ -25,9 +29,9 @@ export default function ApplicationForm() {
       <div className="field"><label htmlFor="ap-why">Why do you want to join?</label><textarea id="ap-why" rows={4} value={form.whyJoin} onChange={set("whyJoin")} /></div>
       <div className="field"><label htmlFor="ap-ref">Referred by (optional)</label><input id="ap-ref" value={form.referredBy} onChange={set("referredBy")} /></div>
       <label className="consent"><input type="checkbox" checked={form.consent} onChange={set("consent")} required /> I agree that JCI Roxas Halaran may use these details to process my application, under the Data Privacy Act of 2012.</label>
-      <Turnstile onToken={setToken} />
+      <Turnstile onToken={setToken} resetKey={resetKey} />
       <FormStatus result={result} />
-      <button className="btn" type="submit" disabled={pending}>{pending ? "Sending…" : "Apply"}</button>
+      <button className="btn" type="submit" disabled={pending || waitingForCheck}>{pending ? "Sending…" : "Apply"}</button>
     </form>
   );
 }

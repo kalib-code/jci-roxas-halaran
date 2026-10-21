@@ -4,11 +4,15 @@ import { seed } from "@/db/seed.js";
 import { submitApplication } from "@/lib/engagement/applications.js";
 import { saveCampaign, submitPledge } from "@/lib/engagement/money.js";
 
-const h = vi.hoisted(() => ({ db: null, claims: null, revalidated: [], invites: [] }));
+const h = vi.hoisted(() => ({ db: null, claims: null, revalidated: [], invites: [], existing: null, metadataUpdates: [] }));
 vi.mock("@clerk/nextjs/server", () => ({
   auth: async () => ({ userId: h.claims ? "user_admin" : null, sessionClaims: h.claims }),
   clerkClient: async () => ({
-    users: { getUser: async () => ({ publicMetadata: {} }) },
+    users: {
+      getUser: async () => ({ publicMetadata: {} }),
+      getUserList: async () => ({ data: h.existing ? [h.existing] : [], totalCount: h.existing ? 1 : 0 }),
+      updateUserMetadata: async (id, m) => { h.metadataUpdates.push([id, m]); return {}; },
+    },
     invitations: { createInvitation: async (p) => { h.invites.push(p); return {}; } },
   }),
 }));
@@ -24,6 +28,8 @@ beforeEach(async () => {
   await seed(h.db);
   h.revalidated = [];
   h.invites = [];
+  h.existing = null;
+  h.metadataUpdates = [];
 });
 
 describe("admin engagement actions", () => {
@@ -46,5 +52,23 @@ describe("admin engagement actions", () => {
     const { payment } = await submitPledge(h.db, { campaignId: campaign.id, payerName: "Ana Cruz", payerEmail: "a@x.ph", amountPesos: 100, method: "gcash", referenceNo: "REF00001", consent: true });
     expect((await confirmPaymentAction(payment.id)).ok).toBe(true);
     expect(h.revalidated).toEqual(expect.arrayContaining(["/support", "/"]));
+  });
+
+  it("give an existing Clerk account the member role instead of inviting it", async () => {
+    h.claims = { metadata: { role: "admin" } };
+    h.existing = { id: "user_existing", publicMetadata: {} };
+    const { application } = await submitApplication(h.db, { name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
+    const r = await approveApplicationAction(application.id);
+    expect(r).toMatchObject({ ok: true, invited: false, linkedAccount: true });
+    expect(h.invites).toEqual([]);
+    expect(h.metadataUpdates).toEqual([["user_existing", { publicMetadata: { role: "member" } }]]);
+  });
+
+  it("never downgrade an existing account that already has a role", async () => {
+    h.claims = { metadata: { role: "admin" } };
+    h.existing = { id: "user_admin2", publicMetadata: { role: "admin" } };
+    const { application } = await submitApplication(h.db, { name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
+    await approveApplicationAction(application.id);
+    expect(h.metadataUpdates).toEqual([]);
   });
 });

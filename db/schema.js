@@ -244,7 +244,8 @@ export const payments = sqliteTable(
     note: text("note"),
     createdAt: text("created_at").notNull(),
   },
-  (t) => [uniqueIndex("payments_method_reference").on(t.method, t.referenceNo)],
+  // A rejected pledge frees its reference so the payer can resubmit a corrected one.
+  (t) => [uniqueIndex("payments_method_reference").on(t.method, t.referenceNo).where(sql`status <> 'rejected'`)],
 );
 
 export const expenses = sqliteTable("expenses", {

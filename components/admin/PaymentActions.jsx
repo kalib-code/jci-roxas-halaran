@@ -13,6 +13,10 @@ export default function PaymentActions({ id }) {
     try {
       const r = await fn();
       if (!r.ok) { setMessage(r.errors.join(" ")); return; }
+      if (r.type === "membership_fee" && !r.linkedMember) {
+        setMessage("Confirmed — but no member has this email, so the fee wasn't recorded on a member. Update the member's email, then record it again.");
+        return;
+      }
       router.refresh();
     } catch (e) {
       setMessage(`Couldn't save (${e.message}).`);

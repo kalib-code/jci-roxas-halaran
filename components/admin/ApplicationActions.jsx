@@ -14,7 +14,15 @@ export default function ApplicationActions({ id }) {
     try {
       const r = await fn();
       if (!r.ok) { setMessage(r.errors.join(" ")); return; }
-      setMessage(r.inviteError ? `Approved — the invitation email failed (${r.inviteError}); resend it from Clerk.` : r.invited ? "Approved — invitation sent." : "Done.");
+      setMessage(
+        r.inviteError
+          ? `Approved — the invitation email failed (${r.inviteError}); resend it from Clerk.`
+          : r.linkedAccount
+            ? "Approved — they already had an account, so it now has member access."
+            : r.invited
+              ? "Approved — invitation sent."
+              : "Done.",
+      );
       router.refresh();
     } catch (e) {
       setMessage(`Couldn't save (${e.message}).`);

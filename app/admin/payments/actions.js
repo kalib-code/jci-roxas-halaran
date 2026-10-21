@@ -16,7 +16,7 @@ export async function confirmPaymentAction(id) {
   const { userId } = await requireArea("content");
   const r = await confirmPayment(getDb(), id, { userId });
   if (r.ok) refreshMoney();
-  return r;
+  return r.ok ? { ok: true, type: r.payment.type, linkedMember: r.linkedMember } : r;
 }
 
 export async function rejectPaymentAction(id, note) {
