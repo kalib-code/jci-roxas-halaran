@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 // pinhole projection squeezes far rows toward the horizon.
 const Z_NEAR = 1;
 const Z_FAR = 5.5;
-const HORIZON = 0.42; // horizon line, as a share of the canvas height
+const HORIZON = 0.22; // horizon line, as a share of the canvas height
 const FPS = 30;
 
 // Swells: k = how tight across the grid, speed = radians per second, amp = lift.
@@ -59,7 +59,7 @@ export default function HeroSea() {
         const z = Z_FAR - (Z_FAR - Z_NEAR) * (r / (rows - 1));
         const scale = focal / z;
         const span = (w / 2 + near) / scale;
-        const fade = Math.min(1, ((Z_FAR - z) / 2.2) ** 2); // fade in softly from the horizon
+        const fade = Math.min(1, ((Z_FAR - z) / 1.4) ** 2); // fade in softly from the horizon
         const dot = Math.max(0.7, 2.4 * Z_NEAR / z);
         for (let c = -Math.ceil(span / dx); c * dx <= span; c++) {
           const x = (c + jitter(r, c) * 0.8) * dx;
