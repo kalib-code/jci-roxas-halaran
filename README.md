@@ -38,8 +38,20 @@ The seed (`npm run db:seed`) only inserts missing rows; it never overwrites edit
 
 ## Deploy
 
-Vercel builds on every push. Environment variables are listed in `.env.example`.
-Old Webflow URLs redirect permanently (see `lib/redirects.js`).
+Vercel builds on every push. Old Webflow URLs redirect permanently (see `lib/redirects.js`).
+
+Checklist before the first deploy (and for any new environment):
+
+1. **Clerk session token.** In the Clerk dashboard → Sessions → Customize session token, set
+   `{ "metadata": "{{user.public_metadata}}" }`. Without it every officer and admin gets a 404 at `/admin`.
+   Give users their role in public metadata, e.g. `{ "role": "admin" }`.
+2. **Turso schema and content first.** Pages are pre-rendered from the database during `next build`, so
+   run `npm run db:migrate && npm run db:seed` against the production database before the first build
+   (the build does not migrate). The Turso URL must start with `libsql://`.
+3. **Vercel environment variables** (Production and Preview; they are also used at build time):
+   `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`,
+   `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`, and optionally `NEXT_PUBLIC_GA_ID`.
+   Preview deployments read the same database as production unless you give Preview its own Turso URL.
 
 ## Design archive (`static/`)
 
