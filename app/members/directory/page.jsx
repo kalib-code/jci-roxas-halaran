@@ -19,7 +19,7 @@ export default async function Directory({ searchParams }) {
         <button className="btn" type="submit">Search</button>
       </form>
       <p>{list.length} member{list.length === 1 ? "" : "s"}{q ? ` matching “${q}”` : ""}. Only members who opted in are listed.</p>
-      <div className="officers">{list.map((m) => <MemberCard key={m.id} member={m} />)}</div>
+      <div className="mdir">{list.map((m) => <MemberCard key={m.id} member={m} />)}</div>
     </>
   );
 }

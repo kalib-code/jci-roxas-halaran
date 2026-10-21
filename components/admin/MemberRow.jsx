@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateMemberAction } from "@/app/admin/members/actions.js";
+import { cardIsPublic } from "@/lib/members/card-view.js";
 
 export default function MemberRow({ member }) {
   const [form, setForm] = useState({ email: member.email ?? "", status: member.status, inDirectory: member.inDirectory });
@@ -26,6 +27,7 @@ export default function MemberRow({ member }) {
         </select>
       </td>
       <td><input aria-label={`${member.name} in directory`} type="checkbox" checked={form.inDirectory} onChange={set("inDirectory")} /></td>
+      <td>{cardIsPublic(member) ? <a href={`/card/${member.slug}`} target="_blank" rel="noreferrer">View</a> : "—"}</td>
       <td><button type="button" className="tool" disabled={pending} onClick={() => save()}>Save</button> {message && <span role="status">{message}</span>}</td>
     </tr>
   );

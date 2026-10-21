@@ -1,21 +1,24 @@
 import Image from "next/image";
+import Link from "next/link";
 import { initials } from "@/lib/format.js";
 
 export default function MemberCard({ member }) {
+  const skills = (member.skills ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 4);
   return (
-    <div className="officer member-card">
-      <figure>
+    <article className="mtile">
+      <div className="mtile__photo">
         {member.photoUrl ? (
-          <Image src={member.photoUrl} alt={member.name} fill sizes="(max-width: 560px) 100vw, 25vw" style={{ objectFit: "cover", objectPosition: "top" }} />
+          <Image src={member.photoUrl} alt={member.name} fill sizes="72px" style={{ objectFit: "cover", objectPosition: "top" }} />
         ) : (
-          <div className="initials" aria-hidden="true">{initials(member.name)}</div>
+          <span aria-hidden="true">{initials(member.name)}</span>
         )}
-      </figure>
-      <div className="officer__meta">
-        <span className="name">{member.name}</span>
-        {(member.profession || member.business) && <span className="role">{[member.profession, member.business].filter(Boolean).join(" · ")}</span>}
-        {member.skills && <span className="member-card__skills">{member.skills}</span>}
       </div>
-    </div>
+      <div className="mtile__body">
+        <h3 className="mtile__name">{member.name}</h3>
+        {(member.profession || member.business) && <p className="mtile__work">{[member.profession, member.business].filter(Boolean).join(" · ")}</p>}
+        {skills.length > 0 && <ul className="mtile__skills">{skills.map((s) => <li key={s}>{s}</li>)}</ul>}
+        {member.cardPublished && <Link className="mtile__card" href={`/card/${member.slug}`} aria-label={`View ${member.name}'s card`}>View card</Link>}
+      </div>
+    </article>
   );
 }

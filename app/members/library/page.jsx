@@ -19,12 +19,13 @@ export default async function Library() {
       {kinds.map((k) => (
         <section key={k}>
           <h2 className="syne">{KIND_LABELS[k]}</h2>
-          <div className="list-rows">
+          <div className="mlib">
             {list.filter((r) => r.kind === k).map((r) => (
-              <div key={r.id}>
-                <span><span className="t">{r.title}</span>{r.description && <><br />{r.description}</>}</span>
-                {safeHttpsUrl(r.fileUrl) && <a className="btn" href={safeHttpsUrl(r.fileUrl)} target="_blank" rel="noreferrer">Open</a>}
-              </div>
+              <article key={r.id} className="dash-card mlib__item">
+                <span className="dash-card__title">{r.title}</span>
+                {r.description && <span className="dash-card__text">{r.description}</span>}
+                {safeHttpsUrl(r.fileUrl) && <a className="tool" href={safeHttpsUrl(r.fileUrl)} target="_blank" rel="noreferrer">Open</a>}
+              </article>
             ))}
           </div>
         </section>

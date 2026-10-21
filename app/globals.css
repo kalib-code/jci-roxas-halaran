@@ -636,3 +636,26 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .mycard { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 40px; align-items: start; }
 .mycard__side { display: flex; flex-direction: column; gap: 14px; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .mhome, .mycard { grid-template-columns: 1fr; } }
+.passport-badge { display: inline-block; padding: 6px 12px; border: 1px solid var(--ochre); background: rgba(229, 168, 35, 0.08); color: var(--ochre); font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.passport-head { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+.passport__timeline li { display: grid; grid-template-columns: 140px minmax(0, 1fr) auto; align-items: baseline; gap: 16px; }
+.passport__timeline .t { color: var(--dune); overflow-wrap: anywhere; }
+.passport__timeline .y { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; color: var(--ochre); white-space: nowrap; }
+.kind { justify-self: start; padding: 2px 8px; border-radius: 999px; font-family: var(--font-space-grotesk), monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(237, 232, 223, 0.08); color: rgba(237, 232, 223, 0.8); }
+.kind--training { background: rgba(58, 107, 79, 0.35); color: #a9d6b5; }
+.kind--project_led, .kind--award { background: rgba(229, 168, 35, 0.16); color: var(--ochre); }
+.kind--position { background: rgba(237, 232, 223, 0.14); color: var(--dune); }
+.mdir { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.mtile { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; padding: 18px; background: rgba(237, 232, 223, 0.04); border: 1px solid rgba(237, 232, 223, 0.08); }
+.mtile__photo { position: relative; display: grid; place-items: center; width: 72px; height: 72px; overflow: hidden; border-radius: 50%; background: var(--canopy); font-family: var(--font-syne), sans-serif; font-size: 1.3rem; color: var(--dune); }
+.mtile__body { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.mtile__name { margin: 0; font-family: var(--font-syne), sans-serif; font-size: 1.05rem; color: var(--dune); overflow-wrap: anywhere; }
+.mtile__work { margin: 0; font-size: 0.9rem; color: rgba(237, 232, 223, 0.75); overflow-wrap: anywhere; }
+.mtile__skills { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.mtile__skills li { padding: 2px 8px; border-radius: 999px; background: rgba(237, 232, 223, 0.08); font-size: 0.78rem; color: rgba(237, 232, 223, 0.8); }
+.mtile__card { font-size: 0.85rem; }
+.mevents { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.mevent__status { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; }
+.mlib { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.mlib__item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+@media (max-width: 600px) { .passport__timeline li { grid-template-columns: 1fr; gap: 4px; } }
