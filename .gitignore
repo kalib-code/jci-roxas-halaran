@@ -12,3 +12,6 @@ dist/
 test-results/
 playwright-report/
 .next-*/
+
+# clerk configuration (can include secrets)
+/.clerk/
