@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { testDb } from "./helpers/db.js";
-import { members, officerTerms, projects, faqs, articles, seoPlan, applications, rsvps, payments, events } from "@/db/schema.js";
+import { members, officerTerms, projects, faqs, articles, seoPlan, applications, rsvps, payments, events, passportEntries } from "@/db/schema.js";
 
 describe("schema", () => {
   it("stores and reads a member with defaults", async () => {
@@ -77,5 +77,15 @@ describe("schema", () => {
     await db.insert(payments).values(p);
     await expect(db.insert(payments).values(p)).rejects.toThrow();
     await db.insert(payments).values({ ...p, method: "maya" });
+  });
+
+  it("allows one passport entry per source record", async () => {
+    const db = await testDb();
+    const [m] = await db.insert(members).values({ slug: "x", name: "X" }).returning();
+    const e = { memberId: m.id, kind: "project_joined", title: "GA", date: "2026-11-01", points: 1, refTable: "rsvps", refId: 7, status: "verified", createdAt: "x", updatedAt: "x" };
+    await db.insert(passportEntries).values(e);
+    await expect(db.insert(passportEntries).values(e)).rejects.toThrow();
+    await db.insert(passportEntries).values({ ...e, refTable: null, refId: null });
+    await db.insert(passportEntries).values({ ...e, refTable: null, refId: null });
   });
 });

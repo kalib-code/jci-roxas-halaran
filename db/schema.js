@@ -270,3 +270,24 @@ export const eventsLog = sqliteTable("events_log", {
   meta: text("meta"),
   createdAt: text("created_at").notNull(),
 });
+
+export const passportEntries = sqliteTable(
+  "passport_entries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    memberId: integer("member_id").notNull().references(() => members.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: ["training", "project_led", "project_joined", "award", "position"] }).notNull(),
+    title: text("title").notNull(),
+    date: text("date").notNull(),
+    points: integer("points").notNull(),
+    note: text("note"),
+    refTable: text("ref_table"),
+    refId: integer("ref_id"),
+    status: text("status", { enum: ["requested", "verified", "declined"] }).notNull().default("requested"),
+    requestedBy: text("requested_by"),
+    verifiedBy: text("verified_by"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [uniqueIndex("passport_entries_ref").on(t.refTable, t.refId)],
+);
