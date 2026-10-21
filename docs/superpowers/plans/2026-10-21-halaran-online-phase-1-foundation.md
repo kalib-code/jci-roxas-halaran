@@ -1631,7 +1631,6 @@ export default function Nav() {
 ```jsx
 import Link from "next/link";
 import Image from "next/image";
-import Contours from "@/components/Contours.jsx";
 import { SITE } from "@/lib/site.js";
 
 export default function SiteFooter({ cta = true }) {
@@ -1639,7 +1638,6 @@ export default function SiteFooter({ cta = true }) {
     <footer className="cta-footer">
       {cta && (
         <div className="cta-footer__inner">
-          <Contours variant="join" />
           <Image src={SITE.logo} alt="" width={149} height={72} />
           <p className="cta-footer__title">Become a<br />member</p>
           <Link className="btn btn--lg" href="/join">Join JCI Roxas Halaran</Link>
