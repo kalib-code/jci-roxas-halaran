@@ -375,3 +375,9 @@ test.describe("e-calling card", () => {
     await expect(page).toHaveURL(/sign-in/);
   });
 });
+
+test("e-calling card page has no site menu", async ({ page }) => {
+  await page.goto("/card/lemuel-capa");
+  await expect(page.getByRole("heading", { level: 1, name: "Lemuel J. Capa" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(0);
+});
