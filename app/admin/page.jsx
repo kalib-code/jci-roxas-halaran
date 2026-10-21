@@ -1,11 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
-import { normalizeRole } from "@/lib/roles.js";
+import { roleFromSessionClaims } from "@/lib/roles.js";
 
 export const metadata = { title: "Admin", robots: { index: false } };
 
 export default async function Admin() {
   const { sessionClaims } = await auth();
-  const role = normalizeRole(sessionClaims?.metadata?.role);
+  const role = roleFromSessionClaims(sessionClaims);
   return (
     <header className="page-hero">
       <h1>Admin</h1>
