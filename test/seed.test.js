@@ -35,4 +35,20 @@ describe("seed", () => {
     const [row] = await db.select().from(projects).where(eq(projects.slug, "coastline-cuts"));
     expect(row.title).toBe("Coastline Cuts 2026");
   });
+
+  it("does not duplicate a row whose matching field was edited", async () => {
+    const db = await testDb();
+    await seed(db);
+    await db.update(faqs).set({ question: "What is JCI, exactly?" }).where(eq(faqs.question, "What is JCI?"));
+    await seed(db);
+    expect(await total(db, faqs)).toBe(9);
+  });
+
+  it("does not bring back rows deleted after the first run", async () => {
+    const db = await testDb();
+    await seed(db);
+    await db.delete(sponsors).where(eq(sponsors.name, "Spaces Studio"));
+    await seed(db);
+    expect(await total(db, sponsors)).toBe(3);
+  });
 });
