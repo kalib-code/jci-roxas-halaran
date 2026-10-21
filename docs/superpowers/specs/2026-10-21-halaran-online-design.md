@@ -68,7 +68,8 @@ Every feature below names the criterion it serves. Every countable user action i
 |---|---|
 | `/about-us` | `/about` |
 | `/our-officers` | `/officers` |
-| `/contact` | `/join#contact` |
+| `/contact` | `/join` (the page has an `id="contact"` section) |
+| `/leadership` | `/officers` (link from the vercel.app redesign) |
 | `/projects` | `/projects` (same) |
 
 The live Webflow site exposes only these five paths (checked 2026-10-21; its sitemap returns 404).
@@ -90,7 +91,7 @@ Clerk owns identity (login, email, role). Turso owns everything else, linked by 
 ### People
 
 - **applications**: id, name, email, phone, birthdate, barangay, why_join, referred_by, consent (bool), status (`pending`/`approved`/`declined`), reviewed_by, reviewed_at, created_at. One pending application per email.
-- **members**: id, clerk_user_id (unique, nullable until the invite is accepted), slug (unique), name, email, photo_url, profession, business, skills, bio, joined_at, status (`active`/`inactive`/`senator`/`alumni`), in_directory (bool, default false), fee_paid_year (int, nullable).
+- **members**: id, clerk_user_id (unique, nullable until the invite is accepted), slug (unique), name, email, photo_url, profession, business, skills, bio, quote, joined_at, status (`active`/`inactive`/`senator`/`alumni`), in_directory (bool, default false), fee_paid_year (int, nullable).
 - **officer_terms**: id, member_id, role, year, sort.
 
 ### Content
