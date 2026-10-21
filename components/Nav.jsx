@@ -12,6 +12,9 @@ export default function Nav() {
   const pathname = usePathname();
   const close = () => setOpen(false);
 
+  // E-calling cards are standalone pages, like a card handed over in person: no site menu.
+  if (pathname?.startsWith("/card/")) return null;
+
   return (
     <nav className="nav" aria-label="Main">
       <Link className="nav__logo" href="/" aria-label={`${SITE.name} — home`} onClick={close}>
