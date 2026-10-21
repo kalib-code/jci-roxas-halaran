@@ -170,3 +170,27 @@
   .progress span { animation: fill 1.2s var(--ease-out) 0.2s backwards; transform-origin: 0 50%; }
   @keyframes fill { from { transform: scaleX(0); } }
 }
+
+/* ---------- hero: sea rolling onto black sand ---------- */
+.hero { --waves-h: clamp(110px, 14vw, 200px); padding-bottom: calc(var(--waves-h) + 8px); }
+.waves { position: absolute; left: 0; right: 0; bottom: 0; height: var(--waves-h); overflow: hidden; pointer-events: none; }
+/* Twice the screen (never too narrow on phones), so a -50% slide loops seamlessly. */
+.waves__layer { position: absolute; left: 0; bottom: 0; width: max(200%, 1800px); height: 100%; }
+.waves__layer--far path { fill: var(--sage); opacity: 0.22; }
+.waves__layer--mid > path:first-of-type { fill: var(--canopy); opacity: 0.85; }
+.waves__layer--sand > path:first-of-type { fill: var(--basalt); }
+.waves__grain { -webkit-mask-image: linear-gradient(#000 20%, transparent 85%); mask-image: linear-gradient(#000 20%, transparent 85%); }
+.waves__crest { fill: none; stroke: var(--dune); stroke-width: 1.5; opacity: 0.14; vector-effect: non-scaling-stroke; }
+.waves__foam { fill: none; stroke: var(--dune); stroke-width: 2.5; opacity: 0.55; vector-effect: non-scaling-stroke; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .waves__layer--far { animation: swell 26s linear infinite; }
+  .waves__layer--mid { animation: swell 17s linear infinite reverse; }
+  .waves__layer--sand { animation: swell 12s linear infinite, wash 6s ease-in-out infinite alternate; }
+  /* Foam brightens as the wash comes in and fades as it pulls back. */
+  .waves__foam { animation: foam 6s ease-in-out infinite alternate; }
+  @keyframes swell { to { translate: -50% 0; } }
+  /* Only ever sinks, so the layers behind never peek out under the sand. */
+  @keyframes wash { from { transform: translateY(10px); } to { transform: none; } }
+  @keyframes foam { from { opacity: 0.25; } to { opacity: 0.7; } }
+}
