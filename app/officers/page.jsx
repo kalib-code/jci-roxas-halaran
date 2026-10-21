@@ -59,7 +59,7 @@ export default async function Officers() {
               {president.quote && <blockquote>“{president.quote}”</blockquote>}
               {(yearAwards.length > 0 || yearProjects > 0) && (
                 <div className="president__year">
-                  <span className="label">This year under his leadership</span>
+                  <span className="label">This year's highlights</span>
                   <ul>
                     {yearProjects > 0 && <li><strong>{yearProjects}</strong> projects completed in {board.year}</li>}
                     {yearAwards.map((a) => <li key={a.id}>{a.title} <span>· {a.awardedBy}</span></li>)}
