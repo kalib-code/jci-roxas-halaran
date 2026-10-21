@@ -618,3 +618,7 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .ecard__bio { margin: 0; line-height: 1.6; white-space: pre-line; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
 .ecard-page__foot { margin: 0; text-align: center; font-size: 0.85rem; color: rgba(237, 232, 223, 0.6); }
 .admin-side__foot .tool { align-self: flex-start; }
+.profile-editor { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: start; }
+.profile-editor__preview { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 12px; }
+.profile-editor h2 { margin: 16px 0 0; }
+@media (max-width: 900px) { .profile-editor { grid-template-columns: 1fr; } .profile-editor__preview { position: static; } }
