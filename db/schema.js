@@ -77,6 +77,22 @@ export const projectPhotos = sqliteTable("project_photos", {
   sort: integer("sort").notNull().default(0),
 });
 
+// Videos and audio shown on a project page. Only the link is stored; the embed
+// is rebuilt from it by lib/media.js.
+export const projectMedia = sqliteTable(
+  "project_media",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title").notNull(),
+    sort: integer("sort").notNull().default(0),
+  },
+  (t) => [uniqueIndex("project_media_project_url").on(t.projectId, t.url)],
+);
+
 export const faqs = sqliteTable("faqs", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   question: text("question").notNull().unique(),

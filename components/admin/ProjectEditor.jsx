@@ -6,6 +6,7 @@ import RichTextEditor from "./RichTextEditor.jsx";
 import FileUpload from "./FileUpload.jsx";
 import ProjectMetricsEditor from "./ProjectMetricsEditor.jsx";
 import { parseCoordinates } from "@/lib/proof/location.js";
+import ProjectMediaEditor from "./ProjectMediaEditor.jsx";
 import { saveProjectAction, addProjectPhotoAction, deleteProjectPhotoAction } from "@/app/admin/projects/actions.js";
 
 const fields = ["title", "summary", "startDate", "endDate", "barangay", "pillar", "status", "coverUrl", "coverAlt", "bodyJson", "bodyHtml", "lat", "lng"];
@@ -62,6 +63,7 @@ export default function ProjectEditor({ project, metrics = [] }) {
               if (r.ok) setPhotos((ps) => [...ps, r.photo]); else setErrors(r.errors);
             })} />
           </section>
+          <ProjectMediaEditor projectId={meta.id} slug={meta.slug} initial={project?.media ?? []} />
         </>)}
       </div>
       <aside className="editor__side">
