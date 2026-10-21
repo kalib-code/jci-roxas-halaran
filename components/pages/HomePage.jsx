@@ -3,7 +3,7 @@ import Image from "next/image";
 import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
 import ArticleCard from "@/components/ArticleCard.jsx";
-import EventCard from "@/components/EventCard.jsx";
+import EventRow from "@/components/EventRow.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -127,7 +127,7 @@ export default async function HomePage({ lang = "en" }) {
             <h2>{L("home.eventsTitle")}</h2>
             <span className="label">RSVP</span>
           </div>
-          <div className="projects">{events.upcoming.slice(0, 3).map((e) => <EventCard key={e.id} event={e} />)}</div>
+          <div className="agenda">{events.upcoming.slice(0, 3).map((e) => <EventRow key={e.id} event={e} />)}</div>
           <p className="section__more"><Link className="btn" href={pathFor(lang, "/events")}>{L("home.eventsMore")}</Link></p>
         </section>
       )}
