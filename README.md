@@ -52,6 +52,8 @@ Checklist before the first deploy (and for any new environment):
    `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`,
    `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`, and optionally `NEXT_PUBLIC_GA_ID`.
    Preview deployments read the same database as production unless you give Preview its own Turso URL.
+4. **Vercel Blob.** Create a Blob store in Vercel → Storage and connect it to the project, so
+   `BLOB_READ_WRITE_TOKEN` exists for Production and Preview. Admin image and file uploads need it.
 
 ## Design archive (`static/`)
 
