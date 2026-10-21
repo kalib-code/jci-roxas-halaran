@@ -4,7 +4,7 @@ import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
 import ArticleCard from "@/components/ArticleCard.jsx";
 import EventRow from "@/components/EventRow.jsx";
-import HeroWaves from "@/components/HeroWaves.jsx";
+import HeroSea from "@/components/HeroSea.jsx";
 import CountUp from "@/components/CountUp.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
@@ -43,7 +43,7 @@ export default async function HomePage({ lang = "en" }) {
       <JsonLd data={organizationLd()} />
 
       <header className="hero">
-        <Contours variant="hero" />
+        <HeroSea />
         <div className="hero__inner">
           <h1 className="hero__title">JCI Roxas<br />Halaran<em>.</em></h1>
           <p className="hero__statement">{L("home.statement")}</p>
@@ -57,7 +57,6 @@ export default async function HomePage({ lang = "en" }) {
             </span>
           </div>
         </div>
-        <HeroWaves />
       </header>
 
       {stats.length > 0 && (
