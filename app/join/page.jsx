@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FaqList from "@/components/FaqList.jsx";
+import ApplicationForm from "@/components/forms/ApplicationForm.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -24,6 +25,12 @@ export default async function Join() {
         <h1>Become a member</h1>
         <p>Join a worldwide network of young active citizens aged 18 to 40 creating positive change, starting right here in Roxas City.</p>
       </header>
+
+      <section id="apply" className="section">
+        <div className="section__bar"><h2>Apply online</h2><span className="label">Membership</span></div>
+        <p>Open to anyone aged 18 to 40. We'll review your application and contact you about orientation and dues.</p>
+        <ApplicationForm />
+      </section>
 
       <section id="contact" className="section">
         <div className="section__bar"><h2>Get in touch</h2><span className="label">Contact</span></div>

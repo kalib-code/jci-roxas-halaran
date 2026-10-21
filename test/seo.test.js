@@ -7,6 +7,7 @@ import {
   breadcrumbLd,
   buildSitemap,
   articleLd,
+  eventLd,
 } from "@/lib/seo.js";
 
 describe("pageMetadata", () => {
@@ -86,5 +87,27 @@ describe("articleLd", () => {
 
   it("credits a named member as a Person", () => {
     expect(articleLd({ ...article, authorName: "Judy Daliva" }).author).toEqual({ "@type": "Person", name: "Judy Daliva" });
+  });
+});
+
+describe("eventLd", () => {
+  it("describes an in-person event in Roxas City with PH times", () => {
+    const ld = eventLd({ slug: "ga", title: "General Assembly", description: "<p>Hi</p>", startAt: "2027-01-15T18:00", endAt: null, venue: "Capiz Gym", coverUrl: null });
+    expect(ld).toMatchObject({
+      "@type": "Event",
+      name: "General Assembly",
+      startDate: "2027-01-15T18:00:00+08:00",
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      location: { "@type": "Place", name: "Capiz Gym", address: { addressLocality: "Roxas City" } },
+      url: `${SITE.url}/events/ga`,
+      description: "Hi",
+    });
+  });
+});
+
+describe("buildSitemap with events", () => {
+  it("adds event pages", () => {
+    const entries = buildSitemap({ routes: [], events: [{ slug: "ga", updatedAt: "2026-11-01T00:00:00.000Z" }] });
+    expect(entries[0].url).toBe(`${SITE.url}/events/ga`);
   });
 });

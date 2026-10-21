@@ -458,3 +458,18 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .article-body img { width: 100%; height: auto; margin: 24px 0; }
 .article-body a { text-decoration: underline; }
 .article__project { margin-top: 32px; color: rgba(237, 232, 223, 0.7); }
+
+/* ============================================================
+   Engagement (Phase 3)
+   ============================================================ */
+.public-form { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; line-height: 1.5; color: rgba(237, 232, 223, 0.75); }
+.consent input { margin-top: 4px; }
+.progress-wrap { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.progress { height: 12px; background: rgba(237, 232, 223, 0.12); overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--ochre); }
+.progress__text { font-family: var(--font-space-grotesk), monospace; font-size: 0.85rem; letter-spacing: 0.06em; color: var(--dune); }
+.campaign__grid { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.campaign__qr { margin: 0; background: #fff; padding: 12px; }
+.campaign__how { margin-top: 16px; color: rgba(237, 232, 223, 0.8); white-space: pre-line; }
+@media (max-width: 760px) { .campaign__grid { grid-template-columns: 1fr; } .campaign__qr { max-width: 260px; } }

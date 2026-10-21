@@ -3,6 +3,8 @@ import Image from "next/image";
 import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
 import ArticleCard from "@/components/ArticleCard.jsx";
+import EventCard from "@/components/EventCard.jsx";
+import { listEvents } from "@/lib/engagement/events.js";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -21,10 +23,11 @@ export const metadata = pageMetadata({
 
 export default async function Home() {
   const db = getDb();
-  const [projects, awards, latest] = await Promise.all([
+  const [projects, awards, latest, events] = await Promise.all([
     listProjects(db, { limit: 3 }),
     listAwards(db),
     listPublishedArticles(db, { limit: 3 }),
+    listEvents(db),
   ]);
 
   return (
@@ -74,6 +77,17 @@ export default async function Home() {
         </div>
         <p className="section__more"><Link className="btn" href="/projects">See all projects</Link></p>
       </section>
+
+      {events.upcoming.length > 0 && (
+        <section className="section">
+          <div className="section__bar">
+            <h2>Upcoming events</h2>
+            <span className="label">RSVP</span>
+          </div>
+          <div className="projects">{events.upcoming.slice(0, 3).map((e) => <EventCard key={e.id} event={e} />)}</div>
+          <p className="section__more"><Link className="btn" href="/events">All events</Link></p>
+        </section>
+      )}
 
       {latest.length > 0 && (
         <section className="section">
