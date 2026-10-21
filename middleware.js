@@ -18,9 +18,8 @@ export default clerkMiddleware(async (auth, req) => {
   }
 });
 
+// Run Clerk only where sign-in matters. On every other route Clerk's
+// development "handshake" would redirect public visitors through Clerk.
 export const config = {
-  matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/admin/:path*", "/members/:path*", "/sign-in/:path*", "/api/:path*"],
 };

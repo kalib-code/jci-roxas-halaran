@@ -108,3 +108,17 @@ test("site heading styles do not leak into the Clerk sign-in card", async ({ pag
   expect(style.size).toBeLessThan(32);
   expect(style.transform).not.toBe("uppercase");
 });
+
+test.describe("public pages load no Clerk script", () => {
+  for (const path of STATIC_ROUTES) {
+    test(`${path}`, async ({ page }) => {
+      const clerk = [];
+      page.on("request", (req) => {
+        if (/clerk\.|accounts\.dev/.test(new URL(req.url()).hostname)) clerk.push(req.url());
+      });
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+      expect(clerk).toEqual([]);
+    });
+  }
+});

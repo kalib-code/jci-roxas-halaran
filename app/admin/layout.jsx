@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { canAccess, roleFromSessionClaims } from "@/lib/roles.js";
@@ -7,5 +8,5 @@ import { canAccess, roleFromSessionClaims } from "@/lib/roles.js";
 export default async function AdminLayout({ children }) {
   const { sessionClaims } = await auth();
   if (!canAccess(roleFromSessionClaims(sessionClaims), "admin")) notFound();
-  return children;
+  return <ClerkProvider>{children}</ClerkProvider>;
 }
