@@ -121,3 +121,45 @@ test.describe("public pages load no Clerk script", () => {
     });
   }
 });
+
+const ARTICLE = "/articles/bonifacio-day-history-and-meaning";
+
+test(`${ARTICLE} is indexable, has Article data and no clipping`, async ({ page }) => {
+  const res = await page.goto(ARTICLE);
+  expect(res.status()).toBe(200);
+  await expect(page.locator("h1")).toHaveCount(1);
+  const types = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent)["@type"]));
+  expect(types).toContain("Article");
+  await page.setViewportSize({ width: 375, height: 812 });
+  const overflow = await page.evaluate(() =>
+    [...document.querySelectorAll("h1, h2, p")].filter((el) => el.scrollWidth > el.clientWidth + 1).length,
+  );
+  expect(overflow).toBe(0);
+});
+
+test("draft articles are not public and not in the sitemap", async ({ page, request }) => {
+  const res = await page.goto("/articles/unfinished-draft");
+  expect(res.status()).toBe(404);
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain(ARTICLE);
+  expect(sitemap).not.toContain("unfinished-draft");
+});
+
+test("project cards open project pages", async ({ page }) => {
+  await page.goto("/projects");
+  await page.getByRole("link", { name: /Coastline Cuts/ }).click();
+  await expect(page).toHaveURL(/\/projects\/coastline-cuts$/);
+  await expect(page.locator("h1")).toHaveText("Coastline Cuts");
+});
+
+test("the article admin requires sign-in", async ({ page }) => {
+  await page.goto("/admin/articles");
+  await expect(page).toHaveURL(/sign-in/);
+});
+
+test("the upload route refuses signed-out callers", async ({ request }) => {
+  const res = await request.post("/api/upload", {
+    data: { type: "blob.generate-client-token", payload: { pathname: "a.jpg", callbackUrl: "http://localhost:3100/api/upload", clientPayload: null, multipart: false } },
+  });
+  expect(res.status()).toBe(403);
+});
