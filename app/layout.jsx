@@ -1,6 +1,7 @@
 import { Syne, Space_Grotesk, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import Nav from "@/components/Nav.jsx";
 import { SITE } from "@/lib/site.js";
 import "./globals.css";
@@ -29,15 +30,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${syne.variable} ${spaceGrotesk.variable} ${inter.variable}`}>
-      <body>
-        <div className="wrap">
-          <Nav />
-          {children}
-        </div>
-        <Analytics />
-        {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${syne.variable} ${spaceGrotesk.variable} ${inter.variable}`}>
+        <body>
+          <div className="wrap">
+            <Nav />
+            {children}
+          </div>
+          <Analytics />
+          {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

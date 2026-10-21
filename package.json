@@ -18,6 +18,7 @@
     "db:seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.39.8",
     "@libsql/client": "^0.15.15",
     "@next/third-parties": "^15.5.28",
     "@vercel/analytics": "^1.6.1",
