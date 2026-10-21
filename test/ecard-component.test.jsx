@@ -34,3 +34,11 @@ describe("ECard", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Ana Cruz" })).toBeTruthy();
   });
 });
+
+describe("ECard before publishing", () => {
+  it("shows Save contact as text, not a link that would 404", () => {
+    render(<ECard card={card} live={false} />);
+    expect(screen.queryByRole("link", { name: "Save contact" })).toBeNull();
+    expect(screen.getByText("Save contact")).toBeTruthy();
+  });
+});

@@ -27,7 +27,7 @@ export default async function MyCard() {
         </p>
       )}
       <div className="mycard">
-        <ECard card={card} qrSvg={live ? await qrSvg(url) : null} />
+        <ECard card={card} qrSvg={live ? await qrSvg(url) : null} live={live} />
         <div className="mycard__side">
           {live && <p>Your card is live at <a href={url}>{url}</a></p>}
           {live && <CardShare url={url} slug={member.slug} />}
