@@ -40,3 +40,10 @@ describe("roleFromSessionClaims", () => {
     expect(roleFromSessionClaims({ metadata: { role: "owner" } })).toBeNull();
   });
 });
+
+describe("content area", () => {
+  it("is admin-only", () => {
+    expect(canAccess("admin", "content")).toBe(true);
+    for (const r of ["member", "officer", "treasurer"]) expect(canAccess(r, "content")).toBe(false);
+  });
+});
