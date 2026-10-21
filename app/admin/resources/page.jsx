@@ -2,7 +2,6 @@ import { safeHttpsUrl } from "@/lib/safe.js";
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listResources } from "@/lib/content/resources.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import ResourceForm, { DeleteResourceButton } from "@/components/admin/ResourceForm.jsx";
 
 export const metadata = { title: "Resources — Admin", robots: { index: false } };
@@ -14,7 +13,6 @@ export default async function AdminResources() {
   return (
     <div className="admin">
       <h1>Resources</h1>
-      <AdminNav isAdmin />
       <ResourceForm />
       <table className="admin-table">
         <thead><tr><th>Title</th><th>Kind</th><th>Visibility</th><th></th></tr></thead>

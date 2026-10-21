@@ -7,7 +7,6 @@ import { listApplications } from "@/lib/engagement/applications.js";
 import { listPayments } from "@/lib/engagement/money.js";
 import { listEvents } from "@/lib/engagement/events.js";
 import { formatDateTime } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 
 export const metadata = { title: "Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -34,7 +33,6 @@ export default async function Admin() {
   return (
     <div className="admin">
       <h1>Admin</h1>
-      <AdminNav isAdmin={isAdmin} />
       <p>Signed in as <strong>{role}</strong>.{!isAdmin && " Only admins can edit content."}</p>
       {isAdmin && (
         <>

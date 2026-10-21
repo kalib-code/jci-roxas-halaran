@@ -2,7 +2,6 @@ import Link from "next/link";
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listPlan } from "@/lib/content/seoPlan.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import { addPlanKeywordAction, setPlanStatusAction } from "./actions.js";
 
 export const metadata = { title: "SEO plan — Admin", robots: { index: false } };
@@ -15,7 +14,6 @@ export default async function SeoPlan() {
   return (
     <div className="admin">
       <h1>SEO plan</h1>
-      <AdminNav isAdmin />
       <div className="plan">
         {months.map((m) => {
           const items = rows.filter((r) => r.month === m);

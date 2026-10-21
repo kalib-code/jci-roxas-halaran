@@ -3,7 +3,6 @@ import { getDb } from "@/lib/db.js";
 import { listPayments, listCampaigns } from "@/lib/engagement/money.js";
 import { formatDate, formatPesos } from "@/lib/format.js";
 import { safeHttpsUrl } from "@/lib/safe.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import PaymentActions from "@/components/admin/PaymentActions.jsx";
 
 export const metadata = { title: "Payments — Admin", robots: { index: false } };
@@ -37,7 +36,6 @@ export default async function AdminPayments() {
   return (
     <div className="admin">
       <h1>Payments</h1>
-      <AdminNav isAdmin />
       <p>Check each reference number in the GCash, Maya or bank app before confirming. Only confirmed payments count toward campaign goals.</p>
       <h2 className="syne">To confirm ({pending.length})</h2>
       {pending.length ? table(pending, true) : <p>Nothing to confirm.</p>}

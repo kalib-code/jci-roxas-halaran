@@ -4,7 +4,6 @@ import { getDb } from "@/lib/db.js";
 import { listProjects } from "@/lib/queries.js";
 import { listCampaigns, listExpenses } from "@/lib/engagement/money.js";
 import { formatDate, formatPesos } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import ExpenseForm from "@/components/admin/ExpenseForm.jsx";
 
 export const metadata = { title: "Expenses — Admin", robots: { index: false } };
@@ -18,7 +17,6 @@ export default async function AdminExpenses() {
   return (
     <div className="admin">
       <h1>Expenses</h1>
-      <AdminNav isAdmin />
       <ExpenseForm projects={projects} campaigns={campaigns} />
       <p>Total recorded: {formatPesos(total)}</p>
       <table className="admin-table">

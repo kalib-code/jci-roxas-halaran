@@ -4,7 +4,6 @@ import { getDb } from "@/lib/db.js";
 import { listProjects } from "@/lib/queries.js";
 import { listCampaigns } from "@/lib/engagement/money.js";
 import { formatPesos } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import CampaignForm from "@/components/admin/CampaignForm.jsx";
 
 export const metadata = { title: "Campaigns — Admin", robots: { index: false } };
@@ -19,7 +18,6 @@ export default async function AdminCampaigns({ searchParams }) {
   return (
     <div className="admin">
       <h1>Campaigns</h1>
-      <AdminNav isAdmin />
       <table className="admin-table">
         <thead><tr><th>Campaign</th><th>Raised</th><th>Goal</th><th>Status</th></tr></thead>
         <tbody>

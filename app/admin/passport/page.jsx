@@ -3,7 +3,6 @@ import { getDb } from "@/lib/db.js";
 import { listRequestedEntries, KIND_LABELS } from "@/lib/members/passport.js";
 import { listMembersAdmin } from "@/lib/members/profile.js";
 import { formatDate } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import PassportReview from "@/components/admin/PassportReview.jsx";
 import AddEntryForm from "@/components/admin/AddEntryForm.jsx";
 
@@ -17,7 +16,6 @@ export default async function AdminPassport() {
   return (
     <div className="admin">
       <h1>Leadership Passport</h1>
-      <AdminNav isAdmin />
       <h2 className="syne">Requests ({requests.length})</h2>
       {requests.length === 0 ? <p>No requests waiting.</p> : (
         <table className="admin-table">

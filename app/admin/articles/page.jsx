@@ -3,7 +3,6 @@ import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listArticlesAdmin } from "@/lib/content/articles.js";
 import { CATEGORY_LABELS } from "@/lib/content/validation.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 
 export const metadata = { title: "Articles — Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -15,7 +14,6 @@ export default async function AdminArticles({ searchParams }) {
   return (
     <div className="admin">
       <h1>Articles</h1>
-      <AdminNav isAdmin />
       <p className="actions">
         <Link className="btn" href="/admin/articles/new">New article</Link>
         <Link href="/admin/articles">All</Link>

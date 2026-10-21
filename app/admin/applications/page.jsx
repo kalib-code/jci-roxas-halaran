@@ -2,7 +2,6 @@ import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listApplications } from "@/lib/engagement/applications.js";
 import { formatDate } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import ApplicationActions from "@/components/admin/ApplicationActions.jsx";
 
 export const metadata = { title: "Applications — Admin", robots: { index: false } };
@@ -14,7 +13,6 @@ export default async function AdminApplications() {
   return (
     <div className="admin">
       <h1>Applications</h1>
-      <AdminNav isAdmin />
       <table className="admin-table">
         <thead><tr><th>Applicant</th><th>Details</th><th>Received</th><th>Status</th></tr></thead>
         <tbody>
