@@ -5,3 +5,10 @@ dist/
 .DS_Store
 *.log
 .vercel
+.next/
+*.db
+*.db-journal
+.env*.local
+test-results/
+playwright-report/
+.next-*/

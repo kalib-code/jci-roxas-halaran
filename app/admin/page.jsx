@@ -1,0 +1,44 @@
+import Link from "next/link";
+import { requireArea } from "@/lib/auth.js";
+import { getDb } from "@/lib/db.js";
+import { monthProgress } from "@/lib/content/seoPlan.js";
+import { listArticlesAdmin } from "@/lib/content/articles.js";
+import AdminNav from "@/components/admin/AdminNav.jsx";
+
+export const metadata = { title: "Admin", robots: { index: false } };
+export const dynamic = "force-dynamic";
+
+const thisMonth = () => new Date().toISOString().slice(0, 7);
+
+export default async function Admin() {
+  const { role } = await requireArea("admin");
+  const isAdmin = role === "admin";
+  const db = getDb();
+  const month = thisMonth();
+  const [progress, drafts] = isAdmin
+    ? await Promise.all([monthProgress(db, month), listArticlesAdmin(db, { status: "draft" })])
+    : [null, []];
+
+  return (
+    <div className="admin">
+      <h1>Admin</h1>
+      <AdminNav isAdmin={isAdmin} />
+      <p>Signed in as <strong>{role}</strong>.{!isAdmin && " Only admins can edit content."}</p>
+      {isAdmin && (
+        <>
+          <section>
+            <h2 className="syne">SEO plan {month}</h2>
+            <p>{progress.published} of {progress.total} articles published. <Link href="/admin/seo-plan">Open the plan →</Link></p>
+          </section>
+          <section>
+            <h2 className="syne">Drafts</h2>
+            {drafts.length === 0 ? <p>No drafts.</p> : (
+              <ul>{drafts.slice(0, 5).map((a) => <li key={a.id}><Link href={`/admin/articles/${a.id}`}>{a.title}</Link></li>)}</ul>
+            )}
+            <p><Link className="btn" href="/admin/articles/new">New article</Link></p>
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
