@@ -24,6 +24,30 @@ function jitter(i, j) {
   return n - Math.floor(n) - 0.5;
 }
 
+const rand = (min, max) => min + Math.random() * (max - min);
+
+// A set wave rolls in from beyond the horizon at a random moment, with its own
+// height (rise, as a share of the canvas), width, speed and curve across the sea.
+// The tallest ones crest up to the header.
+function newSurge(t) {
+  return {
+    born: t,
+    life: rand(9, 15),
+    rise: Math.random() < 0.35 ? rand(0.32, 0.48) : rand(0.08, 0.24),
+    width: rand(0.45, 0.9),
+    kx: rand(0.15, 0.45),
+    phase: rand(0, Math.PI * 2),
+  };
+}
+
+// How far a surge has risen at (x, z): 0..1, peaking on its moving crest line.
+function surgeAt(s, x, z, t) {
+  const age = (t - s.born) / s.life;
+  const crestZ = Z_FAR + 0.6 - (Z_FAR - Z_NEAR + 1.2) * age;
+  const across = 0.7 + 0.3 * Math.sin(s.kx * x + s.phase);
+  return Math.sin(Math.PI * age) * Math.exp(-(((z - crestZ) / s.width) ** 2)) * across;
+}
+
 function lift(x, z, t) {
   let h = 0;
   for (const s of SWELLS) h += s.amp * Math.sin(s.kx * x + s.kz * z - s.speed * t);
@@ -38,6 +62,8 @@ export default function HeroSea() {
     const ctx = canvas.getContext("2d");
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let w = 0, h = 0, frame = 0, last = 0, visible = true;
+    let surges = [];
+    let nextSurge = 1.5;
 
     const size = () => {
       const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -50,6 +76,11 @@ export default function HeroSea() {
 
     const draw = (t) => {
       ctx.clearRect(0, 0, w, h);
+      surges = surges.filter((s) => t - s.born < s.life);
+      if (t >= nextSurge) {
+        if (surges.length < 3) surges.push(newSurge(t));
+        nextSurge = t + rand(3, 9);
+      }
       const horizon = h * HORIZON;
       const focal = (h - horizon) * Z_NEAR / 0.55; // camera height 0.55 puts the nearest row at the bottom
       const near = w < 640 ? 16 : 20; // screen gap between dots on the nearest row
@@ -64,13 +95,20 @@ export default function HeroSea() {
         for (let c = -Math.ceil(span / dx); c * dx <= span; c++) {
           const x = (c + jitter(r, c) * 0.8) * dx;
           const zz = z + jitter(c, r) * 0.6 * (Z_FAR - Z_NEAR) / rows;
-          const lifted = lift(x, zz, t);
+          const swell = lift(x, zz, t);
+          // Surges are sized on screen, so a far wave can still reach the header.
+          let rise = 0, surf = 0;
+          for (const s of surges) {
+            const v = surgeAt(s, x, zz, t);
+            rise += v * s.rise * h;
+            surf = Math.max(surf, v);
+          }
           const sx = w / 2 + x * scale;
-          const sy = horizon + (0.55 - lifted) * focal / zz;
-          if (sy > h + 4) continue;
+          const sy = horizon + (0.55 - swell) * focal / zz - rise;
+          if (sy > h + 4 || sy < -4) continue;
           // Crests catch the light: brighter, and warmer toward ochre.
-          const crest = Math.max(0, lifted / 0.2);
-          ctx.globalAlpha = fade * (0.12 + 0.6 * crest);
+          const crest = Math.max(0, swell / 0.2, surf);
+          ctx.globalAlpha = Math.max(fade, surf) * (0.2 + 0.55 * Math.min(1, crest));
           ctx.fillStyle = crest > 0.6 ? "#e5a823" : "#ede8df";
           ctx.fillRect(sx - dot / 2, sy - dot / 2, dot, dot);
         }
@@ -88,10 +126,10 @@ export default function HeroSea() {
     const stop = () => { cancelAnimationFrame(frame); frame = 0; };
 
     size();
-    draw(8);
+    draw(0);
     start();
 
-    const ro = new ResizeObserver(() => { size(); draw(last / 1000 || 8); });
+    const ro = new ResizeObserver(() => { size(); draw(last / 1000); });
     ro.observe(canvas);
     // Only animate while the hero is on screen and the tab is open.
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); });
