@@ -36,6 +36,24 @@ describe("verifyTurnstile", () => {
   it("fails closed when Cloudflare is unreachable", async () => {
     expect(await verifyTurnstile("tok", { secret: "s", fetchImpl: async () => { throw new Error("down"); } })).toBe(false);
   });
+  it("rejects a token solved on a host outside the allowlist", async () => {
+    const fetchImpl = async () => ({ json: async () => ({ success: true, hostname: "evil.example" }) });
+    expect(await verifyTurnstile("tok", { secret: "s", hostnames: "jciroxashalaran.com", fetchImpl })).toBe(false);
+  });
+  it("accepts an allowlisted host, ignoring case and spaces in the list", async () => {
+    const fetchImpl = async () => ({ json: async () => ({ success: true, hostname: "www.jciroxashalaran.com" }) });
+    const hostnames = "jci-roxas-halaran.vercel.app, WWW.jciroxashalaran.com";
+    expect(await verifyTurnstile("tok", { secret: "s", hostnames, fetchImpl })).toBe(true);
+  });
+  it("skips the host check when no allowlist is set", async () => {
+    const fetchImpl = async () => ({ json: async () => ({ success: true, hostname: "anything.example" }) });
+    expect(await verifyTurnstile("tok", { secret: "s", hostnames: "", fetchImpl })).toBe(true);
+  });
+  it("rejects an oversized token without calling Cloudflare", async () => {
+    const fetchImpl = vi.fn(async () => ({ json: async () => ({ success: true }) }));
+    expect(await verifyTurnstile("x".repeat(2049), { secret: "s", fetchImpl })).toBe(false);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
 });
 
 describe("sendEmail", () => {
