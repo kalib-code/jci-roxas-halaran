@@ -385,3 +385,4 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .contact > div { border-top: 2px solid var(--sage); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; overflow-wrap: anywhere; }
 .contact .l { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
 @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
+.president__body h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3.4rem); line-height: 1.02; color: var(--dune); overflow-wrap: anywhere; }
