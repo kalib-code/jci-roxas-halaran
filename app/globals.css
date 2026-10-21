@@ -487,3 +487,12 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .passport__points strong { font-family: var(--font-syne), sans-serif; font-size: 3rem; color: var(--ochre); }
 .passport__timeline { list-style: none; padding: 0; margin: 0; }
 .passport__timeline li { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid rgba(237, 232, 223, 0.12); }
+
+/* ============================================================
+   Proof (Phase 5)
+   ============================================================ */
+.impact-map { height: clamp(320px, 55vw, 520px); width: 100%; border: 1px solid rgba(237, 232, 223, 0.15); }
+.impact-map .leaflet-popup-content a { color: #1c3b2b; text-decoration: underline; }
+.impact-group { margin-bottom: 24px; }
+.impact-group ul { margin: 8px 0 0; padding-left: 20px; }
+.money-table td:last-child, .money-table th:last-child { text-align: right; }

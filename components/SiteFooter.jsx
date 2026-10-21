@@ -18,7 +18,9 @@ export default function SiteFooter({ cta = true, lang = "en", altHref = null }) 
         <span>
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{" "}
           <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a> ·{" "}
-          <Link href="/resources">Free resources</Link>
+          <Link href="/resources">Free resources</Link> ·{" "}
+          <Link href="/impact">Impact</Link> ·{" "}
+          <Link href="/transparency">Transparency</Link>
           {hilEnabled() && altHref && <> · <Link href={altHref} hrefLang={lang === "hil" ? "en" : "hil"}>{t(lang, "footer.switch")}</Link></>}
         </span>
       </div>

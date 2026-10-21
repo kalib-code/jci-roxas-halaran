@@ -10,6 +10,7 @@ import { getDb } from "@/lib/db.js";
 import { listProjects, listAwards } from "@/lib/queries.js";
 import { listPublishedArticles } from "@/lib/content/articles.js";
 import { listEvents } from "@/lib/engagement/events.js";
+import { impactTotals, homeStats } from "@/lib/proof/impact.js";
 import { organizationLd } from "@/lib/seo.js";
 import { SITE } from "@/lib/site.js";
 import { t, pathFor } from "@/lib/i18n.js";
@@ -17,11 +18,12 @@ import { t, pathFor } from "@/lib/i18n.js";
 export default async function HomePage({ lang = "en" }) {
   const L = (key) => t(lang, key);
   const db = getDb();
-  const [projects, awards, latest, events] = await Promise.all([
+  const [projects, awards, latest, events, totals] = await Promise.all([
     listProjects(db, { limit: 3 }),
     listAwards(db),
     listPublishedArticles(db, { limit: 3 }),
     listEvents(db),
+    impactTotals(db),
   ]);
   const [based, place] = L("home.metaBased").split(/, (?=Capiz)/);
 
@@ -108,7 +110,7 @@ export default async function HomePage({ lang = "en" }) {
           <span className="num">04</span><span className="mid">{L("home.impactLabel")}</span><span className="end">{L("home.impactEnd")}</span>
         </div>
         <div className="stats">
-          {SITE.stats.map((s) => (
+          {homeStats(totals, SITE.stats).map((s) => (
             <div className="stat" key={s.label} lang="en">
               <span className="v">{s.value}</span>
               <span className="l">{s.label}</span>
