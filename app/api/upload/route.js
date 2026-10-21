@@ -1,12 +1,14 @@
 import { handleUpload } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { canAccess, roleFromSessionClaims } from "@/lib/roles.js";
+import { canAccess } from "@/lib/roles.js";
+import { resolveRole } from "@/lib/role-lookup.js";
+import { loadClerkUser } from "@/lib/clerk-user.js";
 import { UPLOAD_TYPES, MAX_UPLOAD_BYTES } from "@/lib/uploads.js";
 
 async function isContentAdmin() {
   const { userId, sessionClaims } = await auth();
-  return Boolean(userId) && canAccess(roleFromSessionClaims(sessionClaims), "content");
+  return Boolean(userId) && canAccess(await resolveRole({ userId, sessionClaims }, loadClerkUser), "content");
 }
 
 export async function POST(request) {
