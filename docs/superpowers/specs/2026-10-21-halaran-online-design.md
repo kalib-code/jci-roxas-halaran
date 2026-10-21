@@ -73,6 +73,16 @@ Every feature below names the criterion it serves. Every countable user action i
 
 The live Webflow site exposes only these five paths (checked 2026-10-21; its sitemap returns 404).
 
+### Design direction
+
+Layout reference: **mellon.org** (editorial, story-led). Secondary reference: fordfoundation.org. Keep the existing brand system; borrow Mellon's layout and restraint, not its fonts.
+
+- **Fonts unchanged:** Syne (display), Space Grotesk (labels), Inter (body).
+- **Palette unchanged, used with restraint:** mostly Basalt `#121314` and Dune `#EDE8DF`; Canopy `#1C3B2B`, Sage `#3A6B4F` and Ochre `#E5A823` as occasional accents. Project photography carries the color.
+- **Large type:** headlines about 40–82px on desktop; impact numbers set at headline size.
+- **Story-led homepage:** big statement headline → stories from projects → latest articles → upcoming events → history ("Since 2023") → join CTA.
+- **Generous white space, strict grid, large images;** carousels only for story collections.
+
 ## 3. Data model
 
 Clerk owns identity (login, email, role). Turso owns everything else, linked by `clerk_user_id`. Money is stored as integer centavos. Timestamps are ISO-8601 text.
