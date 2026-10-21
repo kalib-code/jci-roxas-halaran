@@ -1,3 +1,4 @@
+import { safeHttpsUrl } from "@/lib/safe.js";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -33,7 +34,7 @@ export default async function Resources() {
               {list.filter((r) => r.kind === k).map((r) => (
                 <div key={r.id}>
                   <span><span className="t">{r.title}</span>{r.description && <><br />{r.description}</>}</span>
-                  <a className="btn" href={r.fileUrl} target="_blank" rel="noreferrer">Download</a>
+                  {safeHttpsUrl(r.fileUrl) && <a className="btn" href={safeHttpsUrl(r.fileUrl)} target="_blank" rel="noreferrer">Download</a>}
                 </div>
               ))}
             </div>

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ArticleCard from "@/components/ArticleCard.jsx";
 import { SafeHtml } from "@/components/SafeHtml.jsx";
+import ProgressBar from "@/components/ProgressBar.jsx";
+import VolunteerForm from "@/components/forms/VolunteerForm.jsx";
+import { getCampaignForProject } from "@/lib/engagement/money.js";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -35,7 +38,7 @@ export default async function ProjectPage({ params }) {
   const db = getDb();
   const project = await getProjectBySlug(db, slug);
   if (!project) notFound();
-  const stories = await listArticlesForProject(db, project.id);
+  const [stories, campaign] = await Promise.all([listArticlesForProject(db, project.id), getCampaignForProject(db, project.id)]);
   const date = formatDate(project.startDate);
   return (
     <>
@@ -71,6 +74,17 @@ export default async function ProjectPage({ params }) {
           <div className="projects">{stories.map((a) => <ArticleCard key={a.id} article={a} />)}</div>
         </section>
       )}
+      {campaign && (
+        <section className="section section--line-top">
+          <div className="section__bar"><h2>Support this project</h2><span className="label">{campaign.title}</span></div>
+          <ProgressBar raisedCentavos={campaign.raisedCentavos} goalCentavos={campaign.goalCentavos} label={campaign.title} />
+          <p className="section__more"><Link className="btn" href={`/support#${campaign.slug}`}>Donate</Link></p>
+        </section>
+      )}
+      <section className="section" id="volunteer">
+        <div className="section__bar"><h2>Volunteer</h2><span className="label">Help out</span></div>
+        <VolunteerForm projectId={project.id} />
+      </section>
       <p className="section"><Link className="btn" href="/projects">All projects</Link></p>
       <SiteFooter />
     </>

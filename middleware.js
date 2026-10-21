@@ -1,6 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { canAccess, roleFromSessionClaims } from "./lib/roles.js";
+import { canAccess } from "./lib/roles.js";
+import { resolveRole } from "./lib/role-lookup.js";
+import { loadClerkUser } from "./lib/clerk-user.js";
 
 const isAdmin = createRouteMatcher(["/admin(.*)"]);
 const isMembers = createRouteMatcher(["/members(.*)"]);
@@ -12,7 +14,7 @@ export default clerkMiddleware(async (auth, req) => {
   if (!userId) return redirectToSignIn({ returnBackUrl: req.url });
 
   const area = isAdmin(req) ? "admin" : "members";
-  if (!canAccess(roleFromSessionClaims(sessionClaims), area)) {
+  if (!canAccess(await resolveRole({ userId, sessionClaims }, loadClerkUser), area)) {
     // Signed in but not allowed: answer 404 so the area isn't advertised.
     return new NextResponse("Not found", { status: 404 });
   }

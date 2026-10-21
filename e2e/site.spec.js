@@ -163,3 +163,102 @@ test("the upload route refuses signed-out callers", async ({ request }) => {
   });
   expect(res.status()).toBe(403);
 });
+
+const EVENT = "/events/general-assembly-2027";
+
+test(`${EVENT} has Event data, a calendar file and passes page checks`, async ({ page, request }) => {
+  const res = await page.goto(EVENT);
+  expect(res.status()).toBe(200);
+  await expect(page.locator("h1")).toHaveCount(1);
+  const types = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => JSON.parse(e.textContent)["@type"]));
+  expect(types).toContain("Event");
+  const ics = await request.get(`${EVENT}/ics`);
+  expect(ics.headers()["content-type"]).toContain("text/calendar");
+  expect(await ics.text()).toContain("DTSTART:20990115T100000Z");
+});
+
+test("RSVP: first person goes, the same email is a duplicate, the next joins the waitlist", async ({ page }) => {
+  const rsvp = async (name, email) => {
+    await page.goto(EVENT);
+    await page.getByLabel("Name").first().fill(name);
+    await page.getByLabel("Email").first().fill(email);
+    await page.locator("#rsvp").getByRole("checkbox").check();
+    await page.locator("#rsvp").getByRole("button", { name: /RSVP/ }).click();
+  };
+  await rsvp("Ana Cruz", "ana.e2e@example.ph");
+  await expect(page.locator("#rsvp").getByRole("status")).toContainText("You're going!");
+  await rsvp("Ana Cruz", "ANA.E2E@example.ph");
+  await expect(page.locator("#rsvp").getByRole("alert")).toContainText("already on the list");
+  await rsvp("Ben Reyes", "ben.e2e@example.ph");
+  await expect(page.locator("#rsvp").getByRole("status")).toContainText("waitlist");
+});
+
+test("membership application shows a confirmation", async ({ page }) => {
+  await page.goto("/join");
+  const form = page.locator("#apply");
+  await form.getByLabel("Full name").fill("Carla Santos");
+  await form.getByLabel("Email").fill("carla.e2e@example.ph");
+  await form.getByLabel("Birthdate").fill("1999-05-05");
+  await form.getByRole("checkbox").check();
+  await form.getByRole("button", { name: "Apply" }).click();
+  await expect(form.getByRole("status")).toContainText("We received your application");
+});
+
+test("pledge form shows the campaign and a confirmation", async ({ page }) => {
+  await page.goto("/support");
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
+  const form = page.locator("#pledge");
+  await form.getByLabel("Name").fill("Dino Reyes");
+  await form.getByLabel("Email").fill("dino.e2e@example.ph");
+  await form.getByLabel("Amount (₱)").fill("500");
+  await form.getByLabel("Reference number").fill("e2e0001");
+  await form.getByRole("checkbox").check();
+  await form.getByRole("button", { name: "Submit payment details" }).click();
+  await expect(form.getByRole("status")).toContainText("confirm your payment");
+});
+
+test("engagement admin screens require sign-in", async ({ page }) => {
+  for (const path of ["/admin/applications", "/admin/events", "/admin/payments", "/admin/campaigns", "/admin/expenses"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/sign-in/);
+  }
+});
+
+test.describe("Hiligaynon pages", () => {
+  for (const path of ["/hil", "/hil/join", "/hil/events", "/hil/support"]) {
+    test(`${path} is a well-formed Hiligaynon page`, async ({ page }) => {
+      const res = await page.goto(path);
+      expect(res.status()).toBe(200);
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('[lang="hil"]').first()).toBeVisible();
+      const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+      expect(new URL(canonical).pathname).toBe(path);
+    });
+  }
+
+  test("English pages point to their Hiligaynon twins", async ({ page }) => {
+    await page.goto("/join");
+    const hil = await page.locator('link[rel="alternate"][hreflang="hil"]').getAttribute("href");
+    expect(new URL(hil).pathname).toBe("/hil/join");
+    await expect(page.getByRole("link", { name: "Hiligaynon" })).toBeVisible();
+  });
+
+  test("the Hiligaynon application form uses Hiligaynon labels", async ({ page }) => {
+    await page.goto("/hil/join");
+    await expect(page.locator("#apply").getByLabel("Bug-os nga ngalan")).toBeVisible();
+  });
+});
+
+test("members area requires sign-in", async ({ page }) => {
+  for (const path of ["/members", "/members/profile", "/members/directory", "/members/passport", "/members/library", "/members/events", "/admin/members", "/admin/passport"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/sign-in/);
+  }
+});
+
+test("the avatar upload route refuses signed-out callers", async ({ request }) => {
+  const res = await request.post("/api/upload-avatar", {
+    data: { type: "blob.generate-client-token", payload: { pathname: "a.jpg", callbackUrl: "http://localhost:3100/api/upload-avatar", clientPayload: null, multipart: false } },
+  });
+  expect(res.status()).toBe(403);
+});

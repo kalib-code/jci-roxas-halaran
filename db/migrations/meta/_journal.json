@@ -15,6 +15,27 @@
       "when": 1792553743109,
       "tag": "0001_content",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792557143493,
+      "tag": "0002_engagement",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792558238470,
+      "tag": "0003_rejected_payments_free_reference",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792559108251,
+      "tag": "0004_passport",
+      "breakpoints": true
     }
   ]
 }

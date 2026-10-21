@@ -7,7 +7,7 @@ export const metadata = { title: "Sign in", robots: { index: false } };
 export default function SignInPage() {
   return (
     <section className="auth-page">
-      <SignIn />
+      <SignIn fallbackRedirectUrl="/members" />
     </section>
   );
 }

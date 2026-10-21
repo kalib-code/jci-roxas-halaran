@@ -12,3 +12,12 @@ describe("revalidation paths", () => {
     expect(RESOURCE_PATHS).toEqual(["/resources"]);
   });
 });
+
+import { pathsForEvent, SUPPORT_PATHS } from "@/lib/revalidate.js";
+
+describe("engagement paths", () => {
+  it("covers every page an event appears on", () => {
+    expect(pathsForEvent("ga")).toEqual(["/events", "/events/ga", "/", "/sitemap.xml"]);
+    expect(SUPPORT_PATHS).toEqual(["/support", "/"]);
+  });
+});
