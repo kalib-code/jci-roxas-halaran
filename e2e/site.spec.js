@@ -21,22 +21,24 @@ test.describe("every public page", () => {
       await expect(page.locator('meta[name="description"]')).toHaveCount(1);
     });
 
-    test(`${path} has no text or images cut off on a 375px phone`, async ({ page }) => {
-      await page.setViewportSize({ width: 375, height: 812 });
-      await page.goto(path);
-      // .wrap hides overflow, so page scroll width can't reveal clipping:
-      // check each visible element's right edge instead.
-      const clipped = await page.evaluate(() =>
-        [...document.querySelectorAll("h1, h2, h3, p, a, span, time, blockquote, img")]
-          .filter((el) => !el.closest("svg"))
-          .map((el) => ({ el, r: el.getBoundingClientRect() }))
-          .filter(({ el, r }) =>
-            r.width > 0 && (r.right > window.innerWidth + 1 || el.scrollWidth > el.clientWidth + 1),
-          )
-          .map(({ el, r }) => `${el.tagName}.${el.className} "${el.textContent.trim().slice(0, 30)}" right=${Math.round(r.right)}`),
-      );
-      expect(clipped).toEqual([]);
-    });
+    for (const width of [375, 768, 1440]) {
+      test(`${path} has no text or images cut off at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        // .wrap hides overflow, so page scroll width can't reveal clipping:
+        // check each visible element's right edge instead.
+        const clipped = await page.evaluate(() =>
+          [...document.querySelectorAll("h1, h2, h3, p, a, span, time, blockquote, img")]
+            .filter((el) => !el.closest("svg"))
+            .map((el) => ({ el, r: el.getBoundingClientRect() }))
+            .filter(({ el, r }) =>
+              r.width > 0 && (r.right > window.innerWidth + 1 || el.scrollWidth > el.clientWidth + 1),
+            )
+            .map(({ el, r }) => `${el.tagName}.${el.className} "${el.textContent.trim().slice(0, 30)}" right=${Math.round(r.right)}`),
+        );
+        expect(clipped).toEqual([]);
+      });
+    }
 
     test(`${path} has no broken images`, async ({ page }) => {
       await page.goto(path);
@@ -266,7 +268,7 @@ test("the avatar upload route refuses signed-out callers", async ({ request }) =
 test("impact page lists projects by place even without map locations", async ({ page }) => {
   await page.goto("/impact");
   await expect(page.getByRole("link", { name: "Coastline Cuts" })).toBeVisible();
-  await expect(page.getByText("Project locations are being added")).toBeVisible();
+  await expect(page.getByText("are being mapped")).toBeVisible();
 });
 
 test("transparency page never shows donor names", async ({ page }) => {
@@ -299,5 +301,33 @@ test("transparency money figures fit on a tablet", async ({ page }) => {
         .map((el) => el.textContent);
     });
     expect(clipped, `at ${width}px`).toEqual([]);
+  }
+});
+
+test("main nav reaches Support and Impact, and the footer has three columns", async ({ page }) => {
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await expect(nav.getByRole("link", { name: "Support" })).toHaveAttribute("href", "/support");
+  await expect(nav.getByRole("link", { name: "Impact" })).toHaveAttribute("href", "/impact");
+  await expect(page.getByRole("navigation", { name: "Accountability" }).getByRole("link", { name: "Transparency" })).toBeVisible();
+});
+
+test("support page shows the how-to-pay card with the campaign QR", async ({ page }) => {
+  await page.goto("/support");
+  const card = page.getByRole("complementary", { name: "How to pay" });
+  await expect(card.getByRole("img", { name: "GCash QR code for the Coastal Cleanup Fund" })).toBeVisible();
+  await page.locator("#pledge").getByLabel(/payment for/i).selectOption("membership_fee");
+  await expect(card.getByText("Ask us for payment details")).toBeVisible();
+});
+
+test("project cards without a photo show their own title", async ({ page }) => {
+  await page.goto("/projects");
+  await expect(page.locator(".project__tile-title", { hasText: "Coastline Cuts" })).toHaveCount(1);
+});
+
+test("admin dashboard and tabbed lists still require sign-in", async ({ page }) => {
+  for (const path of ["/admin", "/admin/payments?tab=confirmed", "/admin/applications?tab=declined"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/sign-in/);
   }
 });

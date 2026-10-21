@@ -16,7 +16,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
     "db:seed": "node --env-file=.env.local scripts/seed.mjs",
-    "e2e:serve": "node scripts/prepare-e2e-db.mjs && NEXT_DIST_DIR=.next-e2e next build && NEXT_DIST_DIR=.next-e2e next start -p 3100"
+    "e2e:serve": "node scripts/prepare-e2e-db.mjs && NEXT_DIST_DIR=.next-e2e next build && NEXT_DIST_DIR=.next-e2e next start -p 3100",
+    "db:import-articles": "node --env-file=.env.local scripts/import-articles.mjs",
+    "db:import-projects": "node --env-file=.env.local scripts/import-projects.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.8",

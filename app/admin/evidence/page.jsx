@@ -3,7 +3,6 @@ import { getDb } from "@/lib/db.js";
 import { monthlyEvidence, typeTotals, listSnapshots, CRITERIA, CRITERION_LABELS } from "@/lib/proof/evidence.js";
 import { LOG_CRITERIA } from "@/lib/evidence.js";
 import { phNow } from "@/lib/format.js";
-import AdminNav from "@/components/admin/AdminNav.jsx";
 import SnapshotForm from "@/components/admin/SnapshotForm.jsx";
 
 export const metadata = { title: "Evidence — Admin", robots: { index: false } };
@@ -17,7 +16,6 @@ export default async function Evidence() {
   const snap = new Map(snapshots.map((s) => [s.month, s]));
   return (
     <div className="admin">
-      <AdminNav isAdmin />
       <h1>Bid evidence</h1>
       <p>Every countable action on the site, by Temiong criterion. <a href="/admin/evidence.csv">Download monthly CSV</a> · <a href="/admin/evidence/log.csv">Download every log entry</a></p>
       <table className="admin-table">

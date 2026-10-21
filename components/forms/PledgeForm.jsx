@@ -11,7 +11,7 @@ import { t } from "@/lib/i18n.js";
 
 const MAX_PROOF = 5 * 1024 * 1024;
 
-export default function PledgeForm({ campaigns, defaultCampaignId = "", lang = "en" }) {
+export default function PledgeForm({ campaigns, defaultCampaignId = "", lang = "en", onCampaignChange }) {
   const [form, setForm] = useState({ campaignId: defaultCampaignId, type: "donation", payerName: "", payerEmail: "", amountPesos: "", method: "gcash", referenceNo: "", proofUrl: "", consent: false });
   const [token, setToken] = useState("");
   const [proofError, setProofError] = useState(null);
@@ -49,6 +49,7 @@ export default function PledgeForm({ campaigns, defaultCampaignId = "", lang = "
         <label htmlFor="pl-for">{L("form.paymentFor")}</label>
         <select id="pl-for" value={form.type === "donation" ? form.campaignId : form.type} onChange={(e) => {
           const v = e.target.value;
+          onCampaignChange?.(v === "membership_fee" || v === "sponsorship" ? "" : v);
           setForm((f) => (v === "membership_fee" || v === "sponsorship" ? { ...f, type: v, campaignId: "" } : { ...f, type: "donation", campaignId: v }));
         }}>
           {campaigns.map((c) => <option key={c.id} value={c.id}>{L("form.donationPrefix")} {c.title}</option>)}

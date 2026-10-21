@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
 import { projects } from "@/db/schema.js";
-import { impactTotals, mapProjects, projectsByBarangay, homeStats } from "@/lib/proof/impact.js";
+import { impactTotals, impactStats, mapProjects, projectsByBarangay, homeStats } from "@/lib/proof/impact.js";
 import { transparencyYears, transparencyForYear } from "@/lib/proof/transparency.js";
 import { setProjectMetrics } from "@/lib/proof/metrics.js";
 import { saveEvent, submitVolunteer } from "@/lib/engagement/events.js";
@@ -71,5 +71,15 @@ describe("transparency", () => {
     expect(y.items[0]).toMatchObject({ description: "Trash bags", amountCentavos: 30000, projectTitle: "Coastline Cuts" });
     expect(JSON.stringify(y)).not.toContain("a@x.ph");
     expect(JSON.stringify(y)).not.toContain("Ana Cruz");
+  });
+});
+
+describe("impactStats", () => {
+  it("drops figures that are zero", () => {
+    expect(impactStats({ projectsDone: 11, activeMembers: 18, volunteers: 0, eventsHeld: 0, metrics: { trees_planted: 120, schools: 0 } })).toEqual([
+      ["Projects completed", 11],
+      ["Active members", 18],
+      ["Trees planted", 120],
+    ]);
   });
 });
