@@ -1,5 +1,13 @@
 const img = (name) => `/assets/img/${name}`;
 
+// 2026 board portraits, taken from the Webflow officers page (2026-10-21).
+const SLUGS_2026 = [
+  "jaime-altavas", "mark-vincent-bernas", "jasper-sayo", "raymark-bigcas", "john-moses-aposaga",
+  "christopher-bryan-bernas", "gian-carlo-velado", "elmer-jimenez-jr", "eugenio-dalida-jr",
+  "jaime-miguel-dadivas", "johbert-flores", "judy-daliva", "manuel-luis-luna",
+];
+export const OFFICER_PHOTOS_2026 = Object.fromEntries(SLUGS_2026.map((s) => [s, img(`officer-2026-${s}.jpg`)]));
+
 export const MEMBERS = [
   {
     slug: "lemuel-capa",
@@ -24,7 +32,7 @@ export const MEMBERS = [
   { slug: "johbert-flores", name: "Johbert Flores" },
   { slug: "judy-daliva", name: "Judy Daliva" },
   { slug: "manuel-luis-luna", name: "Manuel Luis Luna" },
-];
+].map((m) => (OFFICER_PHOTOS_2026[m.slug] ? { ...m, photoUrl: OFFICER_PHOTOS_2026[m.slug] } : m));
 
 // [member slug, role] in display order; index = sort.
 const BOARDS = {
