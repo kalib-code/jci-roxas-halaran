@@ -39,12 +39,35 @@ describe("updateProfile card fields", () => {
       cardPublished: true, cardConsent: true, cardShowPhone: true, cardShowEmail: false,
     });
     expect(r.ok).toBe(true);
-    expect(await row()).toMatchObject({ phone: "+639171234567", websiteUrl: "https://judy.ph", facebookUrl: "https://facebook.com/judy", linkedinUrl: null, cardPublished: true, cardShowPhone: true, cardShowEmail: false });
+    expect(await row()).toMatchObject({ phone: "+639171234567", websiteUrl: "https://judy.ph/", facebookUrl: "https://facebook.com/judy", linkedinUrl: null, cardPublished: true, cardShowPhone: true, cardShowEmail: false });
   });
 
   it("refuses a foreign phone, an http link, and publishing without consent", async () => {
     expect(await updateProfile(db, id, { phone: "+1 415 555 0100" })).toEqual({ ok: false, errors: ["Enter a Philippine number, e.g. 0917 123 4567"] });
     expect(await updateProfile(db, id, { websiteUrl: "http://judy.ph" })).toEqual({ ok: false, errors: ["Use a full https:// link"] });
     expect(await updateProfile(db, id, { cardPublished: true })).toEqual({ ok: false, errors: ["Tick the consent box to publish your card"] });
+  });
+});
+
+describe("card links are parsed, not pattern-matched", () => {
+  let db;
+  let id;
+  beforeEach(async () => {
+    db = await testDb();
+    await seed(db);
+    id = (await db.select().from(members).where(eq(members.slug, "judy-daliva")))[0].id;
+  });
+  const saved = async () => (await db.select().from(members).where(eq(members.id, id)))[0];
+  const LINK = { ok: false, errors: ["Use a full https:// link"] };
+
+  it("refuses links with credentials or without a real host", async () => {
+    expect(await updateProfile(db, id, { websiteUrl: "https://user:pass@evil.com" })).toEqual(LINK);
+    expect(await updateProfile(db, id, { websiteUrl: "https://evil" })).toEqual(LINK);
+    expect(await updateProfile(db, id, { websiteUrl: "https://" })).toEqual(LINK);
+  });
+
+  it("stores the browser's reading of the link so nothing parses it differently later", async () => {
+    expect((await updateProfile(db, id, { websiteUrl: "https://good.ph\\@evil.com" })).ok).toBe(true);
+    expect((await saved()).websiteUrl).toBe("https://good.ph/@evil.com");
   });
 });
