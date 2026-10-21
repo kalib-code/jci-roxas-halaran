@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db.js";
 import { requireArea } from "@/lib/auth.js";
 import { pathsForEvent, revalidateAll } from "@/lib/revalidate.js";
 import { saveEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/lib/engagement/events.js";
+import { syncAttendanceEntry } from "@/lib/members/passport.js";
 
 export async function saveEventAction(input) {
   await requireArea("content");
@@ -15,7 +16,10 @@ export async function saveEventAction(input) {
 
 export async function setAttendanceAction(rsvpId, attended) {
   const { userId } = await requireArea("content");
-  return setAttendance(getDb(), rsvpId, attended, { userId });
+  const db = getDb();
+  const r = await setAttendance(db, rsvpId, attended, { userId });
+  if (r.ok) await syncAttendanceEntry(db, r.rsvp, attended);
+  return r;
 }
 
 export async function moveToGoingAction(rsvpId, eventId) {
