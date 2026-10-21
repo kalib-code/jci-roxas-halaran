@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
-    "db:seed": "node --env-file=.env.local scripts/seed.mjs"
+    "db:seed": "node --env-file=.env.local scripts/seed.mjs",
+    "e2e:serve": "node scripts/prepare-e2e-db.mjs && NEXT_DIST_DIR=.next-e2e next build && NEXT_DIST_DIR=.next-e2e next start -p 3100"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.8",
@@ -28,6 +29,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.0",
     "@vitejs/plugin-react": "^4.5.0",
