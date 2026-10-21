@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 export const members = sqliteTable("members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -138,5 +139,133 @@ export const resources = sqliteTable("resources", {
   fileUrl: text("file_url").notNull(),
   kind: text("kind", { enum: ["template", "training", "bylaws", "other"] }).notNull().default("template"),
   visibility: text("visibility", { enum: ["public", "members"] }).notNull().default("public"),
+  createdAt: text("created_at").notNull(),
+});
+
+export const applications = sqliteTable(
+  "applications",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    birthdate: text("birthdate").notNull(),
+    barangay: text("barangay"),
+    whyJoin: text("why_join"),
+    referredBy: text("referred_by"),
+    consent: integer("consent", { mode: "boolean" }).notNull(),
+    status: text("status", { enum: ["pending", "approved", "declined"] }).notNull().default("pending"),
+    reviewedBy: text("reviewed_by"),
+    reviewedAt: text("reviewed_at"),
+    note: text("note"),
+    memberId: integer("member_id").references(() => members.id, { onDelete: "set null" }),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("applications_pending_email").on(t.email).where(sql`status = 'pending'`)],
+);
+
+export const events = sqliteTable("events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  descriptionJson: text("description_json"),
+  startAt: text("start_at").notNull(),
+  endAt: text("end_at"),
+  venue: text("venue"),
+  capacity: integer("capacity"),
+  rsvpOpen: integer("rsvp_open", { mode: "boolean" }).notNull().default(true),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  coverUrl: text("cover_url"),
+  coverAlt: text("cover_alt"),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const rsvps = sqliteTable(
+  "rsvps",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    consent: integer("consent", { mode: "boolean" }).notNull(),
+    status: text("status", { enum: ["going", "waitlist", "cancelled"] }).notNull().default("going"),
+    attended: integer("attended", { mode: "boolean" }).notNull().default(false),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("rsvps_event_email").on(t.eventId, t.email)],
+);
+
+export const volunteerSignups = sqliteTable("volunteer_signups", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  eventId: integer("event_id").references(() => events.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  skills: text("skills"),
+  consent: integer("consent", { mode: "boolean" }).notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+export const campaigns = sqliteTable("campaigns", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  goalCentavos: integer("goal_centavos").notNull(),
+  qrImageUrl: text("qr_image_url"),
+  qrImageAlt: text("qr_image_alt"),
+  paymentInstructions: text("payment_instructions"),
+  open: integer("open", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const payments = sqliteTable(
+  "payments",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    campaignId: integer("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+    type: text("type", { enum: ["donation", "sponsorship", "membership_fee"] }).notNull().default("donation"),
+    payerName: text("payer_name").notNull(),
+    payerEmail: text("payer_email").notNull(),
+    memberId: integer("member_id").references(() => members.id, { onDelete: "set null" }),
+    amountCentavos: integer("amount_centavos").notNull(),
+    method: text("method", { enum: ["gcash", "maya", "bank"] }).notNull(),
+    referenceNo: text("reference_no").notNull(),
+    proofUrl: text("proof_url"),
+    consent: integer("consent", { mode: "boolean" }).notNull(),
+    status: text("status", { enum: ["pending", "confirmed", "rejected"] }).notNull().default("pending"),
+    confirmedBy: text("confirmed_by"),
+    confirmedAt: text("confirmed_at"),
+    note: text("note"),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [uniqueIndex("payments_method_reference").on(t.method, t.referenceNo)],
+);
+
+export const expenses = sqliteTable("expenses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  campaignId: integer("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  amountCentavos: integer("amount_centavos").notNull(),
+  description: text("description").notNull(),
+  spentOn: text("spent_on").notNull(),
+  receiptUrl: text("receipt_url"),
+  recordedBy: text("recorded_by"),
+  createdAt: text("created_at").notNull(),
+});
+
+export const eventsLog = sqliteTable("events_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  type: text("type").notNull(),
+  criterion: text("criterion").notNull(),
+  actor: text("actor").notNull().default("public"),
+  refTable: text("ref_table"),
+  refId: integer("ref_id"),
+  meta: text("meta"),
   createdAt: text("created_at").notNull(),
 });
