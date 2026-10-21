@@ -44,3 +44,11 @@ describe("outlineBody", () => {
     expect(long).toContain('href="#three"');
   });
 });
+
+describe("outlineBody safety", () => {
+  it("cannot be used to break out of an attribute", async () => {
+    const { outlineBody } = await import("@/lib/articleBody.js");
+    const { html } = outlineBody('<a href="https://x.test/<h2>a</h2>" onclick="y()">l</a><h2 id="evil" onmouseover="z()">T</h2>');
+    expect(html).not.toMatch(/onclick|onmouseover|id="evil"/);
+  });
+});
