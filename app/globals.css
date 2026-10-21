@@ -510,3 +510,13 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .footer-cols a:hover { color: var(--ochre); }
 .footer-cols + .baseline { margin-top: 56px; }
 @media (max-width: 600px) { .footer-cols { grid-template-columns: 1fr; gap: 28px; } }
+.project__placeholder { display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; padding: 24px; }
+.project__placeholder--leadership { background: #2a4f3b; }
+.project__placeholder--global { background: var(--basalt); box-shadow: inset 0 0 0 1px var(--sage); }
+.project__placeholder .project__pillar { margin-bottom: auto; color: var(--ochre); }
+.project__placeholder .project__place { color: rgba(237, 232, 223, 0.6); }
+.project__tile-title {
+  position: relative; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.3rem, 2.2vw, 1.9rem); line-height: 1.05;
+  color: var(--dune); overflow-wrap: anywhere;
+}
