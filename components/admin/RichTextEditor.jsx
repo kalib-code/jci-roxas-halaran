@@ -20,7 +20,7 @@ function ToolButton({ editor, label, action, active }) {
   );
 }
 
-export default function RichTextEditor({ initialJson, onChange }) {
+export default function RichTextEditor({ initialJson, initialHtml, onChange }) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showImage, setShowImage] = useState(false);
   const editor = useEditor({
@@ -30,7 +30,8 @@ export default function RichTextEditor({ initialJson, onChange }) {
       Link.configure({ openOnClick: false }),
       Image,
     ],
-    content: initialJson ? JSON.parse(initialJson) : "",
+    // Imported articles arrive with HTML only, so fall back to it.
+    content: initialJson ? JSON.parse(initialJson) : (initialHtml ?? ""),
     onUpdate: ({ editor: e }) => onChange({ json: JSON.stringify(e.getJSON()), html: e.getHTML() }),
   });
   if (!editor) return <div className="rte rte--loading">Loading editor…</div>;

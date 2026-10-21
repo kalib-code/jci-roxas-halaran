@@ -79,6 +79,7 @@ export default function ArticleEditor({ article, authors, projects, planKeywords
         {notice && <p className="form-ok" role="status">{notice}</p>}
         <RichTextEditor
           initialJson={article?.bodyJson ?? null}
+          initialHtml={article?.bodyHtml ?? null}
           onChange={({ json, html }) => { setForm((f) => ({ ...f, bodyJson: json, bodyHtml: html })); setDirty(true); }}
         />
       </div>

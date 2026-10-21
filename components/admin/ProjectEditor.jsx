@@ -41,7 +41,7 @@ export default function ProjectEditor({ project, metrics = [] }) {
         <input className="title-input" aria-label="Title" placeholder="Project title" value={form.title} onChange={set("title")} />
         {errors.length > 0 && <div className="form-errors" role="alert"><ul>{errors.map((e) => <li key={e}>{e}</li>)}</ul></div>}
         {notice && <p className="form-ok" role="status">{notice}</p>}
-        <RichTextEditor initialJson={project?.bodyJson ?? null} onChange={({ json, html }) => setForm((f) => ({ ...f, bodyJson: json, bodyHtml: html }))} />
+        <RichTextEditor initialJson={project?.bodyJson ?? null} initialHtml={project?.body ?? null} onChange={({ json, html }) => setForm((f) => ({ ...f, bodyJson: json, bodyHtml: html }))} />
         {meta && (<>
           <ProjectMetricsEditor projectId={meta.id} initial={metrics} />
           <section>
