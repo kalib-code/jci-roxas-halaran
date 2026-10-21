@@ -25,3 +25,22 @@ describe("rendering stored HTML", () => {
     expect(html).not.toMatch(/<script|onerror|javascript:/);
   });
 });
+
+describe("outlineBody", () => {
+  it("gives each h2 a unique id and lists them for the table of contents", async () => {
+    const { outlineBody } = await import("@/lib/articleBody.js");
+    const { html, headings } = outlineBody('<h2>Capiz &amp; you</h2><p>x</p><h2>FAQ</h2><h2>FAQ</h2><h2 onclick="x()">Hi</h2>');
+    expect(headings.map((h) => h.id)).toEqual(["capiz-you", "faq", "faq-2", "hi"]);
+    expect(headings[0].text).toBe("Capiz & you");
+    expect(html).toContain('<h2 id="faq-2">FAQ</h2>');
+    expect(html).not.toContain("onclick");
+  });
+
+  it("ArticleView shows the table of contents only for long articles", () => {
+    const base = { slug: "a", title: "A", category: "community", publishedAt: null };
+    const short = renderToStaticMarkup(<ArticleView article={{ ...base, bodyHtml: "<h2>One</h2><h2>Two</h2>" }} related={[]} project={null} />);
+    const long = renderToStaticMarkup(<ArticleView article={{ ...base, bodyHtml: "<h2>One</h2><h2>Two</h2><h2>Three</h2>" }} related={[]} project={null} />);
+    expect(short).not.toContain('class="toc"');
+    expect(long).toContain('href="#three"');
+  });
+});
