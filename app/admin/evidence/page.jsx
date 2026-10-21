@@ -39,7 +39,7 @@ export default async function Evidence() {
         <thead><tr><th>Action</th><th>Criterion</th><th>Count</th></tr></thead>
         <tbody>{types.map((t) => <tr key={t.type}><td>{t.type.replace(/_/g, " ")}</td><td>{CRITERION_LABELS[LOG_CRITERIA[t.type]] ?? "—"}</td><td>{t.n}</td></tr>)}</tbody>
       </table>
-      <SnapshotForm key={thisMonth} month={thisMonth} snapshot={snap.get(thisMonth)} />
+      <SnapshotForm months={matrix.map((r) => r.month)} month={thisMonth} snapshots={snapshots} />
     </div>
   );
 }

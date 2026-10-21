@@ -1,6 +1,7 @@
 import { rmSync } from "node:fs";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { createDb } from "../lib/db.js";
+import { phToday } from "../lib/format.js";
 import { seed } from "../db/seed.js";
 import { saveArticle, publishArticle } from "../lib/content/articles.js";
 import { saveEvent } from "../lib/engagement/events.js";
@@ -37,11 +38,11 @@ const { campaign } = await saveCampaign(db, {
 const pledge = await submitPledge(db, {
   payerName: "Ana Villanueva",
   payerEmail: "ana.donor@example.ph",
-  amountPesos: 1500,
+  amountPesos: 1250000,
   method: "gcash",
   referenceNo: "E2E0000001",
   consent: true,
 });
 await confirmPayment(db, pledge.payment.id, ctx);
-await recordExpense(db, { amountPesos: 400, description: "Trash bags and gloves", spentOn: new Date().toISOString().slice(0, 10), campaignId: campaign.id }, ctx);
+await recordExpense(db, { amountPesos: 400, description: "Trash bags and gloves", spentOn: phToday(), campaignId: campaign.id }, ctx);
 console.log("e2e.db ready.");
