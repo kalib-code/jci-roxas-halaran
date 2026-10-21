@@ -266,7 +266,7 @@ test("the avatar upload route refuses signed-out callers", async ({ request }) =
 test("impact page lists projects by place even without map locations", async ({ page }) => {
   await page.goto("/impact");
   await expect(page.getByRole("link", { name: "Coastline Cuts" })).toBeVisible();
-  await expect(page.getByText("Project locations are being added")).toBeVisible();
+  await expect(page.getByText("are being mapped")).toBeVisible();
 });
 
 test("transparency page never shows donor names", async ({ page }) => {
