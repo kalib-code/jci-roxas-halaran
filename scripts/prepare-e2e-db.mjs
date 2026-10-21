@@ -1,6 +1,8 @@
 import { rmSync } from "node:fs";
 import { migrate } from "drizzle-orm/libsql/migrator";
+import { eq } from "drizzle-orm";
 import { createDb } from "../lib/db.js";
+import { members } from "../db/schema.js";
 import { phToday } from "../lib/format.js";
 import { seed } from "../db/seed.js";
 import { saveArticle, publishArticle } from "../lib/content/articles.js";
@@ -45,4 +47,9 @@ const pledge = await submitPledge(db, {
 });
 await confirmPayment(db, pledge.payment.id, ctx);
 await recordExpense(db, { amountPesos: 400, description: "Trash bags and gloves", spentOn: phToday(), campaignId: campaign.id }, ctx);
+// A published e-calling card (phone shown) and an unpublished member.
+await db
+  .update(members)
+  .set({ email: "lemuel@example.ph", phone: "+639171234567", websiteUrl: "https://example.ph/", cardPublished: true, cardShowPhone: true, cardShowEmail: true })
+  .where(eq(members.slug, "lemuel-capa"));
 console.log("e2e.db ready.");

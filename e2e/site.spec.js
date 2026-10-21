@@ -331,3 +331,47 @@ test("admin dashboard and tabbed lists still require sign-in", async ({ page }) 
     await expect(page).toHaveURL(/sign-in/);
   }
 });
+
+test.describe("e-calling card", () => {
+  for (const width of [375, 768, 1440]) {
+    test(`card page has nothing cut off at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/card/lemuel-capa");
+      const clipped = await page.evaluate(() =>
+        [...document.querySelectorAll(".ecard h1, .ecard p, .ecard a, .ecard span")]
+          .map((el) => ({ el, r: el.getBoundingClientRect() }))
+          .filter(({ el, r }) => r.width > 0 && (r.right > window.innerWidth + 1 || el.scrollWidth > el.clientWidth + 1))
+          .map(({ el }) => el.textContent.trim().slice(0, 30)),
+      );
+      expect(clipped).toEqual([]);
+    });
+  }
+
+  test("shows contact actions, a QR code and stays out of search", async ({ page }) => {
+    await page.goto("/card/lemuel-capa");
+    await expect(page.getByRole("heading", { level: 1, name: "Lemuel J. Capa" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Call" })).toHaveAttribute("href", "tel:+639171234567");
+    await expect(page.getByRole("link", { name: "Save contact" })).toHaveAttribute("href", "/card/lemuel-capa/vcard");
+    await expect(page.getByRole("img", { name: "QR code for this card" })).toBeVisible();
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  });
+
+  test("unpublished cards are not found", async ({ request }) => {
+    for (const path of ["/card/judy-daliva", "/card/judy-daliva/vcard", "/card/judy-daliva/image.png", "/card/nobody"]) {
+      expect((await request.get(path)).status(), path).toBe(404);
+    }
+  });
+
+  test("downloads a vCard and a card image", async ({ request }) => {
+    const v = await request.get("/card/lemuel-capa/vcard");
+    expect(v.headers()["content-type"]).toContain("text/vcard");
+    expect(await v.text()).toContain("FN:Lemuel J. Capa");
+    const img = await request.get("/card/lemuel-capa/image.png");
+    expect(img.headers()["content-type"]).toBe("image/png");
+  });
+
+  test("my card page requires sign-in", async ({ page }) => {
+    await page.goto("/members/card");
+    await expect(page).toHaveURL(/sign-in/);
+  });
+});
