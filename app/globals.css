@@ -20,7 +20,7 @@ body {
   margin: 0;
   background: var(--basalt);
   color: var(--dune);
-  font-family: Inter, system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
 }
@@ -41,9 +41,9 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .wrap { background: var(--basalt); overflow: hidden; }
 
 /* type utilities */
-.syne { font-family: Syne, sans-serif; }
+.syne { font-family: var(--font-syne), sans-serif; }
 .label {
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-space-grotesk), monospace;
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -62,7 +62,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .nav__logo img { height: 44px; width: auto; }
 .nav__links {
   display: flex; align-items: center; gap: 28px;
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-space-grotesk), monospace;
   font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
 }
 .nav__links a { color: var(--dune); }
@@ -73,7 +73,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
   background: var(--ochre);
   color: var(--basalt);
   padding: 11px 22px;
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-space-grotesk), monospace;
   font-weight: 600;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
@@ -117,7 +117,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .hero .contours { opacity: 0.14; }
 .hero__inner { position: relative; display: flex; flex-direction: column; gap: 32px; }
 .hero__title {
-  font-family: Syne, sans-serif;
+  font-family: var(--font-syne), sans-serif;
   font-weight: 800;
   font-size: clamp(2.8rem, 8vw, 6.4rem);
   line-height: 0.95;
@@ -131,7 +131,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
   align-items: flex-end; justify-content: space-between;
   border-top: 1px solid rgba(237, 232, 223, 0.15);
   padding-top: 28px;
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-space-grotesk), monospace;
   font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
   color: rgba(237, 232, 223, 0.75);
 }
@@ -152,20 +152,20 @@ h1, h2, h3, p, blockquote { margin: 0; }
   gap: 24px; flex-wrap: wrap;
   margin-bottom: 48px;
 }
-.section__bar h2 { font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); color: var(--dune); }
+.section__bar h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); color: var(--dune); }
 .section__bar .label { color: var(--sage); }
 
 /* ---------- about (landing 01) ---------- */
 .about__grid {
   display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: start;
 }
-.about__grid h2 { font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.1; color: var(--dune); }
+.about__grid h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.1; color: var(--dune); }
 .about__grid p { font-size: 1.05rem; line-height: 1.7; color: rgba(237, 232, 223, 0.75); text-wrap: pretty; }
 
 .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 64px; }
 .pillar { background: var(--canopy); padding: 36px 32px 44px; display: flex; flex-direction: column; gap: 18px; }
-.pillar .num { font-family: "Space Grotesk", monospace; font-size: 0.78rem; letter-spacing: 0.14em; color: var(--ochre); }
-.pillar h3 { font-family: Syne, sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--dune); }
+.pillar .num { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.14em; color: var(--ochre); }
+.pillar h3 { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--dune); }
 .pillar p { font-size: 0.95rem; line-height: 1.65; color: rgba(237, 232, 223, 0.7); }
 
 /* ---------- dune panels ---------- */
@@ -173,11 +173,11 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .dune__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
 .dune__col { display: flex; flex-direction: column; gap: 24px; }
 .dune .label { color: var(--sage); }
-.dune__lede { font-family: Syne, sans-serif; font-weight: 700; font-size: clamp(1.2rem, 2vw, 1.55rem); line-height: 1.4; color: var(--basalt); text-wrap: pretty; }
+.dune__lede { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: clamp(1.2rem, 2vw, 1.55rem); line-height: 1.4; color: var(--basalt); text-wrap: pretty; }
 .dune__stats { display: flex; gap: 40px; border-top: 1px solid rgba(18, 19, 20, 0.15); padding-top: 28px; }
 .dune__stat { display: flex; flex-direction: column; gap: 6px; }
-.dune__stat .v { font-family: Syne, sans-serif; font-weight: 800; font-size: 2.4rem; line-height: 1.1; color: var(--canopy); }
-.dune__stat .l { font-family: "Space Grotesk", monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(18, 19, 20, 0.6); }
+.dune__stat .v { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 2.4rem; line-height: 1.1; color: var(--canopy); }
+.dune__stat .l { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(18, 19, 20, 0.6); }
 .dune__note { font-size: 0.95rem; line-height: 1.65; color: rgba(18, 19, 20, 0.65); }
 .dune__photo { position: relative; height: 520px; }
 .dune__photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -192,7 +192,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
   border-bottom: 1px solid rgba(237, 232, 223, 0.12);
   padding-bottom: 16px;
 }
-.project__meta h3 { font-family: Syne, sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--dune); }
+.project__meta h3 { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--dune); }
 .project__meta .label--sm { color: var(--ochre); white-space: nowrap; }
 
 /* ---------- quote band (landing 03) ---------- */
@@ -207,7 +207,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .quote__inner .label { color: var(--ochre); }
 .quote__text {
   max-width: 900px;
-  font-family: Syne, sans-serif; font-weight: 800;
+  font-family: var(--font-syne), sans-serif; font-weight: 800;
   font-size: clamp(1.6rem, 3.4vw, 2.8rem); line-height: 1.25;
   color: var(--dune); text-wrap: pretty;
 }
@@ -215,8 +215,8 @@ h1, h2, h3, p, blockquote { margin: 0; }
 /* ---------- stats (landing 04) ---------- */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .stat { border-top: 2px solid var(--sage); padding-top: 24px; display: flex; flex-direction: column; gap: 8px; }
-.stat .v { font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(2.6rem, 5vw, 4rem); line-height: 1; color: var(--ochre); }
-.stat .l { font-family: "Space Grotesk", monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.7); }
+.stat .v { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(2.6rem, 5vw, 4rem); line-height: 1; color: var(--ochre); }
+.stat .l { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.7); }
 .stats__mission { margin-top: 48px; max-width: 640px; font-size: 1rem; line-height: 1.7; color: rgba(237, 232, 223, 0.65); }
 
 /* ---------- awards (landing 05) ---------- */
@@ -225,9 +225,9 @@ h1, h2, h3, p, blockquote { margin: 0; }
   padding: 26px 0;
   border-top: 1px solid rgba(237, 232, 223, 0.12);
 }
-.award .t { font-family: Syne, sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--dune); }
-.award .by { font-family: "Space Grotesk", monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
-.award .y { font-family: "Space Grotesk", monospace; font-size: 0.78rem; letter-spacing: 0.12em; color: var(--ochre); text-align: right; }
+.award .t { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--dune); }
+.award .by { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
+.award .y { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; color: var(--ochre); text-align: right; }
 
 /* ---------- big CTA footer (landing) ---------- */
 .cta-footer {
@@ -239,7 +239,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .cta-footer__inner { display: flex; flex-direction: column; align-items: center; gap: 32px; }
 .cta-footer__inner img { height: 72px; width: auto; }
 .cta-footer__title {
-  font-family: Syne, sans-serif; font-weight: 800;
+  font-family: var(--font-syne), sans-serif; font-weight: 800;
   font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 1;
   text-transform: uppercase; color: var(--dune);
 }
@@ -249,7 +249,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
   display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;
   padding: 24px var(--pad-x) 40px;
   border-top: 1px solid rgba(237, 232, 223, 0.1);
-  font-family: "Space Grotesk", monospace;
+  font-family: var(--font-space-grotesk), monospace;
   font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
   color: rgba(237, 232, 223, 0.5);
 }
@@ -263,12 +263,12 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .president__photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .president__photo .label--sm { color: rgba(237, 232, 223, 0.7); }
 .president__body { display: flex; flex-direction: column; gap: 24px; }
-.president__body h1 { font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3.4rem); line-height: 1.02; color: var(--dune); }
+.president__body h1 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3.4rem); line-height: 1.02; color: var(--dune); }
 .president__body .bio { font-size: 1.05rem; line-height: 1.7; color: rgba(237, 232, 223, 0.85); text-wrap: pretty; }
 .president__body blockquote {
   border-left: 2px solid var(--ochre);
   padding: 8px 0 8px 24px;
-  font-family: Syne, sans-serif; font-weight: 700;
+  font-family: var(--font-syne), sans-serif; font-weight: 700;
   font-size: 1.2rem; line-height: 1.5; color: var(--dune);
 }
 .president__body .close { font-size: 1rem; line-height: 1.7; color: rgba(237, 232, 223, 0.75); }
@@ -278,8 +278,8 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .officer figure { margin: 0; height: 340px; }
 .officer img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .officer__meta { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(237, 232, 223, 0.12); padding-top: 12px; }
-.officer__meta .name { font-family: Syne, sans-serif; font-weight: 700; font-size: 1rem; color: var(--dune); }
-.officer__meta .role { font-family: "Space Grotesk", monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage); }
+.officer__meta .name { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1rem; color: var(--dune); }
+.officer__meta .role { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage); }
 
 /* ---------- join page ---------- */
 .join-hero { position: relative; padding: 140px var(--pad-x) 120px; text-align: center; }
@@ -287,7 +287,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .join-hero__inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 32px; }
 .join-hero__inner img { height: 84px; width: auto; }
 .join-hero__title {
-  font-family: Syne, sans-serif; font-weight: 800;
+  font-family: var(--font-syne), sans-serif; font-weight: 800;
   font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: 0.98;
   text-transform: uppercase; color: var(--dune);
 }
@@ -295,7 +295,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 
 .faq__grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start; }
 .faq__head { display: flex; flex-direction: column; gap: 16px; }
-.faq__head h2 { font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.05; color: var(--basalt); }
+.faq__head h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.7rem, 3.2vw, 2.6rem); line-height: 1.05; color: var(--basalt); }
 .faq__item { border-top: 1px solid rgba(18, 19, 20, 0.15); }
 .faq__q {
   all: unset;
@@ -305,9 +305,9 @@ h1, h2, h3, p, blockquote { margin: 0; }
   width: 100%;
   padding: 22px 0;
 }
-.faq__q .n { font-family: "Space Grotesk", monospace; font-size: 0.75rem; letter-spacing: 0.12em; color: var(--sage); }
-.faq__q .q { font-family: Syne, sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--basalt); }
-.faq__q .m { font-family: "Space Grotesk", monospace; font-size: 1.2rem; color: var(--ochre); }
+.faq__q .n { font-family: var(--font-space-grotesk), monospace; font-size: 0.75rem; letter-spacing: 0.12em; color: var(--sage); }
+.faq__q .q { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--basalt); }
+.faq__q .m { font-family: var(--font-space-grotesk), monospace; font-size: 1.2rem; color: var(--ochre); }
 .faq__a { padding: 0 0 24px 58px; max-width: 620px; font-size: 0.98rem; line-height: 1.7; color: rgba(18, 19, 20, 0.7); }
 .faq__item:not(.open) .faq__a { display: none; }
 
@@ -329,3 +329,59 @@ h1, h2, h3, p, blockquote { margin: 0; }
   .hero { min-height: 76vh; }
   .faq__a { padding-left: 0; }
 }
+
+/* ============================================================
+   Halaran Online additions (Phase 1)
+   ============================================================ */
+.hero__statement {
+  max-width: 720px;
+  font-family: var(--font-syne), sans-serif; font-weight: 700;
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem); line-height: 1.3;
+  color: rgba(237, 232, 223, 0.85); text-wrap: pretty;
+}
+.page-hero { padding: 120px var(--pad-x) 48px; border-bottom: 1px solid rgba(237, 232, 223, 0.08); }
+.page-hero h1 {
+  font-family: var(--font-syne), sans-serif; font-weight: 800;
+  font-size: clamp(2.4rem, 7vw, 5.2rem); line-height: 0.98;
+  letter-spacing: -0.02em; text-transform: uppercase; color: var(--dune);
+  overflow-wrap: anywhere;
+}
+.page-hero p { margin-top: 24px; max-width: 640px; font-size: 1.05rem; line-height: 1.7; color: rgba(237, 232, 223, 0.7); }
+
+/* image frames used with next/image fill */
+.project figure, .officer figure, .president__photo figure, .dune__photo { position: relative; overflow: hidden; }
+
+/* officer without a photo */
+.initials {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  background: var(--canopy);
+  font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 3rem;
+  color: var(--ochre);
+}
+
+/* project without a cover image */
+.project__placeholder {
+  position: relative; display: grid; place-items: end start; width: 100%; height: 100%;
+  padding: 20px; background: var(--canopy);
+}
+.project__placeholder .contours { opacity: 0.25; }
+.project__placeholder span {
+  position: relative;
+  font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6);
+}
+.project__meta h3 { overflow-wrap: anywhere; }
+
+.section__more { margin-top: 40px; }
+
+/* past presidents, partners, contact */
+.list-rows > div {
+  display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  padding: 22px 0; border-top: 1px solid rgba(237, 232, 223, 0.12);
+}
+.list-rows .t { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--dune); }
+.list-rows .y { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; color: var(--ochre); }
+.contact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.contact > div { border-top: 2px solid var(--sage); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; overflow-wrap: anywhere; }
+.contact .l { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
+@media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
