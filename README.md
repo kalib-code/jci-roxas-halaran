@@ -54,6 +54,9 @@ Checklist before the first deploy (and for any new environment):
    Preview deployments read the same database as production unless you give Preview its own Turso URL.
 4. **Vercel Blob.** Create a Blob store in Vercel → Storage and connect it to the project, so
    `BLOB_READ_WRITE_TOKEN` exists for Production and Preview. Admin image and file uploads need it.
+5. **Turnstile and Resend (Phase 3).** Create a Cloudflare Turnstile widget for the site's hostnames and set
+   `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Without the secret, public forms skip the bot check.
+   For email receipts, verify the sending domain in Resend and set `RESEND_API_KEY` and `EMAIL_FROM`.
 
 ## Design archive (`static/`)
 
