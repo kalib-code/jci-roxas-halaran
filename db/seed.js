@@ -1,6 +1,6 @@
 import { count } from "drizzle-orm";
-import { members, officerTerms, projects, faqs, awards, sponsors } from "./schema.js";
-import { MEMBERS, TERMS, PROJECTS, FAQS, AWARDS, SPONSORS } from "./seed-data.js";
+import { members, officerTerms, projects, faqs, awards, sponsors, seoPlan } from "./schema.js";
+import { MEMBERS, TERMS, PROJECTS, FAQS, AWARDS, SPONSORS, SEO_PLAN } from "./seed-data.js";
 
 // One-time content migration. Each table is filled only while it is empty, so
 // re-running never duplicates rows, never undoes edits (including edits to
@@ -28,4 +28,5 @@ export async function seed(db) {
   if (await isEmpty(faqs)) await db.insert(faqs).values(FAQS);
   if (await isEmpty(awards)) await db.insert(awards).values(AWARDS);
   if (await isEmpty(sponsors)) await db.insert(sponsors).values(SPONSORS);
+  if (await isEmpty(seoPlan)) await db.insert(seoPlan).values(SEO_PLAN);
 }

@@ -52,6 +52,8 @@ export const projects = sqliteTable("projects", {
     .default("community"),
   status: text("status", { enum: ["planned", "ongoing", "done"] }).notNull().default("done"),
   featured: integer("featured", { mode: "boolean" }).notNull().default(false),
+  bodyJson: text("body_json"),
+  updatedAt: text("updated_at"),
 });
 
 export const projectPhotos = sqliteTable("project_photos", {
@@ -91,4 +93,50 @@ export const sponsors = sqliteTable("sponsors", {
   url: text("url"),
   tier: text("tier"),
   year: integer("year"),
+});
+
+export const articles = sqliteTable("articles", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  metaDescription: text("meta_description"),
+  targetKeyword: text("target_keyword"),
+  category: text("category", { enum: ["capiz", "holidays", "leadership", "business", "community"] })
+    .notNull()
+    .default("community"),
+  bodyJson: text("body_json"),
+  bodyHtml: text("body_html"),
+  coverUrl: text("cover_url"),
+  coverAlt: text("cover_alt"),
+  authorId: integer("author_id").references(() => members.id, { onDelete: "set null" }),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  status: text("status", { enum: ["draft", "published"] }).notNull().default("draft"),
+  publishedAt: text("published_at"),
+  updatedAt: text("updated_at").notNull(),
+  updatedBy: text("updated_by"),
+});
+
+export const seoPlan = sqliteTable(
+  "seo_plan",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    month: text("month").notNull(),
+    keyword: text("keyword").notNull(),
+    volume: integer("volume"),
+    kd: integer("kd"),
+    workingTitle: text("working_title"),
+    status: text("status", { enum: ["idea", "drafting", "published"] }).notNull().default("idea"),
+    articleId: integer("article_id").references(() => articles.id, { onDelete: "set null" }),
+  },
+  (t) => [uniqueIndex("seo_plan_month_keyword").on(t.month, t.keyword)],
+);
+
+export const resources = sqliteTable("resources", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  description: text("description"),
+  fileUrl: text("file_url").notNull(),
+  kind: text("kind", { enum: ["template", "training", "bylaws", "other"] }).notNull().default("template"),
+  visibility: text("visibility", { enum: ["public", "members"] }).notNull().default("public"),
+  createdAt: text("created_at").notNull(),
 });

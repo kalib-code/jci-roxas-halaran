@@ -129,3 +129,38 @@ export const SPONSORS = [
   { name: "Spaces Studio" },
   { name: "CAPA Dance Academy" },
 ];
+
+// [month, keyword, volume, kd, working title] from the Obsidian note
+// "JCI Roxas Halaran — SEO Keyword Plan (10 per month)" (PH data, 2026-10-21).
+export const SEO_PLAN = [
+  ["2026-11", "halaran festival", 140, 10, "Sinadya sa Halaran festival guide"],
+  ["2026-11", "bonifacio day", 14800, 0, "Bonifacio Day (Nov 30): history and meaning"],
+  ["2026-11", "rizal day", 12100, 0, "Rizal Day (Dec 30): what Filipinos commemorate"],
+  ["2026-11", "roxas city capiz", 27100, 0, "Roxas City, Capiz: a local's guide"],
+  ["2026-11", "seafood capital of the philippines", 1600, 4, "Why Roxas City is the Seafood Capital of the Philippines"],
+  ["2026-11", "baybay beach roxas city", 3600, 0, "Capiz tourist spots: Baybay Beach, Olotayan Island and more"],
+  ["2026-11", "typhoon preparedness", 1000, 0, "Typhoon preparedness checklist for Capiz families"],
+  ["2026-11", "anti bullying act", 4400, 0, "The Anti-Bullying Act explained"],
+  ["2026-11", "jci philippines", 2400, 30, "What is JCI? JCI in the Philippines"],
+  ["2026-11", "project proposal sample", 12100, 6, "Community project proposal sample (free template)"],
+  ["2026-12", "manuel roxas", 33100, 1, "Manuel Roxas: the Capiz-born president"],
+  ["2026-12", "capiz", 22200, 0, "A short history of Capiz"],
+  ["2026-12", "capiz shells", 6600, 0, "Capiz shells: from Roxas City to the world"],
+  ["2026-12", "dti business registration", 6600, 10, "DTI business registration guide"],
+  ["2026-12", "entrepreneurship in the philippines", 4400, 0, "Entrepreneurship in the Philippines"],
+  ["2026-12", "negosyo ideas", 2900, 0, "20 negosyo ideas for the province"],
+  ["2026-12", "sponsorship letter", 1600, 0, "Sponsorship letter sample"],
+  ["2026-12", "volunteer philippines", 1300, 16, "Volunteer opportunities in Capiz and the Philippines"],
+  ["2026-12", "event proposal", 720, 0, "Event proposal template"],
+  ["2026-12", "jci roxas halaran", null, null, "JCI Roxas Halaran 2026 year in review"],
+  ["2027-01", "araw ng kagitingan", 27100, 6, "Araw ng Kagitingan (Apr 9): the story of Bataan"],
+  ["2027-01", "labor day philippines", 5400, 3, "Labor Day in the Philippines"],
+  ["2027-01", "edsa people power anniversary", 210, null, "EDSA People Power anniversary (Feb 25)"],
+  ["2027-01", "public speaking tips", 4400, 24, "Public speaking tips for first-time leaders"],
+  ["2027-01", "types of leadership", 4400, 34, "Types of leadership, with Filipino examples"],
+  ["2027-01", "qualities of a good leader", 2900, 15, "Qualities of a good leader"],
+  ["2027-01", "ngo in the philippines", 2900, 0, "NGOs and youth organizations in the Philippines"],
+  ["2027-01", "community development", 1900, 13, "Community development: how to start"],
+  ["2027-01", "sdg philippines", 1000, 11, "The SDGs in the Philippines"],
+  ["2027-01", "tree planting philippines", 720, 0, "How to organize a tree planting"],
+].map(([month, keyword, volume, kd, workingTitle]) => ({ month, keyword, volume, kd, workingTitle }));

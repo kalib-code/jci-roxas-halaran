@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { eq, count } from "drizzle-orm";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
-import { members, officerTerms, projects, faqs, awards, sponsors } from "@/db/schema.js";
+import { members, officerTerms, projects, faqs, awards, sponsors, seoPlan } from "@/db/schema.js";
 
 const total = async (db, table) => (await db.select({ n: count() }).from(table))[0].n;
 
@@ -16,6 +16,7 @@ describe("seed", () => {
     expect(await total(db, faqs)).toBe(9);
     expect(await total(db, awards)).toBe(4);
     expect(await total(db, sponsors)).toBe(4);
+    expect(await total(db, seoPlan)).toBe(30);
   });
 
   it("can run twice without duplicating anything", async () => {
