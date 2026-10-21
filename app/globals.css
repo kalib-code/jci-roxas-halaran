@@ -499,3 +499,14 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .stats--money .stat .v { font-size: clamp(2rem, 3.6vw, 3.2rem); }
 @media (max-width: 900px) { .stats--money { grid-template-columns: 1fr; } }
 .money-table td:last-child, .money-table th:last-child { text-align: right; }
+
+/* ============================================================
+   Design pass
+   ============================================================ */
+.footer-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; text-align: left; }
+.cta-footer__inner + .footer-cols { margin-top: 96px; }
+.footer-cols ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.footer-cols a { color: var(--dune); }
+.footer-cols a:hover { color: var(--ochre); }
+.footer-cols + .baseline { margin-top: 56px; }
+@media (max-width: 600px) { .footer-cols { grid-template-columns: 1fr; gap: 28px; } }
