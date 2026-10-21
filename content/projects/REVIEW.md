@@ -71,3 +71,14 @@ None. Every slug on the list had at least two factual sentences in the posts. Th
 None of the 36 files sets `coverUrl`, so **every project needs a cover photo** and alt text. The seed already has covers for three of them (ironmen-awards-2025, be-a-friend-not-a-bully, friends-x-jci-roxas-halaran). The importer keeps those, so the other 33 still need one:
 
 agritatay-2025, bags-of-hope-2026, bags-to-school-2025, blue-flow-initiative, capiz-love-run-2026, choco-hero-2023, coastline-cuts, computer-literacy-program, empowerun-2026, halad-audio-lab, halaran-night-2023, halarun-for-juan-2026, hapag-ng-daigdig, hot-meals-on-wheels, igpat-sa-dalanon-2024, ipbc-t10-basketball-league-2026, ironmen-awards-2026, juan-cares-for-juana-2025, kandili-mangrove-planting, mission-possible-anemia-screening-2024, mural-marker-inauguration, oplan-kaagapay, project-gills, provincial-arbor-day-2026, sa-dagat, sampukanay-2026, solo-parents-celebration-maayon-2026, symposium-on-mens-mental-health, talentadong-tatay-2025, talentadong-tatay-2026, the-nutcracker, valor-in-every-drop-2025, wash-me-whip.
+
+## Cover photos (pulled from the chapter's Facebook page, 2026-10-21)
+
+27 projects now have a cover from their own Facebook post, in `public/assets/img/projects/`. Check that each photo is the one the chapter wants public, and swap it in the admin if not.
+
+Still need a cover:
+- **hapag-ng-daigdig**: search returned only HALAD album art
+- **mural-marker-inauguration**: the found photos show the Sunset Session beach, not the mural
+- **oplan-kaagapay**: only a donation poster, which shows a personal GCash name and number
+- **hot-meals-on-wheels**: only magazine spreads
+- **halaran-night-2023** and **empowerun-2026**: no photo posts found
