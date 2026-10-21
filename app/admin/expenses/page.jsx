@@ -1,3 +1,4 @@
+import { safeHttpsUrl } from "@/lib/safe.js";
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listProjects } from "@/lib/queries.js";
@@ -28,7 +29,7 @@ export default async function AdminExpenses() {
               <td>{formatDate(e.spentOn)}</td>
               <td>{e.description}</td>
               <td>{formatPesos(e.amountCentavos)}</td>
-              <td>{e.receiptUrl ? <a href={e.receiptUrl} target="_blank" rel="noreferrer">View</a> : "—"}</td>
+              <td>{safeHttpsUrl(e.receiptUrl) ? <a href={safeHttpsUrl(e.receiptUrl)} target="_blank" rel="noreferrer">View</a> : "—"}</td>
             </tr>
           ))}
         </tbody>

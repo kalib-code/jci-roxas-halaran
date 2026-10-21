@@ -1,3 +1,4 @@
+import { safeHttpsUrl } from "@/lib/safe.js";
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listResources } from "@/lib/content/resources.js";
@@ -20,7 +21,7 @@ export default async function AdminResources() {
         <tbody>
           {list.map((r) => (
             <tr key={r.id}>
-              <td><a href={r.fileUrl} target="_blank" rel="noreferrer">{r.title}</a></td>
+              <td>{safeHttpsUrl(r.fileUrl) ? <a href={safeHttpsUrl(r.fileUrl)} target="_blank" rel="noreferrer">{r.title}</a> : r.title}</td>
               <td>{r.kind}</td>
               <td>{r.visibility}</td>
               <td><DeleteResourceButton id={r.id} /></td>

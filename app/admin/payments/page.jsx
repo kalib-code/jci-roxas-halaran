@@ -2,6 +2,7 @@ import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { listPayments, listCampaigns } from "@/lib/engagement/money.js";
 import { formatDate, formatPesos } from "@/lib/format.js";
+import { safeHttpsUrl } from "@/lib/safe.js";
 import AdminNav from "@/components/admin/AdminNav.jsx";
 import PaymentActions from "@/components/admin/PaymentActions.jsx";
 
@@ -24,7 +25,7 @@ export default async function AdminPayments() {
             <td>{p.payerName}<br />{p.payerEmail}</td>
             <td>{formatPesos(p.amountCentavos)}</td>
             <td>{TYPE[p.type]}{p.type === "donation" ? `: ${campaignName(p.campaignId)}` : ""}</td>
-            <td>{p.method.toUpperCase()} {p.referenceNo}{p.proofUrl ? <><br /><a href={p.proofUrl} target="_blank" rel="noreferrer">Screenshot</a></> : null}</td>
+            <td>{p.method.toUpperCase()} {p.referenceNo}{safeHttpsUrl(p.proofUrl) ? <><br /><a href={safeHttpsUrl(p.proofUrl)} target="_blank" rel="noreferrer">Screenshot</a></> : null}</td>
             <td>{formatDate(p.createdAt)}</td>
             <td>{actions ? <PaymentActions id={p.id} /> : `${p.status}${p.note ? ` — ${p.note}` : ""}`}</td>
           </tr>

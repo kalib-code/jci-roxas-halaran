@@ -1,8 +1,8 @@
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { getEvent, listRsvps } from "@/lib/engagement/events.js";
+import { csvCell as cell } from "@/lib/safe.js";
 
-const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
 
 export async function GET(_request, { params }) {
   await requireArea("content");
