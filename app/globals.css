@@ -502,6 +502,8 @@ h1, h2, h3, p, blockquote { margin: 0; }
   .article-grid .acard__media { order: 2; aspect-ratio: 1; }
   .article-grid .acard__excerpt { display: none; }
   .article-grid .acard__title { font-size: 1rem; }
+  .article-grid .acard__meta { flex-direction: column; gap: 2px; }
+  .article-grid .acard__meta > * + *::before { content: none; }
   .acard--featured { padding-bottom: 32px; }
 }
 
@@ -547,6 +549,45 @@ h1, h2, h3, p, blockquote { margin: 0; }
 @media (max-width: 560px) {
   .article__cover.article__cover--contained { width: 100%; }
 }
+
+/* projects list: grouped by year */
+.year-group + .year-group { margin-top: 72px; }
+.year-group__head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding-bottom: 14px; border-bottom: 1px solid rgba(237, 232, 223, 0.12);
+  font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.4rem); color: var(--dune);
+}
+.year-group__head span { font-family: var(--font-space-grotesk), monospace; font-weight: 400; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.5); }
+.year-group .article-grid { margin-top: 32px; }
+.acard__media .project__placeholder { position: absolute; inset: 0; }
+@media (max-width: 560px) {
+  .year-group + .year-group { margin-top: 48px; }
+  .year-group .article-grid { margin-top: 8px; }
+  /* a 96px thumbnail is too small for the tile's own text */
+  .article-grid .project__placeholder { padding: 10px; }
+  .article-grid .project__placeholder > :not(.contours) { display: none; }
+}
+
+/* project page: facts panel beside the story */
+.facts { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; padding: 24px; background: var(--canopy); }
+.facts dl { margin: 0; display: flex; flex-direction: column; }
+.facts dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(237, 232, 223, 0.12); }
+.facts dt { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
+.facts dd { margin: 0; text-align: right; font-size: 0.95rem; color: var(--dune); }
+.facts__campaign .progress-wrap { margin: 10px 0 16px; }
+.facts .btn { text-align: center; }
+@media (min-width: 1100px) {
+  .article__layout--facts { grid-template-columns: minmax(0, 68ch) 320px; }
+  .article__layout--facts .facts { grid-column: 2; grid-row: 1; position: sticky; top: 100px; align-self: start; margin-bottom: 0; }
+  .article__layout--facts .article__main { grid-column: 1; grid-row: 1; }
+}
+.article-grid--gallery { margin-top: 0; gap: 16px; }
+@media (max-width: 560px) { .article-grid--gallery { grid-template-columns: 1fr 1fr; gap: 8px; } }
+.volunteer { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
+.volunteer h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(1.8rem, 3.4vw, 2.8rem); color: var(--dune); }
+.volunteer p { margin-top: 16px; max-width: 42ch; line-height: 1.7; color: rgba(237, 232, 223, 0.7); }
+.volunteer p a { color: var(--ochre); }
+@media (max-width: 900px) { .volunteer { grid-template-columns: 1fr; gap: 32px; } }
 
 /* ============================================================
    Engagement (Phase 3)
