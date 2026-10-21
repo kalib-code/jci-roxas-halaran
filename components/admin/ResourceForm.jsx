@@ -23,11 +23,15 @@ export default function ResourceForm() {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = () => start(async () => {
-    const r = await createResourceAction(form);
-    if (!r.ok) { setErrors(r.errors); return; }
-    setErrors([]);
-    setForm({ title: "", description: "", kind: "template", visibility: "public", fileUrl: "" });
-    router.refresh();
+    try {
+      const r = await createResourceAction(form);
+      if (!r.ok) { setErrors(r.errors); return; }
+      setErrors([]);
+      setForm({ title: "", description: "", kind: "template", visibility: "public", fileUrl: "" });
+      router.refresh();
+    } catch (e) {
+      setErrors([`Couldn't save (${e.message}). Check your connection and try again.`]);
+    }
   });
 
   return (

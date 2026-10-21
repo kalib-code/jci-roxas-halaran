@@ -21,12 +21,16 @@ export default function ProjectEditor({ project }) {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const save = () => start(async () => {
-    const r = await saveProjectAction({ ...form, id: meta?.id, expectedUpdatedAt: meta?.updatedAt ?? null });
-    if (!r.ok) { setErrors(r.errors); return; }
-    setErrors([]);
-    setNotice("Saved — live now.");
-    setMeta({ id: r.project.id, updatedAt: r.project.updatedAt, slug: r.project.slug });
-    if (!project) router.replace(`/admin/projects/${r.project.id}`);
+    try {
+      const r = await saveProjectAction({ ...form, id: meta?.id, expectedUpdatedAt: meta?.updatedAt ?? null });
+      if (!r.ok) { setErrors(r.errors); return; }
+      setErrors([]);
+      setNotice("Saved — live now.");
+      setMeta({ id: r.project.id, updatedAt: r.project.updatedAt, slug: r.project.slug });
+      if (!project) router.replace(`/admin/projects/${r.project.id}`);
+    } catch (e) {
+      setErrors([`Couldn't save (${e.message}). Your text is still here — check your connection and try again.`]);
+    }
   });
 
   return (

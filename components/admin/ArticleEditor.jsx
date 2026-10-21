@@ -13,7 +13,7 @@ const blank = { title: "", slug: "", metaDescription: "", targetKeyword: "", cat
 export default function ArticleEditor({ article, authors, projects, planKeywords, prefill = {} }) {
   const router = useRouter();
   const [form, setForm] = useState(() => (article ? { ...blank, ...strip(article) } : { ...blank, ...prefill }));
-  const [meta, setMeta] = useState(article ? { id: article.id, updatedAt: article.updatedAt, status: article.status, locked: Boolean(article.publishedAt) } : null);
+  const [meta, setMeta] = useState(article ? { id: article.id, slug: article.slug, updatedAt: article.updatedAt, status: article.status, locked: Boolean(article.publishedAt) } : null);
   const [errors, setErrors] = useState([]);
   const [notice, setNotice] = useState(null);
   const [dirty, setDirty] = useState(false);
@@ -27,26 +27,47 @@ export default function ArticleEditor({ article, authors, projects, planKeywords
 
   const set = (key) => (e) => { setForm((f) => ({ ...f, [key]: e.target.value })); setDirty(true); };
 
+  // Applies a store result to the editor. Navigation for a new article happens
+  // only after the whole save (and publish) sequence, so the edit page loads
+  // the final state.
   function apply(r, message) {
     if (!r.ok) { setErrors(r.errors); setNotice(null); return false; }
     setErrors([]);
     setNotice(message);
     setDirty(false);
-    setMeta({ id: r.article.id, updatedAt: r.article.updatedAt, status: r.article.status, locked: Boolean(r.article.publishedAt) });
-    setForm((f) => ({ ...f, slug: r.article.slug }));
-    if (!article && !meta) router.replace(`/admin/articles/${r.article.id}`);
+    setMeta({ id: r.article.id, slug: r.article.slug, updatedAt: r.article.updatedAt, status: r.article.status, locked: Boolean(r.article.publishedAt) });
     return true;
   }
 
-  const save = () => start(async () => {
-    apply(await saveArticleAction({ ...form, id: meta?.id, expectedUpdatedAt: meta?.updatedAt }), "Saved.");
+  const run = (steps) => start(async () => {
+    try {
+      const last = await steps();
+      if (last?.ok && !article && !meta) router.replace(`/admin/articles/${last.article.id}`);
+    } catch (e) {
+      setErrors([`Couldn't save (${e.message}). Your text is still here — check your connection and try again.`]);
+      setNotice(null);
+    }
   });
-  const publish = () => start(async () => {
-    const saved = await saveArticleAction({ ...form, id: meta?.id, expectedUpdatedAt: meta?.updatedAt });
-    if (!apply(saved, null)) return;
-    apply(await publishArticleAction(saved.article.id, saved.article.updatedAt), "Published — live now.");
+
+  const payload = () => ({ ...form, id: meta?.id, expectedUpdatedAt: meta?.updatedAt });
+  const save = () => run(async () => {
+    const r = await saveArticleAction(payload());
+    apply(r, "Saved.");
+    return r;
   });
-  const unpublish = () => start(async () => apply(await unpublishArticleAction(meta.id), "Unpublished — no longer public."));
+  const publish = () => run(async () => {
+    const saved = await saveArticleAction(payload());
+    if (!apply(saved, null)) return saved;
+    if (saved.article.status === "published") { setNotice("Updated — live now."); return saved; }
+    const r = await publishArticleAction(saved.article.id, saved.article.updatedAt);
+    apply(r, "Published — live now.");
+    return r;
+  });
+  const unpublish = () => run(async () => {
+    const r = await unpublishArticleAction(meta.id);
+    apply(r, "Unpublished — no longer public.");
+    return r;
+  });
 
   return (
     <div className="editor">
@@ -63,15 +84,24 @@ export default function ArticleEditor({ article, authors, projects, planKeywords
       </div>
       <aside className="editor__side">
         <div className="actions">
-          <button type="button" className="btn btn--ghost" disabled={pending} onClick={save}>Save draft</button>
+          {meta?.status !== "published" && <button type="button" className="btn btn--ghost" disabled={pending} onClick={save}>Save draft</button>}
           <button type="button" className="btn" disabled={pending} onClick={publish}>{meta?.status === "published" ? "Update" : "Publish"}</button>
           {meta?.status === "published" && <button type="button" className="btn btn--ghost" disabled={pending} onClick={unpublish}>Unpublish</button>}
           {meta && <a href={`/admin/articles/${meta.id}/preview`} target="_blank" rel="noreferrer">Preview</a>}
         </div>
         <div className="field">
           <label htmlFor="slug">Address</label>
-          <input id="slug" value={form.slug} onChange={set("slug")} readOnly={meta?.locked} placeholder="made from the title" />
-          {meta?.locked && <span className="count">Locked after first publish so links never break.</span>}
+          <input
+            id="slug"
+            value={meta?.locked ? meta.slug : form.slug}
+            onChange={set("slug")}
+            readOnly={meta?.locked}
+            placeholder={meta?.slug && !meta.slug.startsWith("untitled-") ? meta.slug : "made from the title"}
+            aria-describedby="slug-help"
+          />
+          <span id="slug-help" className="count">
+            {meta?.locked ? "Locked after first publish so links never break." : "Leave empty to use the title."}
+          </span>
         </div>
         <div className="field">
           <label htmlFor="kw">Target keyword</label>
@@ -122,7 +152,7 @@ export default function ArticleEditor({ article, authors, projects, planKeywords
 
 function strip(a) {
   return {
-    title: a.title ?? "", slug: a.slug ?? "", metaDescription: a.metaDescription ?? "", targetKeyword: a.targetKeyword ?? "",
+    title: a.title ?? "", slug: "", metaDescription: a.metaDescription ?? "", targetKeyword: a.targetKeyword ?? "",
     category: a.category, bodyJson: a.bodyJson ?? "", bodyHtml: a.bodyHtml ?? "", coverUrl: a.coverUrl ?? "", coverAlt: a.coverAlt ?? "",
     authorId: a.authorId ?? "", projectId: a.projectId ?? "",
   };

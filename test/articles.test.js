@@ -110,4 +110,19 @@ describe("public queries", () => {
     const r = await published();
     expect((await getPublishedArticle(db, r.article.slug)).authorName).toBeNull();
   });
+
+describe("review fixes", () => {
+  it("refuses a save that would put a live article below the publish rules", async () => {
+    const pub = await published();
+    const r = await saveArticle(db, { id: pub.article.id, expectedUpdatedAt: pub.article.updatedAt, ...complete, metaDescription: "" }, ctx);
+    expect(r).toEqual({ ok: false, errors: ["This article is live, so it must stay publishable: Add a meta description"] });
+  });
+
+  it("lets a draft's address follow its title until it is published", async () => {
+    const empty = await saveArticle(db, {}, ctx);
+    expect(empty.article.slug).toMatch(/^untitled-/);
+    const titled = await saveArticle(db, { id: empty.article.id, expectedUpdatedAt: empty.article.updatedAt, title: "Rizal Day", slug: empty.article.slug }, ctx);
+    expect(titled.article.slug).toBe("rizal-day");
+  });
+});
 });

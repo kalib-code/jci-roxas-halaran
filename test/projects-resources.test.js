@@ -47,4 +47,12 @@ describe("resources", () => {
   it("refuses a resource without an uploaded file", async () => {
     expect(await createResource(db, { title: "x", fileUrl: "" }, ctx)).toEqual({ ok: false, errors: ["Upload a file first"] });
   });
+
+describe("resource links", () => {
+  it("only accept https files on Vercel Blob", async () => {
+    expect((await createResource(db, { title: "x", fileUrl: "javascript:alert(1)" }, ctx)).ok).toBe(false);
+    expect((await createResource(db, { title: "x", fileUrl: "https://evil.example/x.pdf" }, ctx)).ok).toBe(false);
+    expect((await createResource(db, { title: "x", fileUrl: "https://abc.public.blob.vercel-storage.com/x.pdf" }, ctx)).ok).toBe(true);
+  });
+});
 });
