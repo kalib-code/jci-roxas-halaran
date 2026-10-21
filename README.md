@@ -2,43 +2,44 @@
 
 Official site for JCI Roxas Halaran (Roxas City, Capiz). The design was
 approved in a Claude Design canvas ("JCI Roxas Halaran" project, Coastal Canopy
-& Basalt brand system) and implemented as a React single-page app.
+& Basalt brand system) and implemented as a Next.js site (Halaran Online).
 
 ## Stack
 
-- **React 19 + Vite 7 + React Router 7** (JavaScript, no TypeScript)
-- Routes: `/` (landing), `/leadership` (president + Board 2025), `/join` (CTA + FAQ)
-- `src/site.css` — the design system (Coastal Canopy & Basalt tokens at the top:
-  Basalt `#121314`, Canopy `#1C3B2B`, Sage `#3A6B4F`, Dune `#EDE8DF`,
-  Ochre `#E5A823`; fonts Syne / Space Grotesk / Inter)
-- `src/data/site.js` — **all editable content in one place**: officers,
-  projects, FAQs, awards, stats, the Facebook contact URL
-- `public/assets/img/` — photos; `logo-dc.png` is the logo from the design canvas
+- **Next.js 15 (App Router) + React 19**, JavaScript
+- **Turso** (SQLite) via **Drizzle ORM** — schema in `db/schema.js`, migrations in `db/migrations`
+- **Clerk** for sign-in; roles (`member`, `officer`, `treasurer`, `admin`) in each user's public metadata
+- Design system: Coastal Canopy & Basalt tokens at the top of `app/globals.css`; fonts Syne / Space Grotesk / Inter via `next/font`
+- Logo: `public/assets/img/logo-site.png` (white wordmark — use on dark backgrounds only)
+- Spec: `docs/superpowers/specs/2026-10-21-halaran-online-design.md`
 
 ## Develop
 
 ```bash
+cp .env.example .env.local   # fill in Turso and Clerk keys (Turso URL must start with libsql://)
 npm install
-npm run dev
+npm run db:migrate && npm run db:seed
+npm run dev                  # http://localhost:5174
 ```
 
-Opens at http://localhost:5174.
-
-## Build & deploy
+## Test
 
 ```bash
-npm run build
+npm test            # unit and component tests (Vitest)
+npm run test:e2e    # end-to-end checks (Playwright, uses its own e2e.db and .next-e2e build)
 ```
 
-Deployed on Vercel (SPA rewrites in `vercel.json`). Pushing to the GitHub
-repo's default branch redeploys automatically once the repo is linked in
-Vercel; `vercel --prod` deploys manually.
+`NEXT_DIST_DIR` lets a production build use its own folder, so checks don't clash with a running `npm run dev`.
 
-## Common edits
+## Database changes
 
-- New officer / project / FAQ: edit the arrays in `src/data/site.js`
-- New photos: drop into `public/assets/img/` and reference by filename
-- Colors/typography: tokens at the top of `src/site.css`
+Edit `db/schema.js`, then `npm run db:generate` and `npm run db:migrate`.
+The seed (`npm run db:seed`) only inserts missing rows; it never overwrites edits.
+
+## Deploy
+
+Vercel builds on every push. Environment variables are listed in `.env.example`.
+Old Webflow URLs redirect permanently (see `lib/redirects.js`).
 
 ## Design archive (`static/`)
 
