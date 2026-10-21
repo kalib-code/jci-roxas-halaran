@@ -223,3 +223,42 @@ test("engagement admin screens require sign-in", async ({ page }) => {
     await expect(page).toHaveURL(/sign-in/);
   }
 });
+
+test.describe("Hiligaynon pages", () => {
+  for (const path of ["/hil", "/hil/join", "/hil/events", "/hil/support"]) {
+    test(`${path} is a well-formed Hiligaynon page`, async ({ page }) => {
+      const res = await page.goto(path);
+      expect(res.status()).toBe(200);
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('[lang="hil"]').first()).toBeVisible();
+      const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+      expect(new URL(canonical).pathname).toBe(path);
+    });
+  }
+
+  test("English pages point to their Hiligaynon twins", async ({ page }) => {
+    await page.goto("/join");
+    const hil = await page.locator('link[rel="alternate"][hreflang="hil"]').getAttribute("href");
+    expect(new URL(hil).pathname).toBe("/hil/join");
+    await expect(page.getByRole("link", { name: "Hiligaynon" })).toBeVisible();
+  });
+
+  test("the Hiligaynon application form uses Hiligaynon labels", async ({ page }) => {
+    await page.goto("/hil/join");
+    await expect(page.locator("#apply").getByLabel("Bug-os nga ngalan")).toBeVisible();
+  });
+});
+
+test("members area requires sign-in", async ({ page }) => {
+  for (const path of ["/members", "/members/profile", "/members/directory", "/members/passport", "/members/library", "/members/events", "/admin/members", "/admin/passport"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/sign-in/);
+  }
+});
+
+test("the avatar upload route refuses signed-out callers", async ({ request }) => {
+  const res = await request.post("/api/upload-avatar", {
+    data: { type: "blob.generate-client-token", payload: { pathname: "a.jpg", callbackUrl: "http://localhost:3100/api/upload-avatar", clientPayload: null, multipart: false } },
+  });
+  expect(res.status()).toBe(403);
+});

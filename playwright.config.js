@@ -16,6 +16,7 @@ export default defineConfig({
       TURNSTILE_SECRET_KEY: "",
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
       RESEND_API_KEY: "",
+      NEXT_PUBLIC_HILIGAYNON: "on",
     },
   },
 });
