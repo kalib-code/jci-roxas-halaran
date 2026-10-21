@@ -4,6 +4,7 @@ import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
 import ArticleCard from "@/components/ArticleCard.jsx";
 import EventRow from "@/components/EventRow.jsx";
+import CountUp from "@/components/CountUp.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
@@ -66,7 +67,7 @@ export default async function HomePage({ lang = "en" }) {
           <div className="stats">
             {stats.map(([label, value]) => (
               <div className="stat" key={label} lang="en">
-                <span className="v">{value.toLocaleString("en-PH")}</span>
+                <CountUp value={value} />
                 <span className="l">{label}</span>
               </div>
             ))}

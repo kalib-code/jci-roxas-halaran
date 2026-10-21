@@ -1,3 +1,4 @@
+import Toc from "@/components/Toc.jsx";
 import Link from "next/link";
 import Image from "next/image";
 import ArticleCard, { ArticleMeta } from "@/components/ArticleCard.jsx";
@@ -9,6 +10,7 @@ export default function ArticleView({ article, related, project }) {
   const body = outlineBody(article.bodyHtml);
   return (
     <article className="article">
+      <div className="read-progress" aria-hidden="true" />
       <header className="article__head">
         <p className="acard__cat">
           <Link href="/articles">Articles</Link> / <Link href={`/articles?category=${article.category}`}>{CATEGORY_LABELS[article.category]}</Link>
@@ -34,12 +36,7 @@ export default function ArticleView({ article, related, project }) {
           <p className="section__more"><Link className="btn" href="/join">Join JCI Roxas Halaran</Link></p>
         </div>
         {body.headings.length > 2 && (
-          <nav className="toc" aria-label="On this page">
-            <p className="acard__cat">On this page</p>
-            <ol>
-              {body.headings.map((h) => <li key={h.id}><a href={`#${h.id}`}>{h.text}</a></li>)}
-            </ol>
-          </nav>
+          <Toc headings={body.headings} />
         )}
       </div>
       {related.length > 0 && (

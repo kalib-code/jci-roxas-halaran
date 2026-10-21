@@ -1,0 +1,172 @@
+/* ============================================================
+   Motion and interaction layer.
+   Everything that moves sits behind prefers-reduced-motion, and
+   nothing here hides content unless the browser can animate it back.
+   ============================================================ */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- focus: visible for keyboards, quiet for mice ---------- */
+:focus-visible { outline: 2px solid var(--ochre); outline-offset: 3px; }
+.btn:focus-visible { outline-offset: 4px; }
+
+/* ---------- states that apply with or without motion ---------- */
+.toc a { position: relative; transition: color 0.2s; }
+.toc a[aria-current] { color: var(--dune); }
+.toc a[aria-current]::before {
+  content: ""; position: absolute; left: -21px; top: 0; bottom: 0;
+  width: 2px; background: var(--ochre);
+}
+
+/* FAQ: the panel collapses with grid rows so the height can animate to "auto". */
+.faq__panel { display: grid; grid-template-rows: 0fr; }
+.faq__panel > .faq__a { min-height: 0; overflow: hidden; padding-bottom: 0; }
+.faq__panel > .faq__a::after { content: ""; display: block; height: 24px; }
+.faq__item.open .faq__panel { grid-template-rows: 1fr; }
+.faq__item:not(.open) .faq__a { display: block; }
+.faq__q .m { display: inline-block; }
+
+/* Mobile menu: kept in layout so it can fade, but hidden from tab order while closed. */
+@media (max-width: 860px) {
+  .nav__links { display: flex; visibility: hidden; opacity: 0; transform: translateY(-8px); }
+  .nav__links.open { visibility: visible; opacity: 1; transform: none; }
+}
+
+/* Reading progress on article pages, driven by scroll with no JS. */
+.read-progress { display: none; }
+@supports (animation-timeline: scroll()) {
+  .read-progress {
+    display: block; position: fixed; top: 0; left: 0; right: 0; z-index: 101;
+    height: 3px; background: var(--ochre);
+    transform-origin: 0 50%; transform: scaleX(0);
+    animation: grow-x linear both; animation-timeline: scroll(root);
+  }
+}
+@keyframes grow-x { to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .read-progress { animation: none; display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---------- page entrance on every navigation ---------- */
+  /* "backwards" so no transform lingers: it would trap position: fixed children. */
+  .page-in { animation: page-in 0.5s var(--ease-out) backwards; }
+  @keyframes page-in { from { opacity: 0; transform: translateY(12px); } }
+
+  /* ---------- hero: staggered rise, contour lines draw in ---------- */
+  .hero__title, .hero__statement, .hero__meta,
+  .page-hero h1, .page-hero p,
+  .article__head > *, .join-hero__inner > * {
+    animation: rise 0.8s var(--ease-out) backwards;
+  }
+  .hero__statement, .page-hero p, .article__head > :nth-child(2), .join-hero__inner > :nth-child(2) { animation-delay: 0.08s; }
+  .hero__meta, .article__head > :nth-child(3), .join-hero__inner > :nth-child(3) { animation-delay: 0.16s; }
+  .article__head > :nth-child(n + 4), .join-hero__inner > :nth-child(n + 4) { animation-delay: 0.24s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+
+  .hero .contours path, .quote .contours path, .join-hero .contours path {
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    animation: draw 2.4s var(--ease-in-out) forwards;
+  }
+  .contours path:nth-child(2) { animation-delay: 0.12s; }
+  .contours path:nth-child(3) { animation-delay: 0.24s; }
+  .contours path:nth-child(4) { animation-delay: 0.36s; }
+  .contours path:nth-child(5) { animation-delay: 0.48s; }
+  .contours path:nth-child(6) { animation-delay: 0.6s; }
+  .contours path:nth-child(7) { animation-delay: 0.72s; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  /* After drawing, the hero lines keep a slow tidal drift. */
+  .hero .contours g { animation: drift 18s ease-in-out 2.4s infinite alternate; }
+  @keyframes drift { to { transform: translate(-24px, 10px); } }
+
+  /* ---------- scroll reveals ---------- */
+  /* Tied to each element's own entry into view. Anything on screen at load is
+     already past the range, so it renders fully visible. */
+  @supports (animation-timeline: view()) {
+    .section__bar, .stat, .acard, .honor, .pillar, .officer, .erow,
+    .past-president, .award, .year-group__head, .leader > *, .dune__grid > *,
+    .quote__inner, .faq__grid > *, .volunteer > *, .media, .contact > div {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    @keyframes reveal { from { opacity: 0; transform: translateY(32px); } }
+
+    /* Grid neighbours land one after another instead of as a block. */
+    :is(.article-grid, .projects, .stats, .honors, .officers, .pillars) > :nth-child(3n + 2) { animation-range: entry 6% entry 76%; }
+    :is(.article-grid, .projects, .stats, .honors, .officers, .pillars) > :nth-child(3n + 3) { animation-range: entry 12% entry 82%; }
+
+    .dune__photo img, .leader__photo img { animation: settle linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    @keyframes settle { from { transform: scale(1.12); } to { transform: scale(1); } }
+  }
+
+  /* ---------- buttons and links ---------- */
+  .btn { transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s var(--ease-out), box-shadow 0.25s; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgba(229, 168, 35, 0.6); }
+  .btn--ghost:hover { border-color: var(--ochre); color: var(--ochre); box-shadow: none; background: transparent; }
+  .btn:active { transform: translateY(0) scale(0.98); transition-duration: 0.08s; }
+
+  .nav__links a:not(.btn) { position: relative; transition: color 0.2s; }
+  @media (min-width: 861px) {
+    .nav__links a:not(.btn)::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 1px;
+      background: currentColor; transform: scaleX(0); transform-origin: right;
+      transition: transform 0.35s var(--ease-out);
+    }
+    .nav__links a:not(.btn):hover::after, .nav__links a.active::after { transform: scaleX(1); transform-origin: left; }
+  }
+
+  .section__more a:not(.btn), .footer-cols a, .article-body a {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    transition: background-size 0.35s var(--ease-out), color 0.2s;
+  }
+  .section__more a:not(.btn):hover, .footer-cols a:hover { background-size: 100% 1px; }
+
+  .chips a { transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s var(--ease-out); }
+  .chips a:active { transform: scale(0.96); }
+
+  /* ---------- cards ---------- */
+  .acard__media img, .officer img, .erow__photo img { transition: transform 0.6s var(--ease-out); }
+  .acard__link:hover .acard__media img { transform: scale(1.05); }
+  .officer:hover img, .erow__link:hover .erow__photo img { transform: scale(1.04); }
+  .acard__title { transition: color 0.2s; }
+  .acard__media .project__placeholder .contours { transition: transform 0.8s var(--ease-out); }
+  .acard__link:hover .project__placeholder .contours { transform: translateY(-8px) scale(1.04); }
+
+  .erow__link { transition: background 0.3s; }
+  .erow__link:hover { background: rgba(237, 232, 223, 0.03); }
+  .erow__body { transition: transform 0.35s var(--ease-out); }
+  .erow__link:hover .erow__body { transform: translateX(6px); }
+  .erow__date { transition: border-color 0.3s, background 0.3s; }
+  .erow__link:hover .erow__date { border-color: var(--ochre); }
+
+  .honor, .pillar { transition: transform 0.35s var(--ease-out), border-color 0.35s, background 0.35s; }
+  .honor:hover { transform: translateY(-4px); border-color: rgba(229, 168, 35, 0.5); }
+  .pillar:hover { transform: translateY(-4px); background: #224734; }
+
+  /* ---------- FAQ and mobile menu ---------- */
+  .faq__panel { transition: grid-template-rows 0.4s var(--ease-out); }
+  .faq__q .m { transition: transform 0.3s var(--ease-out); }
+  .faq__item.open .faq__q .m { transform: rotate(180deg); }
+
+  @media (max-width: 860px) {
+    .nav__links { transition: opacity 0.25s, transform 0.35s var(--ease-out), visibility 0s linear 0.35s; }
+    .nav__links.open { transition: opacity 0.25s, transform 0.35s var(--ease-out), visibility 0s; }
+    .nav__links.open > * { animation: rise 0.45s var(--ease-out) backwards; }
+    .nav__links.open > :nth-child(2) { animation-delay: 0.03s; }
+    .nav__links.open > :nth-child(3) { animation-delay: 0.06s; }
+    .nav__links.open > :nth-child(4) { animation-delay: 0.09s; }
+    .nav__links.open > :nth-child(5) { animation-delay: 0.12s; }
+    .nav__links.open > :nth-child(6) { animation-delay: 0.15s; }
+    .nav__links.open > :nth-child(n + 7) { animation-delay: 0.18s; }
+  }
+
+  /* ---------- progress bars fill in ---------- */
+  .progress span { animation: fill 1.2s var(--ease-out) 0.2s backwards; transform-origin: 0 50%; }
+  @keyframes fill { from { transform: scaleX(0); } }
+}
