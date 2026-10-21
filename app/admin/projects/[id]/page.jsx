@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { getProject, getProjectBySlug } from "@/lib/content/projects.js";
+import { listProjectMetrics } from "@/lib/proof/metrics.js";
 import AdminNav from "@/components/admin/AdminNav.jsx";
 import ProjectEditor from "@/components/admin/ProjectEditor.jsx";
 
@@ -15,11 +16,12 @@ export default async function EditProject({ params }) {
   const row = await getProject(db, id);
   if (!row) notFound();
   const project = await getProjectBySlug(db, row.slug);
+  const metrics = await listProjectMetrics(db, row.id);
   return (
     <div className="admin">
       <AdminNav isAdmin />
       <h1>Edit project</h1>
-      <ProjectEditor project={project} />
+      <ProjectEditor project={project} metrics={metrics} />
     </div>
   );
 }

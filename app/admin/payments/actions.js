@@ -10,6 +10,8 @@ function refreshMoney() {
   revalidateAll(SUPPORT_PATHS);
   revalidatePath("/projects/[slug]", "page");
   revalidatePath("/admin/payments");
+  revalidatePath("/transparency");
+  revalidatePath("/impact");
 }
 
 export async function confirmPaymentAction(id) {
@@ -39,6 +41,9 @@ export async function saveCampaignAction(input) {
 export async function recordExpenseAction(input) {
   const { userId } = await requireArea("content");
   const r = await recordExpense(getDb(), input, { userId });
-  if (r.ok) revalidatePath("/admin/expenses");
+  if (r.ok) {
+    revalidatePath("/admin/expenses");
+    revalidatePath("/transparency");
+  }
   return r;
 }
