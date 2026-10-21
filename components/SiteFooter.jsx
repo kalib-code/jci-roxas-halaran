@@ -16,7 +16,8 @@ export default function SiteFooter({ cta = true }) {
         <span>{SITE.name} — {SITE.address.locality}, {SITE.address.region}, {SITE.address.postalCode}</span>
         <span>
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{" "}
-          <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a> ·{" "}
+          <Link href="/resources">Free resources</Link>
         </span>
       </div>
     </footer>

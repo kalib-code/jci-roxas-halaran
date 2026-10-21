@@ -5,7 +5,7 @@ import { getDb } from "@/lib/db.js";
 import { listProjects } from "@/lib/queries.js";
 import { pageMetadata, breadcrumbLd } from "@/lib/seo.js";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   title: "Our projects",

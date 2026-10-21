@@ -2,14 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import Contours from "@/components/Contours.jsx";
 import ProjectCard from "@/components/ProjectCard.jsx";
+import ArticleCard from "@/components/ArticleCard.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
 import { getDb } from "@/lib/db.js";
 import { listProjects, listAwards } from "@/lib/queries.js";
+import { listPublishedArticles } from "@/lib/content/articles.js";
 import { pageMetadata, organizationLd } from "@/lib/seo.js";
 import { SITE } from "@/lib/site.js";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   title: { absolute: "JCI Roxas Halaran | Leadership & Entrepreneurship in Roxas City, Capiz" },
@@ -19,7 +21,11 @@ export const metadata = pageMetadata({
 
 export default async function Home() {
   const db = getDb();
-  const [projects, awards] = await Promise.all([listProjects(db, { limit: 3 }), listAwards(db)]);
+  const [projects, awards, latest] = await Promise.all([
+    listProjects(db, { limit: 3 }),
+    listAwards(db),
+    listPublishedArticles(db, { limit: 3 }),
+  ]);
 
   return (
     <>
@@ -68,6 +74,17 @@ export default async function Home() {
         </div>
         <p className="section__more"><Link className="btn" href="/projects">See all projects</Link></p>
       </section>
+
+      {latest.length > 0 && (
+        <section className="section">
+          <div className="section__bar">
+            <h2>From the blog</h2>
+            <span className="label">Articles</span>
+          </div>
+          <div className="projects">{latest.map((a) => <ArticleCard key={a.id} article={a} />)}</div>
+          <p className="section__more"><Link className="btn" href="/articles">All articles</Link></p>
+        </section>
+      )}
 
       <section className="quote">
         <Contours variant="quote" />

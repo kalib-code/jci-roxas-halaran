@@ -31,7 +31,7 @@ describe("ProjectCard", () => {
   it("shows cover and formatted date", () => {
     render(
       <ProjectCard
-        project={{ title: "IRONMEN Awards 2025", startDate: "2025-07-08", coverUrl: "/i.jpg", coverAlt: "Ceremony" }}
+        project={{ slug: "x", title: "IRONMEN Awards 2025", startDate: "2025-07-08", coverUrl: "/i.jpg", coverAlt: "Ceremony" }}
       />,
     );
     expect(screen.getByRole("img", { name: "Ceremony" })).toBeTruthy();
@@ -39,7 +39,7 @@ describe("ProjectCard", () => {
   });
 
   it("shows a placeholder and no date when they are missing", () => {
-    const { container } = render(<ProjectCard project={{ title: "SA DAGAT", startDate: null, coverUrl: null }} />);
+    const { container } = render(<ProjectCard project={{ slug: "x", title: "SA DAGAT", startDate: null, coverUrl: null }} />);
     expect(container.querySelector("img")).toBeNull();
     expect(container.querySelector(".project__placeholder")).toBeTruthy();
     expect(container.querySelector("time")).toBeNull();

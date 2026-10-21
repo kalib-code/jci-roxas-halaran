@@ -435,3 +435,26 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .plan__card { border-top: 2px solid var(--sage); padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
 .plan__card .k { font-family: var(--font-syne), sans-serif; font-weight: 700; color: var(--dune); }
 .plan__card .m { font-size: 0.8rem; color: rgba(237, 232, 223, 0.6); }
+
+/* ============================================================
+   Articles and project pages (Phase 2)
+   ============================================================ */
+.article-card__link { display: flex; flex-direction: column; gap: 16px; color: inherit; }
+.article-card__link:hover h3 { color: var(--ochre); }
+.article-card__excerpt { font-size: 0.95rem; line-height: 1.6; color: rgba(237, 232, 223, 0.7); }
+.article-card--featured figure { height: clamp(260px, 42vw, 520px); }
+.article-card--featured h3 { font-size: clamp(1.4rem, 3vw, 2.2rem); }
+.article-grid { margin-top: 48px; }
+.category-filter { margin-top: 24px; font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.category-filter a[aria-current="page"] { color: var(--dune); text-decoration: underline; }
+.article__byline { font-family: var(--font-space-grotesk), monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.article__cover, .gallery__item { position: relative; overflow: hidden; height: clamp(240px, 45vw, 560px); margin: 0; }
+.gallery__item { height: 300px; }
+.article-body { max-width: 68ch; font-size: 1.1rem; line-height: 1.8; color: rgba(237, 232, 223, 0.88); overflow-wrap: anywhere; }
+.article-body h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.8rem; line-height: 1.2; margin: 48px 0 16px; color: var(--dune); }
+.article-body h3 { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.3rem; margin: 32px 0 12px; color: var(--dune); }
+.article-body p, .article-body ul, .article-body ol { margin: 0 0 20px; }
+.article-body blockquote { border-left: 2px solid var(--ochre); margin: 24px 0; padding: 4px 0 4px 24px; font-family: var(--font-syne), sans-serif; font-weight: 700; color: var(--dune); }
+.article-body img { width: 100%; height: auto; margin: 24px 0; }
+.article-body a { text-decoration: underline; }
+.article__project { margin-top: 32px; color: rgba(237, 232, 223, 0.7); }

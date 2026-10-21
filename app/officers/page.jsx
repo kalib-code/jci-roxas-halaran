@@ -7,7 +7,7 @@ import { getCurrentBoard, getPastPresidents } from "@/lib/queries.js";
 import { pageMetadata, breadcrumbLd } from "@/lib/seo.js";
 import { initials } from "@/lib/format.js";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   title: "Our officers",

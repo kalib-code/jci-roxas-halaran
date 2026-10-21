@@ -6,6 +6,7 @@ import {
   organizationLd,
   breadcrumbLd,
   buildSitemap,
+  articleLd,
 } from "@/lib/seo.js";
 
 describe("pageMetadata", () => {
@@ -44,12 +45,46 @@ describe("structured data", () => {
 });
 
 describe("buildSitemap", () => {
-  it("lists every route with the home page first and highest", () => {
-    const now = new Date("2026-10-21T00:00:00Z");
-    const entries = buildSitemap(["/", "/about"], now);
+  it("lists static routes without dates and content with its real update time", () => {
+    const entries = buildSitemap({
+      routes: ["/", "/about"],
+      articles: [{ slug: "rizal-day", updatedAt: "2026-11-01T00:00:00.000Z" }],
+      projects: [{ slug: "coastline-cuts", updatedAt: null }],
+    });
     expect(entries).toEqual([
-      { url: `${SITE.url}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-      { url: `${SITE.url}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+      { url: `${SITE.url}/`, changeFrequency: "weekly", priority: 1 },
+      { url: `${SITE.url}/about`, changeFrequency: "monthly", priority: 0.7 },
+      { url: `${SITE.url}/articles/rizal-day`, lastModified: new Date("2026-11-01T00:00:00.000Z"), changeFrequency: "monthly", priority: 0.8 },
+      { url: `${SITE.url}/projects/coastline-cuts`, changeFrequency: "monthly", priority: 0.6 },
     ]);
+  });
+});
+
+describe("articleLd", () => {
+  const article = {
+    slug: "rizal-day",
+    title: "Rizal Day",
+    metaDescription: "What Filipinos commemorate.",
+    coverUrl: null,
+    publishedAt: "2026-11-01T00:00:00.000Z",
+    updatedAt: "2026-11-02T00:00:00.000Z",
+    authorName: null,
+  };
+
+  it("describes an article by the chapter when there is no author", () => {
+    const ld = articleLd(article);
+    expect(ld).toMatchObject({
+      "@type": "Article",
+      headline: "Rizal Day",
+      datePublished: "2026-11-01T00:00:00.000Z",
+      dateModified: "2026-11-02T00:00:00.000Z",
+      author: { "@type": "Organization", name: "JCI Roxas Halaran" },
+      mainEntityOfPage: `${SITE.url}/articles/rizal-day`,
+    });
+    expect(ld.image).toBe(absoluteUrl(SITE.ogImage));
+  });
+
+  it("credits a named member as a Person", () => {
+    expect(articleLd({ ...article, authorName: "Judy Daliva" }).author).toEqual({ "@type": "Person", name: "Judy Daliva" });
   });
 });

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import FaqList from "@/components/FaqList.jsx";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
@@ -6,7 +7,7 @@ import { listFaqs } from "@/lib/queries.js";
 import { pageMetadata, breadcrumbLd } from "@/lib/seo.js";
 import { SITE } from "@/lib/site.js";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   title: "Become a member",
@@ -30,6 +31,7 @@ export default async function Join() {
           <div><span className="l">Email</span><a href={`mailto:${SITE.email}`}>{SITE.email}</a></div>
           <div><span className="l">Facebook</span><a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Message our page</a></div>
           <div><span className="l">Location</span><span>{SITE.address.locality}, {SITE.address.region} {SITE.address.postalCode}</span></div>
+          <div><span className="l">Free templates</span><Link href="/resources">Download our resources</Link></div>
         </div>
       </section>
 
