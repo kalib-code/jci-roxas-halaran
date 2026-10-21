@@ -73,3 +73,13 @@ describe("syncAttendanceEntry", () => {
     expect((await syncAttendanceEntry(db, rsvp, true, { now })).added).toBe(false);
   });
 });
+
+describe("points validation", () => {
+  it("refuses negative or fractional points from admins", async () => {
+    const bad = "Points must be a whole number from 0 to 100";
+    expect(await addVerifiedEntry(db, judy.id, { kind: "training", title: "Leadership 101", date: "2026-05-01" }, { userId: "admin", points: -5 })).toEqual({ ok: false, errors: [bad] });
+    const { entry } = await requestEntry(db, judy.id, { kind: "training", title: "Leadership 101", date: "2026-05-01" }, { userId: "u" });
+    expect(await verifyEntry(db, entry.id, { userId: "admin", points: 2.5 })).toEqual({ ok: false, errors: [bad] });
+    expect((await verifyEntry(db, entry.id, { userId: "admin", points: 0 })).entry.points).toBe(0);
+  });
+});

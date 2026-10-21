@@ -90,3 +90,23 @@ describe("listRsvpsForEmail", () => {
     expect(rows).toEqual([expect.objectContaining({ title: "GA", slug: "ga", status: "going", attended: false })]);
   });
 });
+
+describe("admin link control", () => {
+  it("lets an admin unlink a wrongly linked account", async () => {
+    await memberForUser(db, { clerkUserId: "user_wrong", email: "judy@x.ph" });
+    const r = await adminUpdateMember(db, (await judy()).id, { email: "judy@x.ph", status: "active", inDirectory: false, unlink: true });
+    expect(r.member.clerkUserId).toBeNull();
+  });
+
+  it("drops the link when an admin changes a linked member's email", async () => {
+    await memberForUser(db, { clerkUserId: "user_wrong", email: "judy@x.ph" });
+    const r = await adminUpdateMember(db, (await judy()).id, { email: "real.judy@x.ph", status: "active", inDirectory: false });
+    expect(r.member).toMatchObject({ email: "real.judy@x.ph", clerkUserId: null });
+  });
+
+  it("keeps the link when the email is unchanged", async () => {
+    await memberForUser(db, { clerkUserId: "user_j", email: "judy@x.ph" });
+    const r = await adminUpdateMember(db, (await judy()).id, { email: "JUDY@x.ph", status: "senator", inDirectory: false });
+    expect(r.member.clerkUserId).toBe("user_j");
+  });
+});

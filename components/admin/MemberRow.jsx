@@ -8,9 +8,9 @@ export default function MemberRow({ member }) {
   const [message, setMessage] = useState(null);
   const [pending, start] = useTransition();
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
-  const save = () => start(async () => {
+  const save = (extra = {}) => start(async () => {
     try {
-      const r = await updateMemberAction(member.id, form);
+      const r = await updateMemberAction(member.id, { ...form, ...extra });
       setMessage(r.ok ? "Saved" : r.errors.join(" "));
     } catch (e) {
       setMessage(`Couldn't save (${e.message})`);
@@ -18,7 +18,7 @@ export default function MemberRow({ member }) {
   });
   return (
     <tr>
-      <td>{member.name}<br /><span className="count">{member.clerkUserId ? "Account linked" : "No account yet"}{member.feePaidYear ? ` · Fee paid ${member.feePaidYear}` : ""}</span></td>
+      <td>{member.name}<br /><span className="count">{member.clerkUserId ? <>Account linked <button type="button" className="tool" disabled={pending} onClick={() => save({ unlink: true })}>Unlink</button></> : "No account yet"}{member.feePaidYear ? ` · Fee paid ${member.feePaidYear}` : ""}</span></td>
       <td><input aria-label={`Email for ${member.name}`} type="email" value={form.email} onChange={set("email")} /></td>
       <td>
         <select aria-label={`Status for ${member.name}`} value={form.status} onChange={set("status")}>
@@ -26,7 +26,7 @@ export default function MemberRow({ member }) {
         </select>
       </td>
       <td><input aria-label={`${member.name} in directory`} type="checkbox" checked={form.inDirectory} onChange={set("inDirectory")} /></td>
-      <td><button type="button" className="tool" disabled={pending} onClick={save}>Save</button> {message && <span role="status">{message}</span>}</td>
+      <td><button type="button" className="tool" disabled={pending} onClick={() => save()}>Save</button> {message && <span role="status">{message}</span>}</td>
     </tr>
   );
 }
