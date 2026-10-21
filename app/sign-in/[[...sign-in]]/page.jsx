@@ -2,10 +2,11 @@ import { SignIn } from "@clerk/nextjs";
 
 export const metadata = { title: "Sign in", robots: { index: false } };
 
+// Own wrapper, not .page-hero: Clerk renders its own h1/p inside the card,
+// and the page-hero heading styles would otherwise restyle them.
 export default function SignInPage() {
   return (
-    <section className="page-hero" style={{ display: "grid", placeItems: "center" }}>
-      <h1 className="syne">Sign in</h1>
+    <section className="auth-page">
       <SignIn />
     </section>
   );

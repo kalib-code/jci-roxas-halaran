@@ -391,3 +391,6 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .dune__stat { flex: 1 1 140px; min-width: 0; }
 .dune__stat .l { overflow-wrap: anywhere; }
 .dune__stat .v { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+
+/* sign-in: centre Clerk's card; no site heading styles inside it */
+.auth-page { display: grid; place-items: center; min-height: 70vh; padding: 64px var(--pad-x); }

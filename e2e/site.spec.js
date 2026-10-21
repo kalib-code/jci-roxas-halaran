@@ -96,3 +96,15 @@ test("admin requires sign-in", async ({ page }) => {
   await page.goto("/admin");
   await expect(page).toHaveURL(/sign-in/);
 });
+
+test("site heading styles do not leak into the Clerk sign-in card", async ({ page }) => {
+  await page.goto("/sign-in");
+  const title = page.locator(".cl-headerTitle");
+  await expect(title).toBeVisible({ timeout: 15_000 });
+  const style = await title.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { size: parseFloat(s.fontSize), transform: s.textTransform };
+  });
+  expect(style.size).toBeLessThan(32);
+  expect(style.transform).not.toBe("uppercase");
+});
