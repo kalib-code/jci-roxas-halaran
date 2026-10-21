@@ -63,6 +63,6 @@ describe("listProjects", () => {
 describe("listFaqs and listAwards", () => {
   it("keeps FAQ order and sorts awards newest first", async () => {
     expect((await listFaqs(db))[0].question).toBe("What is JCI?");
-    expect((await listAwards(db))[0].year).toBe(2025);
+    expect((await listAwards(db))[0].year).toBe(2026);
   });
 });

@@ -136,6 +136,21 @@ h1, h2, h3, p, blockquote { margin: 0; }
   color: rgba(237, 232, 223, 0.75);
 }
 .hero__meta .btn { padding: 16px 32px; font-size: 0.82rem; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.honors { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.honor { display: flex; flex-direction: column; justify-content: space-between; gap: 20px; padding: 28px 24px; border: 1px solid rgba(237, 232, 223, 0.14); min-height: 160px; }
+.honor__title { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.15rem; line-height: 1.3; text-wrap: balance; }
+.honor__by { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.leader { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 56px; align-items: center; }
+.leader__photo { position: relative; aspect-ratio: 4 / 5; margin: 0; overflow: hidden; background: var(--canopy); }
+.leader__body { display: flex; flex-direction: column; gap: 18px; }
+.leader__name { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.05; margin: 0; }
+.leader__quote { margin: 0; font-size: 1.1rem; line-height: 1.6; opacity: 0.85; }
+.quote__cta { margin-top: 32px; }
+@media (max-width: 900px) {
+  .leader { grid-template-columns: 1fr; gap: 28px; }
+  .leader__photo { max-width: 280px; }
+}
 
 /* ---------- section scaffolding ---------- */
 .section { padding: 96px var(--pad-x); }

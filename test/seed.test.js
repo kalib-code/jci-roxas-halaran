@@ -14,7 +14,7 @@ describe("seed", () => {
     expect(await total(db, officerTerms)).toBe(26);
     expect(await total(db, projects)).toBe(11);
     expect(await total(db, faqs)).toBe(9);
-    expect(await total(db, awards)).toBe(4);
+    expect(await total(db, awards)).toBe(13);
     expect(await total(db, sponsors)).toBe(4);
     expect(await total(db, seoPlan)).toBe(30);
   });
