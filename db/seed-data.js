@@ -116,11 +116,21 @@ export const FAQS = [
   ["How can my business or organization partner with JCI?", "Email us or message our Facebook page — we welcome partnerships for community projects, sponsorships, and joint initiatives."],
 ].map(([question, answer], sort) => ({ question, answer, sort }));
 
+// From the chapter's Facebook page (content/FACEBOOK-ACTIVITIES.md, 2026-10-21).
 export const AWARDS = [
-  { title: "Nominated Top 5 Best Local Organization Website", awardedBy: "Temiong Awards", year: 2024 },
+  { title: "JCIPEA Diamond Seal of Efficiency", awardedBy: "JCI Philippines National Convention", year: 2026 },
+  { title: "JCIPEA Gavel", awardedBy: "JCI Philippines National Convention", year: 2026 },
+  { title: "CWAS Implementation Award", awardedBy: "JCI Philippines National Convention", year: 2026 },
+  { title: "Sinagtala Award, 1st Runner-Up, Best Digital Marketing Campaign (HALAD AUDIO LAB)", awardedBy: "Temiong Awards", year: 2026 },
+  { title: "Top 10 National Program Implementers, Visayas Area", awardedBy: "JCI Philippines", year: 2026 },
+  { title: "Star President — Lemuel Capa", awardedBy: "JCI", year: 2025 },
+  { title: "Star Member — John Moses Aposaga", awardedBy: "JCI", year: 2025 },
+  { title: "Quadro Award, Best Educational Program (The Nutcracker)", awardedBy: "Quadro Awards", year: 2024 },
   { title: "Nominated Top 5 Most Outstanding Local Organization", awardedBy: "Quadro Awards", year: 2024 },
-  { title: "Star Local President — Lemuel Capa", awardedBy: "JCI Philippines", year: 2025 },
-  { title: "Star Local President — John Paul Sorongon", awardedBy: "JCI Philippines", year: 2024 },
+  { title: "Nominated Top 5 Most Outstanding Local Organization Website", awardedBy: "Quadro Awards", year: 2024 },
+  { title: "Nominated Top 5 Most Outstanding Local Organization President", awardedBy: "Quadro Awards", year: 2024 },
+  { title: "Star Local President — John Paul Sorongon", awardedBy: "JCI World Congress", year: 2024 },
+  { title: "JCI Senator — John Paul C. Sorongon", awardedBy: "JCI", year: 2024 },
 ];
 
 export const SPONSORS = [
