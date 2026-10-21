@@ -22,8 +22,8 @@ describe("getCurrentBoard", () => {
     expect(board.president.name).toBe("Jaime Cortes Altavas");
     expect(board.officers).toHaveLength(12);
     expect(board.officers[0]).toMatchObject({
-      name: "Mark Vincent D. Bernas",
-      role: "Executive Vice President",
+      name: "Lemuel J. Capa",
+      role: "Immediate Past President",
     });
   });
 

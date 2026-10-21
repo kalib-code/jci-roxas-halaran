@@ -41,7 +41,7 @@ describe("getPassport", () => {
     await addVerifiedEntry(db, judy.id, { kind: "project_led", title: "Coastal Cleanup", date: "2026-06-20" }, { userId: "admin", now });
     await addVerifiedEntry(db, judy.id, { kind: "training", title: "Leadership 101", date: "2026-05-01" }, { userId: "admin", now });
     const p = await getPassport(db, judy.id);
-    expect(p.positions).toEqual([{ role: "Director", year: 2026 }]);
+    expect(p.positions).toEqual([{ role: "Director for Membership", year: 2026 }]);
     expect(p.points).toBe(5 + 2 + 3);
     expect(p.badges.map((b) => b.label)).toEqual(["First steps", "Trained ×1", "Project chair ×1", "Officer"]);
     expect(p.entries.map((e) => e.title)).toEqual(["Coastal Cleanup", "Leadership 101"]);
