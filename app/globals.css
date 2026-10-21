@@ -444,6 +444,14 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .article-card__excerpt { font-size: 0.95rem; line-height: 1.6; color: rgba(237, 232, 223, 0.7); }
 .article__cover, .gallery__item { position: relative; overflow: hidden; height: clamp(240px, 45vw, 560px); margin: 0; }
 .gallery__item { height: 300px; }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 24px; align-items: start; }
+.media { margin: 0; }
+.media iframe { display: block; width: 100%; border: 0; background: var(--basalt, #121314); }
+.media--video iframe { aspect-ratio: 16 / 9; }
+.media--vertical iframe { aspect-ratio: 9 / 16; max-height: 640px; }
+.media--audio iframe { height: 166px; }
+.media--audio.media--set iframe { height: 380px; }
+.media figcaption { margin-top: 8px; font-size: 0.9rem; }
 .article-body { max-width: 68ch; font-size: 1.1rem; line-height: 1.8; color: rgba(237, 232, 223, 0.88); overflow-wrap: anywhere; }
 .article-body h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.8rem; line-height: 1.2; margin: 48px 0 16px; color: var(--dune); }
 .article-body h3 { font-family: var(--font-syne), sans-serif; font-weight: 700; font-size: 1.3rem; margin: 32px 0 12px; color: var(--dune); }

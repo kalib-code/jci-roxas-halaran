@@ -6,7 +6,8 @@ const FIELDS = ["title", "slug", "metaDescription", "targetKeyword", "category",
 const REQUIRED = ["title", "slug", "metaDescription", "targetKeyword", "category"];
 
 // A content file is a "---" block of `key: value` lines followed by the HTML body.
-export function parseFrontMatter(text, fields, required) {
+// Keys listed in `repeatable` may appear on several lines and come back as arrays.
+export function parseFrontMatter(text, fields, required, repeatable = []) {
   const match = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(text.replace(/\r\n/g, "\n"));
   if (!match) throw new Error("File must start with a --- header block");
   const meta = {};
@@ -15,7 +16,9 @@ export function parseFrontMatter(text, fields, required) {
     const i = line.indexOf(":");
     const key = line.slice(0, i).trim();
     if (i < 0 || !fields.includes(key)) throw new Error(`Unknown header line "${line}"`);
-    meta[key] = line.slice(i + 1).trim();
+    const value = line.slice(i + 1).trim();
+    if (repeatable.includes(key)) (meta[key] ??= []).push(value);
+    else meta[key] = value;
   }
   for (const key of required) {
     if (!meta[key]) throw new Error(`Missing "${key}" in header`);

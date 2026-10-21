@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import ArticleCard from "@/components/ArticleCard.jsx";
 import { SafeHtml } from "@/components/SafeHtml.jsx";
 import ProgressBar from "@/components/ProgressBar.jsx";
+import ProjectMedia from "@/components/ProjectMedia.jsx";
 import VolunteerForm from "@/components/forms/VolunteerForm.jsx";
 import { getCampaignForProject } from "@/lib/engagement/money.js";
 import SiteFooter from "@/components/SiteFooter.jsx";
@@ -56,6 +57,7 @@ export default async function ProjectPage({ params }) {
       <section className="section">
         {project.body ? <SafeHtml className="article-body" html={project.body} /> : <p>The full story of this project is coming soon.</p>}
       </section>
+      <ProjectMedia items={project.media} />
       {project.photos.length > 0 && (
         <section className="section">
           <div className="section__bar"><h2>Gallery</h2><span className="label">Photos</span></div>

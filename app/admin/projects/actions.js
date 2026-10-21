@@ -5,7 +5,7 @@ import { getDb } from "@/lib/db.js";
 import { requireArea } from "@/lib/auth.js";
 import { pathsForProject, revalidateAll } from "@/lib/revalidate.js";
 import { setProjectMetrics } from "@/lib/proof/metrics.js";
-import { saveProject, addProjectPhoto, deleteProjectPhoto, getProject } from "@/lib/content/projects.js";
+import { saveProject, addProjectPhoto, deleteProjectPhoto, addProjectMedia, deleteProjectMedia, getProject } from "@/lib/content/projects.js";
 
 export async function saveProjectAction(input) {
   const { userId } = await requireArea("content");
@@ -28,6 +28,21 @@ export async function addProjectPhotoAction(input) {
 export async function deleteProjectPhotoAction(photoId, slug) {
   await requireArea("content");
   const r = await deleteProjectPhoto(getDb(), photoId);
+  if (r.ok) revalidateAll(pathsForProject(slug));
+  return r;
+}
+
+export async function addProjectMediaAction(input) {
+  await requireArea("content");
+  const db = getDb();
+  const r = await addProjectMedia(db, input);
+  if (r.ok) revalidateAll(pathsForProject((await getProject(db, input.projectId)).slug));
+  return r;
+}
+
+export async function deleteProjectMediaAction(mediaId, slug) {
+  await requireArea("content");
+  const r = await deleteProjectMedia(getDb(), mediaId);
   if (r.ok) revalidateAll(pathsForProject(slug));
   return r;
 }
