@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
+import { eventsLog } from "@/db/schema.js";
 
 const h = vi.hoisted(() => ({ db: null, claims: null, revalidated: [], userMetadata: null }));
 
@@ -33,6 +34,13 @@ beforeEach(async () => {
 });
 
 describe("article actions", () => {
+  it("log publishing as planning evidence", async () => {
+    h.claims = { metadata: { role: "admin" } };
+    const saved = await saveArticleAction(complete);
+    await publishArticleAction(saved.article.id, saved.article.updatedAt);
+    expect((await h.db.select().from(eventsLog)).map((l) => [l.type, l.criterion])).toEqual([["article_published", "planning"]]);
+  });
+
   it("refuse officers", async () => {
     h.claims = { metadata: { role: "officer" } };
     await expect(saveArticleAction(complete)).rejects.toThrow("NEXT_NOT_FOUND");
