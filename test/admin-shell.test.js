@@ -32,6 +32,12 @@ describe("isCurrent", () => {
     expect(isCurrent("/admin", "/admin")).toBe(true);
     expect(isCurrent("/admin/events", "/admin/evidence")).toBe(false);
   });
+
+  it("treats /members as an exact-match root too", () => {
+    expect(isCurrent("/members", "/members")).toBe(true);
+    expect(isCurrent("/members", "/members/profile")).toBe(false);
+    expect(isCurrent("/members/profile", "/members/profile")).toBe(true);
+  });
 });
 
 describe("adminCounts", () => {

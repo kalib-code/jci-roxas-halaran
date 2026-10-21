@@ -617,3 +617,4 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .ecard__qr figcaption { font-size: 0.8rem; color: rgba(237, 232, 223, 0.6); }
 .ecard__bio { margin: 0; line-height: 1.6; white-space: pre-line; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
 .ecard-page__foot { margin: 0; text-align: center; font-size: 0.85rem; color: rgba(237, 232, 223, 0.6); }
+.admin-side__foot .tool { align-self: flex-start; }
