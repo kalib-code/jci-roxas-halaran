@@ -119,7 +119,7 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .hero__title {
   font-family: var(--font-syne), sans-serif;
   font-weight: 800;
-  font-size: clamp(2.8rem, 8vw, 6.4rem);
+  font-size: clamp(2rem, 9.5vw, 6.4rem);
   line-height: 0.95;
   letter-spacing: -0.02em;
   text-transform: uppercase;
@@ -386,3 +386,8 @@ h1, h2, h3, p, blockquote { margin: 0; }
 .contact .l { font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.6); }
 @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
 .president__body h2 { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: clamp(2rem, 4.5vw, 3.4rem); line-height: 1.02; color: var(--dune); overflow-wrap: anywhere; }
+/* long award titles in the "Since" panel must wrap on phones */
+.dune__stats { flex-wrap: wrap; }
+.dune__stat { flex: 1 1 140px; min-width: 0; }
+.dune__stat .l { overflow-wrap: anywhere; }
+.dune__stat .v { font-size: clamp(1.6rem, 7vw, 2.4rem); }

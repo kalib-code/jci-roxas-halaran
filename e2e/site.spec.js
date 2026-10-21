@@ -21,13 +21,21 @@ test.describe("every public page", () => {
       await expect(page.locator('meta[name="description"]')).toHaveCount(1);
     });
 
-    test(`${path} has no horizontal scroll on a 375px phone`, async ({ page }) => {
+    test(`${path} has no text or images cut off on a 375px phone`, async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.goto(path);
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      // .wrap hides overflow, so page scroll width can't reveal clipping:
+      // check each visible element's right edge instead.
+      const clipped = await page.evaluate(() =>
+        [...document.querySelectorAll("h1, h2, h3, p, a, span, time, blockquote, img")]
+          .filter((el) => !el.closest("svg"))
+          .map((el) => ({ el, r: el.getBoundingClientRect() }))
+          .filter(({ el, r }) =>
+            r.width > 0 && (r.right > window.innerWidth + 1 || el.scrollWidth > el.clientWidth + 1),
+          )
+          .map(({ el, r }) => `${el.tagName}.${el.className} "${el.textContent.trim().slice(0, 30)}" right=${Math.round(r.right)}`),
       );
-      expect(overflow).toBeLessThanOrEqual(0);
+      expect(clipped).toEqual([]);
     });
 
     test(`${path} has no broken images`, async ({ page }) => {
