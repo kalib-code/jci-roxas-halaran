@@ -4,6 +4,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import Nav from "@/components/Nav.jsx";
 import { SITE } from "@/lib/site.js";
 import "./globals.css";
+import "./motion.css";
 
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-syne", display: "swap" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-space-grotesk", display: "swap" });

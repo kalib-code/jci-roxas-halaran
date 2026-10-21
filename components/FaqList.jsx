@@ -15,7 +15,7 @@ export default function FaqList({ faqs }) {
               <span className="q">{f.question}</span>
               <span className="m" aria-hidden="true">{open ? "−" : "+"}</span>
             </button>
-            <p className="faq__a">{f.answer}</p>
+            <div className="faq__panel" inert={!open}><p className="faq__a">{f.answer}</p></div>
           </div>
         );
       })}

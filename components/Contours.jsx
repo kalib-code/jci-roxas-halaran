@@ -42,7 +42,7 @@ export default function Contours({ variant }) {
   return (
     <svg className="contours" viewBox={viewBox} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="none" stroke={stroke} strokeWidth={width}>
-        {paths.map((d) => <path key={d} d={d} />)}
+        {paths.map((d) => <path key={d} d={d} pathLength="1" />)}
       </g>
     </svg>
   );
