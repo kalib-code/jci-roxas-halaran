@@ -3,6 +3,10 @@ import { requireArea } from "@/lib/auth.js";
 import { getDb } from "@/lib/db.js";
 import { monthProgress } from "@/lib/content/seoPlan.js";
 import { listArticlesAdmin } from "@/lib/content/articles.js";
+import { listApplications } from "@/lib/engagement/applications.js";
+import { listPayments } from "@/lib/engagement/money.js";
+import { listEvents } from "@/lib/engagement/events.js";
+import { formatDateTime } from "@/lib/format.js";
 import AdminNav from "@/components/admin/AdminNav.jsx";
 
 export const metadata = { title: "Admin", robots: { index: false } };
@@ -15,9 +19,17 @@ export default async function Admin() {
   const isAdmin = role === "admin";
   const db = getDb();
   const month = thisMonth();
-  const [progress, drafts] = isAdmin
-    ? await Promise.all([monthProgress(db, month), listArticlesAdmin(db, { status: "draft" })])
-    : [null, []];
+  const [progress, drafts, apps, pendingPayments, events] = isAdmin
+    ? await Promise.all([
+        monthProgress(db, month),
+        listArticlesAdmin(db, { status: "draft" }),
+        listApplications(db),
+        listPayments(db, { status: "pending" }),
+        listEvents(db),
+      ])
+    : [null, [], [], [], { upcoming: [] }];
+  const pendingApps = apps.filter((a) => a.status === "pending").length;
+  const next = events.upcoming[0];
 
   return (
     <div className="admin">
@@ -26,6 +38,14 @@ export default async function Admin() {
       <p>Signed in as <strong>{role}</strong>.{!isAdmin && " Only admins can edit content."}</p>
       {isAdmin && (
         <>
+          <section>
+            <h2 className="syne">To do</h2>
+            <ul>
+              <li><Link href="/admin/applications">{pendingApps} pending application{pendingApps === 1 ? "" : "s"}</Link></li>
+              <li><Link href="/admin/payments">{pendingPayments.length} payment{pendingPayments.length === 1 ? "" : "s"} to confirm</Link></li>
+              <li>{next ? <Link href={`/admin/events/${next.id}`}>Next event: {next.title}, {formatDateTime(next.startAt)} — {next.going} going</Link> : <Link href="/admin/events/new">No upcoming events — create one</Link>}</li>
+            </ul>
+          </section>
           <section>
             <h2 className="syne">SEO plan {month}</h2>
             <p>{progress.published} of {progress.total} articles published. <Link href="/admin/seo-plan">Open the plan →</Link></p>
