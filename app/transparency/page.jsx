@@ -33,7 +33,7 @@ export default async function Transparency({ searchParams }) {
       </header>
       <section className="section">
         <div className="section__bar"><h2>{year} at a glance</h2><span className="label">Summary</span></div>
-        <div className="stats">
+        <div className="stats stats--money">
           <div className="stat"><span className="v">{formatPesos(y.income.total)}</span><span className="l">Money in</span></div>
           <div className="stat"><span className="v">{formatPesos(y.expensesTotal)}</span><span className="l">Money out</span></div>
           <div className="stat"><span className="v">{formatPesos(y.balance)}</span><span className="l">Balance</span></div>

@@ -262,3 +262,28 @@ test("the avatar upload route refuses signed-out callers", async ({ request }) =
   });
   expect(res.status()).toBe(403);
 });
+
+test("impact page lists projects by place even without map locations", async ({ page }) => {
+  await page.goto("/impact");
+  await expect(page.getByRole("link", { name: "Coastline Cuts" })).toBeVisible();
+  await expect(page.getByText("Project locations are being added")).toBeVisible();
+});
+
+test("transparency page never shows donor names", async ({ page }) => {
+  await page.goto("/transparency");
+  await expect(page.locator("h1")).toHaveText("Transparency");
+  await expect(page.getByText("Trash bags and gloves")).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Coastal Cleanup Fund" }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: "₱1,500" })).toBeVisible();
+  await expect(page.getByText("Ana Villanueva")).toHaveCount(0);
+  await expect(page.getByText("ana.donor@example.ph")).toHaveCount(0);
+});
+
+test("evidence dashboard and its CSV exports require sign-in", async ({ page, request }) => {
+  await page.goto("/admin/evidence");
+  await expect(page).toHaveURL(/sign-in/);
+  for (const path of ["/admin/evidence.csv", "/admin/evidence/log.csv"]) {
+    const res = await request.get(path, { maxRedirects: 0 });
+    expect([307, 404]).toContain(res.status());
+  }
+});
