@@ -43,6 +43,13 @@
       "when": 1792560988917,
       "tag": "0005_proof",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792565800681,
+      "tag": "0006_ecard",
+      "breakpoints": true
     }
   ]
 }

@@ -96,4 +96,10 @@ describe("schema", () => {
     await db.insert(analyticsSnapshots).values({ month: "2026-11", updatedAt: "x" });
     await expect(db.insert(analyticsSnapshots).values({ month: "2026-11", updatedAt: "x" })).rejects.toThrow();
   });
+  it("gives members card fields with private defaults", async () => {
+    const db = await testDb();
+    await db.insert(members).values({ slug: "ana", name: "Ana" });
+    const [row] = await db.select().from(members);
+    expect(row).toMatchObject({ phone: null, websiteUrl: null, facebookUrl: null, linkedinUrl: null, instagramUrl: null, cardPublished: false, cardShowPhone: false, cardShowEmail: true });
+  });
 });
