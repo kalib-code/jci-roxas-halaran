@@ -9,6 +9,13 @@ export default defineConfig({
     url: "http://localhost:3100",
     timeout: 240_000,
     reuseExistingServer: false,
-    env: { TURSO_DATABASE_URL: "file:e2e.db", TURSO_AUTH_TOKEN: "", NEXT_PUBLIC_SITE_URL: "http://localhost:3100" },
+    env: {
+      TURSO_DATABASE_URL: "file:e2e.db",
+      TURSO_AUTH_TOKEN: "",
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3100",
+      TURNSTILE_SECRET_KEY: "",
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: "",
+      RESEND_API_KEY: "",
+    },
   },
 });

@@ -3,6 +3,8 @@ import { migrate } from "drizzle-orm/libsql/migrator";
 import { createDb } from "../lib/db.js";
 import { seed } from "../db/seed.js";
 import { saveArticle, publishArticle } from "../lib/content/articles.js";
+import { saveEvent } from "../lib/engagement/events.js";
+import { saveCampaign } from "../lib/engagement/money.js";
 
 rmSync("e2e.db", { force: true });
 const db = createDb("file:e2e.db");
@@ -23,4 +25,12 @@ const ready = await saveArticle(
 );
 await publishArticle(db, ready.article.id, { expectedUpdatedAt: ready.article.updatedAt }, ctx);
 console.log(`e2e articles: published ${ready.article.slug}, draft ${draft.article.slug}`);
+await saveEvent(db, { title: "General Assembly 2027", startAt: "2099-01-15T18:00", venue: "Capiz Provincial Gym", capacity: 1 });
+await saveCampaign(db, {
+  title: "Coastal Cleanup Fund",
+  goalPesos: 20000,
+  qrImageUrl: "/assets/img/logo-site.png",
+  qrImageAlt: "GCash QR code for the Coastal Cleanup Fund",
+  paymentInstructions: "GCash 0917 000 0000 — JCI Roxas Halaran",
+});
 console.log("e2e.db ready.");
