@@ -291,3 +291,25 @@ export const passportEntries = sqliteTable(
   },
   (t) => [uniqueIndex("passport_entries_ref").on(t.refTable, t.refId)],
 );
+
+export const projectMetrics = sqliteTable(
+  "project_metrics",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+    metric: text("metric").notNull(),
+    value: integer("value").notNull(),
+  },
+  (t) => [uniqueIndex("project_metrics_project_metric").on(t.projectId, t.metric)],
+);
+
+export const analyticsSnapshots = sqliteTable("analytics_snapshots", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  month: text("month").notNull().unique(),
+  organicClicks: integer("organic_clicks"),
+  impressions: integer("impressions"),
+  visitors: integer("visitors"),
+  note: text("note"),
+  updatedBy: text("updated_by"),
+  updatedAt: text("updated_at").notNull(),
+});

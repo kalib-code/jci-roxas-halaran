@@ -15,6 +15,7 @@ export default function AdminNav({ isAdmin }) {
           <Link href="/admin/expenses">Expenses</Link>
           <Link href="/admin/members">Members</Link>
           <Link href="/admin/passport">Passport</Link>
+          <Link href="/admin/evidence">Evidence</Link>
           <Link href="/admin/resources">Resources</Link>
           <Link href="/admin/seo-plan">SEO plan</Link>
         </>

@@ -4,11 +4,13 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "./RichTextEditor.jsx";
 import FileUpload from "./FileUpload.jsx";
+import ProjectMetricsEditor from "./ProjectMetricsEditor.jsx";
+import { parseCoordinates } from "@/lib/proof/location.js";
 import { saveProjectAction, addProjectPhotoAction, deleteProjectPhotoAction } from "@/app/admin/projects/actions.js";
 
-const fields = ["title", "summary", "startDate", "endDate", "barangay", "pillar", "status", "coverUrl", "coverAlt", "bodyJson", "bodyHtml"];
+const fields = ["title", "summary", "startDate", "endDate", "barangay", "pillar", "status", "coverUrl", "coverAlt", "bodyJson", "bodyHtml", "lat", "lng"];
 
-export default function ProjectEditor({ project }) {
+export default function ProjectEditor({ project, metrics = [] }) {
   const router = useRouter();
   const [form, setForm] = useState(() =>
     Object.fromEntries(fields.map((k) => [k, project?.[k === "bodyHtml" ? "body" : k] ?? (k === "pillar" ? "community" : k === "status" ? "done" : "")])),
@@ -40,7 +42,8 @@ export default function ProjectEditor({ project }) {
         {errors.length > 0 && <div className="form-errors" role="alert"><ul>{errors.map((e) => <li key={e}>{e}</li>)}</ul></div>}
         {notice && <p className="form-ok" role="status">{notice}</p>}
         <RichTextEditor initialJson={project?.bodyJson ?? null} onChange={({ json, html }) => setForm((f) => ({ ...f, bodyJson: json, bodyHtml: html }))} />
-        {meta && (
+        {meta && (<>
+          <ProjectMetricsEditor projectId={meta.id} initial={metrics} />
           <section>
             <h2 className="syne">Gallery</h2>
             <ul>
@@ -59,7 +62,7 @@ export default function ProjectEditor({ project }) {
               if (r.ok) setPhotos((ps) => [...ps, r.photo]); else setErrors(r.errors);
             })} />
           </section>
-        )}
+        </>)}
       </div>
       <aside className="editor__side">
         <div className="actions">
@@ -70,6 +73,15 @@ export default function ProjectEditor({ project }) {
         <div className="field"><label htmlFor="start">Start date</label><input id="start" type="date" value={form.startDate} onChange={set("startDate")} /></div>
         <div className="field"><label htmlFor="end">End date</label><input id="end" type="date" value={form.endDate} onChange={set("endDate")} /></div>
         <div className="field"><label htmlFor="brgy">Barangay</label><input id="brgy" value={form.barangay} onChange={set("barangay")} /></div>
+        <div className="field">
+          <label htmlFor="loc-paste">Location (paste "lat, lng" or a Google Maps link)</label>
+          <input id="loc-paste" placeholder="11.5853, 122.7511" onChange={(e) => {
+            const c = parseCoordinates(e.target.value);
+            if (c) setForm((f) => ({ ...f, lat: String(c.lat), lng: String(c.lng) }));
+          }} />
+        </div>
+        <div className="field"><label htmlFor="lat">Latitude</label><input id="lat" inputMode="decimal" value={form.lat} onChange={set("lat")} /></div>
+        <div className="field"><label htmlFor="lng">Longitude</label><input id="lng" inputMode="decimal" value={form.lng} onChange={set("lng")} /></div>
         <div className="field">
           <label htmlFor="pillar">Pillar</label>
           <select id="pillar" value={form.pillar} onChange={set("pillar")}>

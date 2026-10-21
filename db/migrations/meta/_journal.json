@@ -36,6 +36,13 @@
       "when": 1792559108251,
       "tag": "0004_passport",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792560988917,
+      "tag": "0005_proof",
+      "breakpoints": true
     }
   ]
 }

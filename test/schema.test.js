@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { testDb } from "./helpers/db.js";
-import { members, officerTerms, projects, faqs, articles, seoPlan, applications, rsvps, payments, events, passportEntries } from "@/db/schema.js";
+import { members, officerTerms, projects, faqs, articles, seoPlan, applications, rsvps, payments, events, passportEntries, projectMetrics, analyticsSnapshots } from "@/db/schema.js";
 
 describe("schema", () => {
   it("stores and reads a member with defaults", async () => {
@@ -87,5 +87,13 @@ describe("schema", () => {
     await expect(db.insert(passportEntries).values(e)).rejects.toThrow();
     await db.insert(passportEntries).values({ ...e, refTable: null, refId: null });
     await db.insert(passportEntries).values({ ...e, refTable: null, refId: null });
+  });
+  it("keeps one value per project and metric, and one analytics snapshot per month", async () => {
+    const db = await testDb();
+    const [p] = await db.insert(projects).values({ slug: "p", title: "P" }).returning();
+    await db.insert(projectMetrics).values({ projectId: p.id, metric: "trees_planted", value: 10 });
+    await expect(db.insert(projectMetrics).values({ projectId: p.id, metric: "trees_planted", value: 5 })).rejects.toThrow();
+    await db.insert(analyticsSnapshots).values({ month: "2026-11", updatedAt: "x" });
+    await expect(db.insert(analyticsSnapshots).values({ month: "2026-11", updatedAt: "x" })).rejects.toThrow();
   });
 });
