@@ -595,3 +595,25 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .dash-bar { grid-column: 1 / -1; height: 6px; margin-top: 6px; background: rgba(237, 232, 223, 0.1); }
 .dash-bar span { display: block; height: 100%; background: var(--ochre); }
 @media (max-width: 900px) { .dash { grid-template-columns: 1fr; } }
+/* ============================================================
+   E-calling card
+   ============================================================ */
+.ecard-page { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 48px 16px 96px; }
+.ecard { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 20px; padding: 28px; background: linear-gradient(160deg, #1c3b2b 0%, #121314 70%); border: 1px solid rgba(237, 232, 223, 0.12); border-radius: 20px; }
+.ecard__brand img { height: 32px; width: auto; }
+.ecard__who { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.ecard__photo { position: relative; display: grid; place-items: center; width: 120px; height: 120px; overflow: hidden; border-radius: 50%; border: 3px solid var(--ochre); background: var(--canopy); font-family: var(--font-syne), sans-serif; font-size: 2.2rem; color: var(--dune); }
+.ecard__name { margin: 10px 0 0; font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.7rem; line-height: 1.1; color: var(--dune); overflow-wrap: anywhere; }
+.ecard__role { margin: 0; font-family: var(--font-space-grotesk), monospace; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.ecard__work { margin: 0; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
+.ecard__actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; }
+.ecard__actions a { display: grid; place-items: center; min-height: 48px; padding: 8px; border: 1px solid rgba(237, 232, 223, 0.2); color: var(--dune); font-family: var(--font-space-grotesk), monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.ecard__actions a.ecard__save { grid-column: 1 / -1; background: var(--ochre); border-color: var(--ochre); color: var(--basalt); font-weight: 700; }
+.ecard__links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.ecard__links a { display: inline-block; padding: 6px 12px; border-radius: 999px; background: rgba(237, 232, 223, 0.08); color: var(--dune); font-size: 0.85rem; }
+.ecard__qr { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ecard__qr > div { width: 180px; height: 180px; padding: 10px; border-radius: 12px; background: var(--dune); }
+.ecard__qr svg { display: block; width: 100%; height: 100%; }
+.ecard__qr figcaption { font-size: 0.8rem; color: rgba(237, 232, 223, 0.6); }
+.ecard__bio { margin: 0; line-height: 1.6; white-space: pre-line; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
+.ecard-page__foot { margin: 0; text-align: center; font-size: 0.85rem; color: rgba(237, 232, 223, 0.6); }
