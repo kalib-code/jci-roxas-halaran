@@ -39,3 +39,9 @@ describe("SiteFooter", () => {
     hasBoth(["footer.chapter", "footer.involved", "footer.accountability"]);
   });
 });
+
+describe("join steps", () => {
+  it("are written in both languages", () => {
+    hasBoth(["join.stepsTitle", "join.step1", "join.step2", "join.step3", "join.step4"]);
+  });
+});

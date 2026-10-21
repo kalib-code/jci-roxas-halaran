@@ -22,8 +22,16 @@ export default async function JoinPage({ lang = "en" }) {
 
       <section id="apply" className="section">
         <div className="section__bar"><h2>{L("join.applyTitle")}</h2><span className="label">{L("join.applyLabel")}</span></div>
-        <p>{L("join.applyIntro")}</p>
-        <ApplicationForm lang={lang} />
+        <div className="apply-grid">
+          <div>
+            <p>{L("join.applyIntro")}</p>
+            <h3 className="syne">{L("join.stepsTitle")}</h3>
+            <ol className="join-steps">
+              {["join.step1", "join.step2", "join.step3", "join.step4"].map((k) => <li key={k}>{L(k)}</li>)}
+            </ol>
+          </div>
+          <ApplicationForm lang={lang} />
+        </div>
       </section>
 
       <section id="contact" className="section">
