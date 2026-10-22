@@ -1,3 +1,4 @@
+import { SITE } from "@/lib/site.js";
 import { describe, it, expect, beforeEach } from "vitest";
 import { eq } from "drizzle-orm";
 import { testDb } from "./helpers/db.js";
@@ -76,10 +77,18 @@ describe("transparency", () => {
 
 describe("impactStats", () => {
   it("drops figures that are zero", () => {
-    expect(impactStats({ projectsDone: 11, activeMembers: 18, volunteers: 0, eventsHeld: 0, metrics: { trees_planted: 120, schools: 0 } })).toEqual([
+    expect(impactStats({ projectsDone: 11, activeMembers: 18, volunteers: 0, eventsHeld: 0, metrics: { trees_planted: 120, schools: 0 } }, { memberFloor: 0 })).toEqual([
       ["Projects completed", 11],
       ["Active members", 18],
       ["Trees planted", 120],
     ]);
+  });
+  it("shows the chapter's stated member count until the members list catches up", () => {
+    const members = (active) => impactStats({ projectsDone: 0, activeMembers: active, volunteers: 0, eventsHeld: 0, metrics: {} });
+    expect(members(18)).toEqual([["Active members", 48]]);
+    expect(members(52)).toEqual([["Active members", 52]]);
+  });
+  it("states 48 members on the About page", () => {
+    expect(SITE.stats.find((s) => s.label === "Members").value).toBe("48");
   });
 });
