@@ -18,6 +18,13 @@ export function nameKey(name) {
   return words.length < 2 ? words.join("-") : `${words[0]}-${words.at(-1)}`;
 }
 
+// "Jaime Cortes M. Altavas" and "Jaime Altavas" agree; "Jaime Miguel Altavas"
+// and "Jaime Cortes Altavas" don't, since each has a given name the other lacks.
+function wordsAgree(a, b) {
+  const [short, long] = [nameWords(a), nameWords(b)].sort((x, y) => x.length - y.length);
+  return short.every((w) => long.includes(w));
+}
+
 // Slug in the house style: the full name minus initials and suffix punctuation,
 // with "jr" kept so "Elmer F. Jimenez, Jr." gives "elmer-jimenez-jr".
 function rosterSlug(name) {
@@ -31,9 +38,10 @@ function rosterSlug(name) {
 export async function importRoster(db, rows) {
   const existing = await db.select().from(members);
   const byEmail = new Map(existing.filter((m) => m.email).map((m) => [m.email.toLowerCase(), m]));
-  const byKey = new Map(existing.map((m) => [nameKey(m.name), m]));
+  const byKey = new Map();
+  for (const m of existing) byKey.set(nameKey(m.name), [...(byKey.get(nameKey(m.name)) ?? []), m]);
   const slugs = new Set(existing.map((m) => m.slug));
-  const result = { added: [], filled: [], unchanged: [], badPhones: [] };
+  const result = { added: [], filled: [], unchanged: [], needsReview: [], badPhones: [] };
 
   for (const row of rows) {
     const name = row.name.trim();
@@ -41,7 +49,16 @@ export async function importRoster(db, rows) {
     const phone = row.phone ? normalizePhone(row.phone) : null;
     if (row.phone && !phone) result.badPhones.push(`${name}: ${row.phone}`);
 
-    const match = (email && byEmail.get(email)) ?? byKey.get(nameKey(name));
+    // The email becomes the member's sign-in link, so a name match must be
+    // unambiguous: one candidate, and every full word of the shorter name present
+    // in the longer. Anything else is left for a person to sort out.
+    const candidates = byKey.get(nameKey(name)) ?? [];
+    const byName = candidates.length === 1 && wordsAgree(name, candidates[0].name) ? candidates[0] : null;
+    const match = (email && byEmail.get(email)) ?? byName;
+    if (!match && candidates.length) {
+      result.needsReview.push(`${name} ~ ${candidates.map((m) => m.name).join(" / ")}`);
+      continue;
+    }
     if (match) {
       const fill = {};
       if (name !== match.name) fill.name = name;
@@ -58,7 +75,7 @@ export async function importRoster(db, rows) {
     for (let n = 2; slugs.has(slug); n++) slug = `${rosterSlug(name)}-${n}`;
     const [added] = await db.insert(members).values({ slug, name, email, phone: phone || null }).returning();
     slugs.add(slug);
-    byKey.set(nameKey(name), added);
+    byKey.set(nameKey(name), [...(byKey.get(nameKey(name)) ?? []), added]);
     if (email) byEmail.set(email, added);
     result.added.push(name);
   }
