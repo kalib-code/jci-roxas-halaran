@@ -1,6 +1,7 @@
 import { Syne, Space_Grotesk, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import Nav from "@/components/Nav.jsx";
 import { SITE } from "@/lib/site.js";
 import "./globals.css";
@@ -38,6 +39,9 @@ export default function RootLayout({ children }) {
         </div>
         <Analytics />
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+        {process.env.NEXT_PUBLIC_UMAMI_ID && (
+          <Script src="https://cloud.umami.is/script.js" data-website-id={process.env.NEXT_PUBLIC_UMAMI_ID} strategy="afterInteractive" />
+        )}
       </body>
     </html>
   );
