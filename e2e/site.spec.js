@@ -59,9 +59,9 @@ test("home page declares the chapter as an NGO", async ({ page }) => {
 
 test("officers page shows the 2026 president and a photo for every officer", async ({ page }) => {
   await page.goto("/officers");
-  await expect(page.getByText("Jaime Cortes Altavas — 2026 Local Organization President")).toBeVisible();
+  await expect(page.getByText("Jaime Cortes M. Altavas — 2026 Local Organization President")).toBeVisible();
   await expect(page.locator(".officer .initials")).toHaveCount(0);
-  await expect(page.locator(".officer", { hasText: "Judy Daliva" }).locator("img")).toHaveAttribute("alt", "Judy Daliva");
+  await expect(page.locator(".officer", { hasText: "Judy J. Daliva" }).locator("img")).toHaveAttribute("alt", "Judy J. Daliva");
 });
 
 test("sitemap and robots", async ({ request }) => {

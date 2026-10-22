@@ -20,7 +20,7 @@ describe("passport entries", () => {
   it("lets a member request an entry that an admin verifies with adjusted points", async () => {
     const { entry } = await requestEntry(db, judy.id, { kind: "training", title: "Effective Communication", date: "2026-10-05" }, { userId: "user_j", now });
     expect(entry).toMatchObject({ status: "requested", points: 2 });
-    expect((await listRequestedEntries(db))[0]).toMatchObject({ memberName: "Judy Daliva" });
+    expect((await listRequestedEntries(db))[0]).toMatchObject({ memberName: "Judy J. Daliva" });
     const r = await verifyEntry(db, entry.id, { userId: "admin", points: 3, now });
     expect(r.entry).toMatchObject({ status: "verified", points: 3, verifiedBy: "admin" });
   });

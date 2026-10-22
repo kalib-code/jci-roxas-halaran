@@ -62,7 +62,7 @@ describe("directory", () => {
   });
 
   it("lists only opted-in active members", async () => {
-    expect((await listDirectory(db)).map((m) => m.name)).toEqual(["Judy Daliva"]);
+    expect((await listDirectory(db)).map((m) => m.name)).toEqual(["Judy J. Daliva"]);
   });
 
   it("searches name, profession, business and skills, case-insensitively", async () => {

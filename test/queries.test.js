@@ -19,7 +19,7 @@ describe("getCurrentBoard", () => {
   it("returns the latest year's president separately from the board", async () => {
     const board = await getCurrentBoard(db);
     expect(board.year).toBe(2026);
-    expect(board.president.name).toBe("Jaime Cortes Altavas");
+    expect(board.president.name).toBe("Jaime Cortes M. Altavas");
     expect(board.officers).toHaveLength(12);
     expect(board.officers[0]).toMatchObject({
       name: "Lemuel J. Capa",
