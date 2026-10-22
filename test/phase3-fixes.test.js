@@ -53,7 +53,7 @@ describe("membership fees", () => {
     expect((await confirmPayment(db, unmatched.payment.id, { userId: "admin" })).linkedMember).toBeNull();
     await db.update(members).set({ email: "b@x.ph" }).where(eq(members.slug, "judy-daliva"));
     const matched = await pledge({ type: "membership_fee", payerEmail: "b@x.ph", referenceNo: "REF99999" });
-    expect((await confirmPayment(db, matched.payment.id, { userId: "admin" })).linkedMember).toBe("Judy Daliva");
+    expect((await confirmPayment(db, matched.payment.id, { userId: "admin" })).linkedMember).toBe("Judy J. Daliva");
   });
 });
 
