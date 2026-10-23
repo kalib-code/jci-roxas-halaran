@@ -16,7 +16,7 @@ describe("seed", () => {
     expect(await total(db, faqs)).toBe(9);
     expect(await total(db, awards)).toBe(13);
     expect(await total(db, sponsors)).toBe(4);
-    expect(await total(db, seoPlan)).toBe(30);
+    expect(await total(db, seoPlan)).toBe(33);
   });
 
   it("can run twice without duplicating anything", async () => {

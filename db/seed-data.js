@@ -144,6 +144,9 @@ export const SPONSORS = [
 // [month, keyword, volume, kd, working title] from the Obsidian note
 // "JCI Roxas Halaran — SEO Keyword Plan (10 per month)" (PH data, 2026-10-21).
 export const SEO_PLAN = [
+  ["2026-10", "jci meaning", 1000, 16, "JCI meaning: what JCI stands for"],
+  ["2026-10", "how to join jci", 30, null, "How to join JCI in the Philippines"],
+  ["2026-10", "jci roxas", null, null, "The JCI chapters of Roxas City and Capiz"],
   ["2026-11", "halaran festival", 140, 10, "Sinadya sa Halaran festival guide"],
   ["2026-11", "bonifacio day", 14800, 0, "Bonifacio Day (Nov 30): history and meaning"],
   ["2026-11", "rizal day", 12100, 0, "Rizal Day (Dec 30): what Filipinos commemorate"],

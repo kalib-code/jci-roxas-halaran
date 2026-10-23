@@ -1,4 +1,4 @@
-import { REDIRECTS } from "./lib/redirects.js";
+import { REDIRECTS, HOST_REDIRECTS } from "./lib/redirects.js";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -10,7 +10,7 @@ const nextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
   async redirects() {
-    return REDIRECTS;
+    return [...HOST_REDIRECTS, ...REDIRECTS];
   },
 };
 
