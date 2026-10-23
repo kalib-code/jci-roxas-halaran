@@ -35,6 +35,13 @@ On 2026-10-21, 875 posts from the chapter's Facebook page were reviewed. The ful
   - Add why the chapter is named "Halaran" if you want that story told. **Partly answered:** the "Communio" post says the name is "Rooted in the word 'offering'" and that "the 'Halaran Festival' was the premier celebration of the city and province, depicting the colorful history and the landing of the Bornean Datus" (#188). Confirm with the chapter.
 - **sdg-philippines**: links projects to SDGs from their titles (Arbor Day → 13, 15; Men's Mental Health → 3; anti-bullying → 4, 16). The posts support related tags: the chapter ties men's mental health work to SDG 3 under JCI RISE (#147), and anti-bullying is tagged #EducationForPeace2025 (#399). They give no SDG numbers for Arbor Day.
 
+- **jci-meaning, how-to-join-jci, jci-roxas-capiz** (added and published 2026-10-23 for the JCI keywords):
+  - Annual dues are not stated anywhere. If the chapter is happy to print its amount, add it to how-to-join-jci.
+  - "Opportunity to Impact (OTI)" is named as the Roxas orientation, from the chapter's posts. Confirm what a prospective member must do before induction (OTI, a project, a form), and add it.
+  - jci-roxas-capiz lists Makawiwili, Sinadya, Halaran and Panitan Tumandok. Other chapters may exist: a "JCI Roxas Kapatiran Reloaded" Facebook page appears in search. Confirm the current list and whether to add it.
+  - Makawiwili is described as having held "more than 25 induction ceremonies" (Capiz Times: 25th; roxascity.gov.ph: 26th). Confirm with the chapter.
+  - The Sinadya and Panitan Tumandok descriptions are short on purpose. Ask those chapters for a line on their focus.
+
 ## Capiz
 - **halaran-festival-guide**: sources disagree on when Sinadya and Halaran merged and split. The article says they were held together for years and the city now uses "Sinadya". Confirm. The posts only say Halaran was "historically" the premier festival (#188), which fits the article.
 - **roxas-city-capiz-guide**: population 179,292 (2020 census, 47 barangays) via PhilAtlas, not the PSA page.
