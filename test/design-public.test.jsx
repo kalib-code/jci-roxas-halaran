@@ -35,6 +35,11 @@ describe("SiteFooter", () => {
     expect(screen.getByRole("navigation", { name: "Chapter" })).toBeTruthy();
   });
 
+  it("links members to their login", () => {
+    render(<SiteFooter cta={false} />);
+    expect(screen.getByRole("link", { name: "Member login" }).getAttribute("href")).toBe("/members");
+  });
+
   it("has the column headings in both languages", () => {
     hasBoth(["footer.chapter", "footer.involved", "footer.accountability"]);
   });

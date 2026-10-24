@@ -26,7 +26,9 @@ export default function SiteFooter({ cta = true, lang = "en", altHref = null }) 
         <span>{SITE.name} — {SITE.address.locality}, {SITE.address.region}, {SITE.address.postalCode}</span>
         <span>
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{" "}
-          <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a> ·{" "}
+          {/* Signed-out visitors are sent to /sign-in and back; members land in their area. */}
+          <Link href="/members" prefetch={false} rel="nofollow">Member login</Link>
           {hilEnabled() && altHref && <> · <Link href={altHref} hrefLang={lang === "hil" ? "en" : "hil"}>{t(lang, "footer.switch")}</Link></>}
           {" "}· © {new Date().getFullYear()}
         </span>
