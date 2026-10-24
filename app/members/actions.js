@@ -5,6 +5,8 @@ import { getDb } from "@/lib/db.js";
 import { currentMember } from "@/lib/members/current.js";
 import { updateProfile } from "@/lib/members/profile.js";
 import { requestEntry } from "@/lib/members/passport.js";
+import { notifyAdmins } from "@/lib/notify-admins.js";
+import { SITE } from "@/lib/site.js";
 
 const NO_PROFILE = { ok: false, errors: ["Your account isn't linked to a member profile yet — ask an admin."] };
 
@@ -24,5 +26,9 @@ export async function requestEntryAction(input) {
   const r = await requestEntry(getDb(), member.id, input, { userId });
   if (!r.ok) return r;
   revalidatePath("/members/passport");
+  await notifyAdmins({
+    subject: `Passport entry to verify: ${member.name}`,
+    text: `${member.name} asked to log "${input?.title ?? "an activity"}" in their JCI passport.\nVerify it at ${SITE.url}/admin/passport`,
+  });
   return { ok: true };
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createHmac, randomBytes } from "node:crypto";
 import { Resend } from "resend";
-import { handleInbound, shouldForward, buildForward, parseRecipients } from "@/lib/inbound.js";
+import { handleInbound, shouldForward, buildForward, parseRecipients, pickAttachments } from "@/lib/inbound.js";
 
 const opts = { infoAddress: "info@jciroxashalaran.com", from: "JCI Roxas Halaran <forwarder@jciroxashalaran.com>", recipients: ["sec@x.ph", "pres@x.ph"] };
 const received = (data = {}) => ({
@@ -36,6 +36,33 @@ describe("info@ forwarding", () => {
     expect(shouldForward({ type: "email.delivered", data: {} }, opts)).toEqual({ skip: "not-an-inbound-email" });
     expect(shouldForward(received(), { ...opts, recipients: [] })).toEqual({ skip: "no-recipients-configured" });
     expect(shouldForward(received({ from: "forwarder@jciroxashalaran.com" }), opts)).toEqual({ skip: "own-message" });
+  });
+
+  it("trusts the envelope recipient over typed headers, and can't be fooled by a display name", () => {
+    expect(shouldForward(received({ to: ["info@jciroxashalaran.com"], received_for: ["other@jciroxashalaran.com"] }), opts)).toEqual({ skip: "not-for-info" });
+    expect(shouldForward(received({ to: ['"<info@jciroxashalaran.com>" <evil@x.ph>'] }), opts)).toEqual({ skip: "not-for-info" });
+  });
+
+  it("strips scripts, forms, styles and remote images from forwarded HTML", () => {
+    const msg = buildForward(
+      { from: "a@x.ph", to: [], subject: "s", html: '<p style="x">Hi</p><script>alert(1)</script><form action="https://evil"><input></form><img src="https://track/p.gif"><img src="data:image/png;base64,AA"><a href="javascript:x">j</a><a href="https://ok.ph">ok</a>' },
+      [],
+      opts,
+    );
+    const body = msg.html.slice(msg.html.indexOf("</p>") + 4);
+    expect(body).not.toMatch(/script|form|style=|track\/p\.gif|javascript:/);
+    expect(msg.html).toContain('<img src="data:image/png;base64,AA" />');
+    expect(msg.html).toContain('<a href="https://ok.ph">ok</a>');
+    expect(msg.text).toContain("External email sent to info@");
+  });
+
+  it("drops attachments that run code or exceed the limits, and cleans file names", () => {
+    const a = (filename, size = 1000) => ({ filename, size, download_url: `https://dl/${filename}`, content_type: "application/octet-stream", content_disposition: "attachment" });
+    const { kept, dropped } = pickAttachments([a("deck.pdf"), a("invoice.exe"), a("budget.xlsm"), a("big.zip", 30 * 1024 * 1024), a("evil\u202efdp.js")]);
+    expect(kept.map((k) => k.filename)).toEqual(["deck.pdf"]);
+    expect(dropped).toEqual(["invoice.exe", "budget.xlsm", "big.zip", "evil_fdp.js"]);
+    const many = pickAttachments([...Array(12)].map((_, i) => a(`f${i}.pdf`)));
+    expect(many.kept).toHaveLength(10);
   });
 
   it("sends from our domain with Reply-To set to the original sender", () => {

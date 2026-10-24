@@ -3,6 +3,7 @@
 import { getDb } from "@/lib/db.js";
 import { verifyTurnstile } from "@/lib/turnstile.js";
 import { sendEmail } from "@/lib/email.js";
+import { notifyAdmins } from "@/lib/notify-admins.js";
 import { SITE } from "@/lib/site.js";
 import { formatDateTime, formatPesos } from "@/lib/format.js";
 import { pathsForEvent, revalidateAll } from "@/lib/revalidate.js";
@@ -23,8 +24,7 @@ export async function applyAction(input) {
       subject: "We received your JCI Roxas Halaran application",
       text: `Hi ${name},\n\nThank you for applying to JCI Roxas Halaran. Our team will review your application and contact you soon.\n\nJCI Roxas Halaran\n${SITE.url}`,
     }),
-    sendEmail({
-      to: SITE.email,
+    notifyAdmins({
       subject: `New membership application: ${name}`,
       text: `${name} (${email}) applied to join.\nReview it at ${SITE.url}/admin/applications`,
     }),
@@ -42,11 +42,17 @@ export async function rsvpAction(input) {
     r.status === "waitlist"
       ? "The event is full — you're on the waitlist. We'll email you if a spot opens."
       : `You're going! See you on ${when}.`;
-  await sendEmail({
-    to: r.rsvp.email,
-    subject: `${r.status === "waitlist" ? "Waitlist" : "RSVP"}: ${r.event.title}`,
-    text: `Hi ${r.rsvp.name},\n\n${message}\n\n${r.event.title}\n${when}${r.event.venue ? `\n${r.event.venue}` : ""}\n${SITE.url}/events/${r.event.slug}`,
-  });
+  await Promise.all([
+    sendEmail({
+      to: r.rsvp.email,
+      subject: `${r.status === "waitlist" ? "Waitlist" : "RSVP"}: ${r.event.title}`,
+      text: `Hi ${r.rsvp.name},\n\n${message}\n\n${r.event.title}\n${when}${r.event.venue ? `\n${r.event.venue}` : ""}\n${SITE.url}/events/${r.event.slug}`,
+    }),
+    notifyAdmins({
+      subject: `New ${r.status === "waitlist" ? "waitlist signup" : "RSVP"}: ${r.event.title}`,
+      text: `${r.rsvp.name} (${r.rsvp.email}) ${r.status === "waitlist" ? "joined the waitlist for" : "RSVP'd to"} ${r.event.title} on ${when}.\nSee the list at ${SITE.url}/admin/events`,
+    }),
+  ]);
   return { ok: true, message };
 }
 
@@ -54,10 +60,9 @@ export async function volunteerAction(input) {
   if (!(await verifyTurnstile(input?.turnstileToken))) return BOT;
   const r = await submitVolunteer(getDb(), input);
   if (!r.ok) return r;
-  await sendEmail({
-    to: SITE.email,
+  await notifyAdmins({
     subject: `New volunteer: ${r.signup.name}`,
-    text: `${r.signup.name} (${r.signup.email}) signed up to volunteer.${r.signup.skills ? `\nSkills: ${r.signup.skills}` : ""}`,
+    text: `${r.signup.name} (${r.signup.email}) signed up to volunteer.${r.signup.skills ? `\nSkills: ${r.signup.skills}` : ""}\nSee volunteers at ${SITE.url}/admin/events`,
   });
   return { ok: true, message: "Thank you for volunteering! We'll contact you with details." };
 }
@@ -67,8 +72,7 @@ export async function pledgeAction(input) {
   const r = await submitPledge(getDb(), input);
   if (!r.ok) return r;
   const p = r.payment;
-  await sendEmail({
-    to: SITE.email,
+  await notifyAdmins({
     subject: `New pledge to confirm: ${formatPesos(p.amountCentavos)} via ${p.method.toUpperCase()}`,
     text: `${p.payerName} (${p.payerEmail}) reported ${formatPesos(p.amountCentavos)} via ${p.method.toUpperCase()}, reference ${p.referenceNo}.\nConfirm it at ${SITE.url}/admin/payments`,
   });
