@@ -4,6 +4,8 @@ import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
 import { members } from "@/db/schema.js";
 import { inviteUnlinkedMembers } from "@/lib/members/invite.js";
+import { currentBoardMembers, currentBoardEmails } from "@/lib/members/board.js";
+import { shouldRaise } from "@/lib/clerk-invite.js";
 
 let db;
 const bySlug = async (slug) => (await db.select().from(members).where(eq(members.slug, slug)))[0];
@@ -22,7 +24,7 @@ describe("inviting unlinked members", () => {
     const invite = vi.fn(async () => ({ invited: true }));
     const r = await inviteUnlinkedMembers(db, { invite });
     expect(invite).toHaveBeenCalledTimes(1);
-    expect(invite).toHaveBeenCalledWith("judy@x.ph");
+    expect(invite.mock.calls[0][0]).toBe("judy@x.ph");
     expect(r.invited).toEqual([(await bySlug("judy-daliva")).name]);
     expect(r.withoutEmail.length).toBeGreaterThan(0);
   });
@@ -43,6 +45,48 @@ describe("inviting unlinked members", () => {
     const r = await inviteUnlinkedMembers(db, { invite });
     expect(r.failed).toEqual([{ name: (await bySlug("judy-daliva")).name, error: "Email is invalid" }]);
     expect(r.invited).toHaveLength(1);
+  });
+});
+
+describe("the board gets admin automatically", () => {
+  it("invites current board members as admin and everyone else as member", async () => {
+    const board = await currentBoardMembers(db);
+    const boardIds = new Set(board.map((b) => b.id));
+    const outsider = (await db.select().from(members)).find((m) => !boardIds.has(m.id));
+    await db.update(members).set({ email: null });
+    await db.update(members).set({ email: "board@x.ph" }).where(eq(members.id, board[0].id));
+    await db.update(members).set({ email: "out@x.ph" }).where(eq(members.id, outsider.id));
+    const invite = vi.fn(async () => ({ invited: true }));
+    const r = await inviteUnlinkedMembers(db, { invite });
+    expect(Object.fromEntries(invite.mock.calls.map(([email, o]) => [email, o.role]))).toEqual({ "board@x.ph": "admin", "out@x.ph": "member" });
+    expect(r.admins).toEqual([board[0].name]);
+  });
+
+  it("raises board members who already have an account, but not anyone else", async () => {
+    const board = await currentBoardMembers(db);
+    const boardIds = new Set(board.map((b) => b.id));
+    const outsider = (await db.select().from(members)).find((m) => !boardIds.has(m.id));
+    await db.update(members).set({ clerkUserId: "user_b" }).where(eq(members.id, board[0].id));
+    await db.update(members).set({ clerkUserId: "user_o" }).where(eq(members.id, outsider.id));
+    const raise = vi.fn(async () => true);
+    await inviteUnlinkedMembers(db, { invite: async () => ({ invited: true }), raise });
+    expect(raise.mock.calls).toEqual([["user_b", "admin"]]);
+  });
+
+  it("lists the board's emails for info@ forwarding, cleaned and without duplicates", async () => {
+    const board = await currentBoardMembers(db);
+    await db.update(members).set({ email: null });
+    await db.update(members).set({ email: " Pres@X.ph " }).where(eq(members.id, board[0].id));
+    await db.update(members).set({ email: "pres@x.ph" }).where(eq(members.id, board[1].id));
+    expect(await currentBoardEmails(db)).toEqual(["pres@x.ph"]);
+  });
+
+  it("only ever raises a role", () => {
+    expect(shouldRaise(undefined, "member")).toBe(true);
+    expect(shouldRaise("member", "admin")).toBe(true);
+    expect(shouldRaise("officer", "admin")).toBe(true);
+    expect(shouldRaise("admin", "member")).toBe(false);
+    expect(shouldRaise("treasurer", "member")).toBe(false);
   });
 });
 

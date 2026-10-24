@@ -59,8 +59,11 @@ Checklist before the first deploy (and for any new environment):
    For email receipts, verify the sending domain in Resend and set `RESEND_API_KEY` and `EMAIL_FROM`.
 6. **info@ forwarding.** With Resend Receiving on for the domain, add a webhook in Resend → Webhooks for the
    `email.received` event pointing at `https://www.jciroxashalaran.com/api/inbound`. Set its signing secret as
-   `RESEND_WEBHOOK_SECRET` and the board's addresses, comma-separated, as `INFO_FORWARD_TO`. Each email to
-   info@ is forwarded from `forwarder@` with Reply-To set to the original sender, attachments included.
+   `RESEND_WEBHOOK_SECRET`. Each email to info@ is forwarded from `forwarder@` to the current board (the latest
+   year in the officer list) with Reply-To set to the original sender; `INFO_FORWARD_TO` adds extra addresses.
+7. **Board = admin.** "Invite members" in Admin → Members gives current board members the admin role (and raises
+   board members who already have an account). Admins receive alerts for applications, RSVPs, volunteers,
+   pledges and passport requests. Roles are only ever raised; demote past officers in Clerk by hand.
 
 ## Design archive (`static/`)
 
