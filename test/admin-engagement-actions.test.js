@@ -56,7 +56,7 @@ describe("admin engagement actions", () => {
 
   it("give an existing Clerk account the member role instead of inviting it", async () => {
     h.claims = { metadata: { role: "admin" } };
-    h.existing = { id: "user_existing", publicMetadata: {} };
+    h.existing = { id: "user_existing", publicMetadata: {}, emailAddresses: [{ emailAddress: "a@x.ph", verification: { status: "verified" } }] };
     const { application } = await submitApplication(h.db, { name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
     const r = await approveApplicationAction(application.id);
     expect(r).toMatchObject({ ok: true, invited: false, linkedAccount: true });
@@ -64,9 +64,18 @@ describe("admin engagement actions", () => {
     expect(h.metadataUpdates).toEqual([["user_existing", { publicMetadata: { role: "member" } }]]);
   });
 
+  it("invite instead when the matching account never verified that email", async () => {
+    h.claims = { metadata: { role: "admin" } };
+    h.existing = { id: "user_claimer", publicMetadata: {}, emailAddresses: [{ emailAddress: "a@x.ph", verification: { status: "unverified" } }] };
+    const { application } = await submitApplication(h.db, { name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
+    const r = await approveApplicationAction(application.id);
+    expect(r).toMatchObject({ ok: true, invited: true, linkedAccount: false });
+    expect(h.metadataUpdates).toEqual([]);
+  });
+
   it("never downgrade an existing account that already has a role", async () => {
     h.claims = { metadata: { role: "admin" } };
-    h.existing = { id: "user_admin2", publicMetadata: { role: "admin" } };
+    h.existing = { id: "user_admin2", publicMetadata: { role: "admin" }, emailAddresses: [{ emailAddress: "a@x.ph", verification: { status: "verified" } }] };
     const { application } = await submitApplication(h.db, { name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
     await approveApplicationAction(application.id);
     expect(h.metadataUpdates).toEqual([]);
