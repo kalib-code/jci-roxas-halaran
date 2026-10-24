@@ -57,6 +57,10 @@ Checklist before the first deploy (and for any new environment):
 5. **Turnstile and Resend (Phase 3).** Create a Cloudflare Turnstile widget for the site's hostnames and set
    `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Without the secret, public forms skip the bot check.
    For email receipts, verify the sending domain in Resend and set `RESEND_API_KEY` and `EMAIL_FROM`.
+6. **info@ forwarding.** With Resend Receiving on for the domain, add a webhook in Resend → Webhooks for the
+   `email.received` event pointing at `https://www.jciroxashalaran.com/api/inbound`. Set its signing secret as
+   `RESEND_WEBHOOK_SECRET` and the board's addresses, comma-separated, as `INFO_FORWARD_TO`. Each email to
+   info@ is forwarded from `forwarder@` with Reply-To set to the original sender, attachments included.
 
 ## Design archive (`static/`)
 
