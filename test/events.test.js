@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
 import { eventsLog } from "@/db/schema.js";
-import { saveEvent, submitRsvp, listEvents, getEventBySlug, setAttendance, submitVolunteer, listRsvps } from "@/lib/engagement/events.js";
+import { saveEvent, submitRsvp, listEvents, getEventBySlug, setAttendance, submitVolunteer, listRsvps, listVolunteers } from "@/lib/engagement/events.js";
 
 const now = "2026-11-01T00:00:00.000Z";
 let db;
@@ -59,5 +59,13 @@ describe("volunteers", () => {
   it("records a sign-up for an event", async () => {
     const r = await submitVolunteer(db, { eventId: ga.id, name: "Ana Cruz", email: "a@x.ph", skills: "Photography", consent: true }, { now });
     expect(r.ok).toBe(true);
+  });
+
+  it("lists sign-ups newest first with what they signed up for", async () => {
+    await submitVolunteer(db, { eventId: ga.id, name: "Ana Cruz", email: "a@x.ph", consent: true }, { now: "2026-10-01T00:00:00Z" });
+    await submitVolunteer(db, { eventId: ga.id, name: "Ben Reyes", email: "b@x.ph", skills: "Driving", consent: true }, { now: "2026-10-02T00:00:00Z" });
+    const list = await listVolunteers(db);
+    expect(list.map((v) => v.name)).toEqual(["Ben Reyes", "Ana Cruz"]);
+    expect(list[0]).toMatchObject({ skills: "Driving", eventTitle: ga.title, eventId: ga.id, projectTitle: null });
   });
 });
