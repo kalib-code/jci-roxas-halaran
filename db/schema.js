@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 export const members = sqliteTable("members", {
@@ -294,6 +294,22 @@ export const eventsLog = sqliteTable("events_log", {
   meta: text("meta"),
   createdAt: text("created_at").notNull(),
 });
+
+// Who changed what in the admin area, newest first on /admin/activity.
+export const auditLog = sqliteTable(
+  "audit_log",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    actorId: text("actor_id").notNull(),
+    action: text("action").notNull(),
+    targetTable: text("target_table"),
+    targetId: integer("target_id"),
+    summary: text("summary").notNull(),
+    details: text("details"),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [index("audit_log_created_at").on(t.createdAt)],
+);
 
 export const passportEntries = sqliteTable(
   "passport_entries",
