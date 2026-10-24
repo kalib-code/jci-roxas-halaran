@@ -45,3 +45,13 @@ describe("inviting unlinked members", () => {
     expect(r.invited).toHaveLength(1);
   });
 });
+
+describe("matching an existing Clerk account", () => {
+  it("only trusts an address the account has verified", async () => {
+    const { ownsEmail } = await import("@/lib/clerk-invite.js");
+    const user = (status) => ({ emailAddresses: [{ emailAddress: "Judy@X.ph", verification: { status } }] });
+    expect(ownsEmail(user("verified"), "judy@x.ph")).toBe(true);
+    expect(ownsEmail(user("unverified"), "judy@x.ph")).toBe(false);
+    expect(ownsEmail(user("verified"), "other@x.ph")).toBe(false);
+  });
+});
