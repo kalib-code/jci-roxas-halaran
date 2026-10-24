@@ -7,6 +7,7 @@ const h = vi.hoisted(() => ({ db: null, human: true, emails: [], revalidated: []
 vi.mock("@/lib/db.js", async (orig) => ({ ...(await orig()), getDb: () => h.db }));
 vi.mock("@/lib/turnstile.js", () => ({ verifyTurnstile: async () => h.human }));
 vi.mock("@/lib/email.js", () => ({ sendEmail: async (m) => { h.emails.push(m); return { sent: true }; } }));
+vi.mock("@/lib/notify-admins.js", () => ({ notifyAdmins: async (m) => { h.emails.push({ ...m, to: "admins" }); return { sent: true }; } }));
 vi.mock("next/cache", () => ({ revalidatePath: (p) => h.revalidated.push(p) }));
 
 const { applyAction, rsvpAction, pledgeAction } = await import("@/app/actions/engagement.js");
@@ -30,10 +31,17 @@ describe("public actions", () => {
     });
   });
 
-  it("confirm an application and email both the applicant and the chapter", async () => {
+  it("confirm an application and email both the applicant and the admins", async () => {
     const r = await applyAction({ name: "Ana Cruz", email: "a@x.ph", birthdate: "1998-01-01", consent: true });
     expect(r).toEqual({ ok: true, message: "Thank you! We received your application and will contact you soon." });
-    expect(h.emails.map((m) => m.to)).toEqual(["a@x.ph", "roxashalaran.jci@gmail.com"]);
+    expect(h.emails.map((m) => m.to)).toEqual(["a@x.ph", "admins"]);
+  });
+
+  it("alert the admins about every RSVP", async () => {
+    await rsvpAction({ eventId: ga.id, name: "Ana Cruz", email: "a@x.ph", consent: true });
+    const alert = h.emails.find((m) => m.to === "admins");
+    expect(alert.subject).toBe("New RSVP: General Assembly");
+    expect(alert.text).toContain("Ana Cruz (a@x.ph) RSVP'd to General Assembly");
   });
 
   it("tell a late RSVP they are on the waitlist and refresh the event pages", async () => {
