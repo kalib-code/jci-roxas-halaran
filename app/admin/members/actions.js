@@ -5,6 +5,8 @@ import { getDb } from "@/lib/db.js";
 import { requireArea } from "@/lib/auth.js";
 import { adminUpdateMember } from "@/lib/members/profile.js";
 import { verifyEntry, declineEntry, addVerifiedEntry } from "@/lib/members/passport.js";
+import { inviteUnlinkedMembers } from "@/lib/members/invite.js";
+import { inviteMember } from "@/lib/clerk-invite.js";
 
 export async function updateMemberAction(id, input) {
   await requireArea("content");
@@ -14,6 +16,13 @@ export async function updateMemberAction(id, input) {
     revalidatePath("/members/directory");
   }
   return r.ok ? { ok: true } : r;
+}
+
+export async function inviteAllMembersAction() {
+  await requireArea("content");
+  const r = await inviteUnlinkedMembers(getDb(), { invite: inviteMember });
+  revalidatePath("/admin/members");
+  return { ok: true, ...r };
 }
 
 export async function verifyEntryAction(id, points) {
