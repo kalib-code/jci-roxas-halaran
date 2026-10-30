@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { SITE } from "@/lib/site.js";
 import { initials } from "@/lib/format.js";
+import { platformFor } from "@/lib/members/card-view.js";
+import SocialIcon from "@/components/members/SocialIcon.jsx";
 
 // One card design for the public page, the member's own card page and the live editor preview.
 // `live` is false for an unpublished card: its vCard link would 404, so Save contact is shown as text.
@@ -29,7 +31,7 @@ export default function ECard({ card, qrSvg = null, nameAs = "p", live = true })
       </nav>
       {card.links.length > 0 && (
         <ul className="ecard__links">
-          {card.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a></li>)}
+          {card.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer"><SocialIcon platform={platformFor(l.url).key} />{l.label}</a></li>)}
         </ul>
       )}
       {qrSvg && (
@@ -41,7 +43,7 @@ export default function ECard({ card, qrSvg = null, nameAs = "p", live = true })
       {card.bio && <p className="ecard__bio">{card.bio}</p>}
       <a className="ecard__chapter" href={SITE.discordUrl} target="_blank" rel="noopener noreferrer">
         <span>Official chapter Discord</span>
-        Join JCI Roxas Halaran on Discord
+        <strong><SocialIcon platform="discord" size={20} />Join JCI Roxas Halaran on Discord</strong>
       </a>
     </article>
   );

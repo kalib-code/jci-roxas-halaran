@@ -770,13 +770,17 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .ecard__actions a { display: grid; place-items: center; min-height: 48px; padding: 8px; border: 1px solid rgba(237, 232, 223, 0.2); color: var(--dune); font-family: var(--font-space-grotesk), monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .ecard__actions a.ecard__save { grid-column: 1 / -1; background: var(--ochre); border-color: var(--ochre); color: var(--basalt); font-weight: 700; }
 .ecard__links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.ecard__links a { display: inline-block; padding: 6px 12px; border-radius: 999px; background: rgba(237, 232, 223, 0.08); color: var(--dune); font-size: 0.85rem; }
+.ecard__links a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(237, 232, 223, 0.08); color: var(--dune); font-size: 0.85rem; }
+.social-icon { flex: none; }
+.with-icon { display: inline-flex; align-items: center; gap: 5px; vertical-align: bottom; }
 .ecard__qr { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .ecard__qr > div { width: 180px; height: 180px; padding: 10px; border-radius: 12px; background: var(--dune); }
 .ecard__qr svg { display: block; width: 100%; height: 100%; }
 .ecard__qr figcaption { font-size: 0.8rem; color: rgba(237, 232, 223, 0.6); }
 .ecard__bio { margin: 0; line-height: 1.6; white-space: pre-line; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
 .ecard__chapter { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid rgba(229, 168, 35, 0.4); border-radius: 12px; color: var(--dune); font-weight: 600; text-align: center; }
+.ecard__chapter strong { font-weight: 600; }
+.ecard__chapter .social-icon { margin-right: 8px; vertical-align: -4px; }
 .ecard__chapter span { font-family: var(--font-space-grotesk), monospace; font-size: 0.7rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
 .ecard__chapter:hover { border-color: var(--ochre); }
 .ecard-page__foot { margin: 0; text-align: center; font-size: 0.85rem; color: rgba(237, 232, 223, 0.6); }

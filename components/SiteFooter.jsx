@@ -3,6 +3,7 @@ import Image from "next/image";
 import { SITE } from "@/lib/site.js";
 import { FOOTER_COLUMNS } from "@/lib/routes.js";
 import { hilEnabled, t } from "@/lib/i18n.js";
+import SocialIcon from "@/components/members/SocialIcon.jsx";
 
 export default function SiteFooter({ cta = true, lang = "en", altHref = null }) {
   return (
@@ -26,8 +27,8 @@ export default function SiteFooter({ cta = true, lang = "en", altHref = null }) 
         <span>{SITE.name} — {SITE.address.locality}, {SITE.address.region}, {SITE.address.postalCode}</span>
         <span>
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{" "}
-          <a href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a> ·{" "}
-          <a href={SITE.discordUrl} target="_blank" rel="noopener noreferrer">Discord</a> ·{" "}
+          <a className="with-icon" href={SITE.facebookUrl} target="_blank" rel="noopener noreferrer"><SocialIcon platform="facebook" size={14} />Facebook</a> ·{" "}
+          <a className="with-icon" href={SITE.discordUrl} target="_blank" rel="noopener noreferrer"><SocialIcon platform="discord" size={14} />Discord</a> ·{" "}
           {/* Signed-out visitors are sent to /sign-in and back; members land in their area. */}
           <Link href="/members" prefetch={false} rel="nofollow">Member login</Link>
           {hilEnabled() && altHref && <> · <Link href={altHref} hrefLang={lang === "hil" ? "en" : "hil"}>{t(lang, "footer.switch")}</Link></>}
