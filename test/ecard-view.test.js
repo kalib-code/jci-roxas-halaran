@@ -3,14 +3,14 @@ import { eq } from "drizzle-orm";
 import { testDb } from "./helpers/db.js";
 import { seed } from "@/db/seed.js";
 import { members } from "@/db/schema.js";
-import { cardIsPublic, roleLine, cardView, vcard, profileCompleteness } from "@/lib/members/card-view.js";
+import { cardIsPublic, roleLine, cardView, cardLinks, platformFor, vcard, profileCompleteness } from "@/lib/members/card-view.js";
 import { getPublicCard } from "@/lib/members/ecard.js";
 import { qrSvg, cardUrl, originFrom } from "@/lib/members/qr.js";
 
 const base = {
   slug: "ana-cruz", name: "Ana Cruz", email: "ana@x.ph", phone: "+639171234567", status: "active",
   profession: "Architect", business: "Cruz, Ana; Design Studio", photoUrl: null, bio: "Hi", joinedAt: "2024-03-01",
-  websiteUrl: "https://ana.ph", facebookUrl: null, linkedinUrl: "https://linkedin.com/in/ana", instagramUrl: null,
+  links: [{ label: "LinkedIn", url: "https://linkedin.com/in/ana" }, { label: "", url: "https://ana.ph" }],
   cardPublished: true, cardShowPhone: false, cardShowEmail: true,
 };
 
@@ -36,9 +36,31 @@ describe("cardView", () => {
     const card = cardView(base, []);
     expect(card.phone).toBeNull();
     expect(card.email).toBe("ana@x.ph");
-    expect(card.links).toEqual([{ label: "LinkedIn", url: "https://linkedin.com/in/ana" }, { label: "Website", url: "https://ana.ph" }]);
+    expect(card.links).toEqual([{ label: "LinkedIn", url: "https://linkedin.com/in/ana" }, { label: "Website", url: "https://ana.ph/" }]);
     expect(cardView({ ...base, cardShowPhone: true, cardShowEmail: false }, []).phone).toBe("+639171234567");
     expect(cardView({ ...base, cardShowEmail: false }, []).email).toBeNull();
+  });
+});
+
+describe("card links", () => {
+  it("names known sites from their address", () => {
+    expect(platformFor("https://discord.gg/abc")).toEqual({ key: "discord", label: "Discord" });
+    expect(platformFor("https://www.tiktok.com/@ana")).toEqual({ key: "tiktok", label: "TikTok" });
+    expect(platformFor("https://m.facebook.com/ana")).toEqual({ key: "facebook", label: "Facebook" });
+    expect(platformFor("https://shopee.ph/ana")).toEqual({ key: "shopee", label: "Shopee" });
+    expect(platformFor("https://notfacebook.com/ana")).toEqual({ key: "website", label: "Website" });
+    expect(platformFor("not a link")).toEqual({ key: "website", label: "Website" });
+  });
+
+  it("keeps only safe links and fills in missing labels", () => {
+    expect(cardLinks([
+      { label: "  My   shop ", url: "https://ana.ph/shop" },
+      { label: "", url: "https://discord.gg/abc" },
+      { label: "Bad", url: "javascript:alert(1)" },
+      { label: "Old", url: "http://ana.ph" },
+      { label: "Typing", url: "" },
+    ])).toEqual([{ label: "My shop", url: "https://ana.ph/shop" }, { label: "Discord", url: "https://discord.gg/abc" }]);
+    expect(cardLinks(null)).toEqual([]);
   });
 });
 
@@ -53,7 +75,14 @@ describe("vcard", () => {
     expect(lines).toContain("EMAIL;TYPE=INTERNET:ana@x.ph");
     expect(lines).toContain("URL:https://site.ph/card/ana-cruz");
     expect(lines.some((l) => l.startsWith("TEL"))).toBe(false);
+    expect(lines).toContain("X-SOCIALPROFILE;TYPE=linkedin:https://linkedin.com/in/ana");
     expect(lines.at(-1)).toBe("END:VCARD");
+  });
+
+  it("takes the social TYPE from the address, never from the member's label", () => {
+    const text = vcard(cardView({ ...base, links: [{ label: "x:y;EVIL=1", url: "https://discord.gg/abc" }] }, []), "https://site.ph/card/ana-cruz");
+    expect(text).toContain("X-SOCIALPROFILE;TYPE=discord:https://discord.gg/abc\r\n");
+    expect(text).not.toContain("EVIL");
   });
 });
 

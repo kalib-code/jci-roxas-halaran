@@ -35,6 +35,13 @@ describe("ECard", () => {
   });
 });
 
+describe("ECard chapter Discord", () => {
+  it("links every card to the official chapter Discord", () => {
+    render(<ECard card={{ ...card, links: [] }} />);
+    expect(screen.getByRole("link", { name: /Join JCI Roxas Halaran on Discord/ }).getAttribute("href")).toMatch(/^https:\/\/discord\.gg\//);
+  });
+});
+
 describe("ECard before publishing", () => {
   it("shows Save contact as text, not a link that would 404", () => {
     render(<ECard card={card} live={false} />);

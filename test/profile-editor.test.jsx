@@ -15,7 +15,7 @@ afterEach(cleanup);
 const member = {
   id: 1, slug: "judy-daliva", name: "Judy Daliva", email: "judy@x.ph", status: "active", photoUrl: null,
   profession: null, business: null, skills: null, bio: null, inDirectory: false, joinedAt: "2024-01-01",
-  phone: null, websiteUrl: null, facebookUrl: null, linkedinUrl: null, instagramUrl: null,
+  phone: null, links: null,
   cardPublished: false, cardShowPhone: false, cardShowEmail: true,
 };
 
@@ -32,6 +32,26 @@ describe("ProfileForm live preview", () => {
     expect(preview().getByRole("link", { name: "Call" }).getAttribute("href")).toBe("tel:+639171234567");
     fireEvent.click(screen.getByLabelText("Show my email on my card"));
     expect(preview().queryByRole("link", { name: "Email" })).toBeNull();
+  });
+
+  it("lets the member add, name and remove as many links as they like", () => {
+    render(<ProfileForm member={member} positions={[]} />);
+    const preview = () => within(screen.getByRole("complementary", { name: "Card preview" }));
+    fireEvent.change(screen.getByLabelText("Link 1 address"), { target: { value: "https://discord.gg/judy" } });
+    expect(preview().getByRole("link", { name: "Discord" }).getAttribute("href")).toBe("https://discord.gg/judy");
+    fireEvent.click(screen.getByRole("button", { name: "+ Add a link" }));
+    fireEvent.change(screen.getByLabelText("Link 2 address"), { target: { value: "https://judy.ph" } });
+    fireEvent.change(screen.getByLabelText("Link 2 label"), { target: { value: "My studio" } });
+    expect(preview().getByRole("link", { name: "My studio" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Remove link 1" }));
+    expect(preview().queryByRole("link", { name: "Discord" })).toBeNull();
+    expect(screen.getByLabelText("Link 1 address").value).toBe("https://judy.ph");
+  });
+
+  it("starts from the member's saved links", () => {
+    render(<ProfileForm member={{ ...member, links: [{ label: "Shop", url: "https://shopee.ph/judy" }] }} positions={[]} />);
+    expect(screen.getByLabelText("Link 1 address").value).toBe("https://shopee.ph/judy");
+    expect(screen.getByLabelText("Link 1 label").value).toBe("Shop");
   });
 
   it("asks for consent only when publishing", () => {

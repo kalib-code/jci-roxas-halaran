@@ -29,7 +29,7 @@ export default function ECard({ card, qrSvg = null, nameAs = "p", live = true })
       </nav>
       {card.links.length > 0 && (
         <ul className="ecard__links">
-          {card.links.map((l) => <li key={l.label}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a></li>)}
+          {card.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a></li>)}
         </ul>
       )}
       {qrSvg && (
@@ -39,6 +39,10 @@ export default function ECard({ card, qrSvg = null, nameAs = "p", live = true })
         </figure>
       )}
       {card.bio && <p className="ecard__bio">{card.bio}</p>}
+      <a className="ecard__chapter" href={SITE.discordUrl} target="_blank" rel="noopener noreferrer">
+        <span>Official chapter Discord</span>
+        Join JCI Roxas Halaran on Discord
+      </a>
     </article>
   );
 }

@@ -3,11 +3,13 @@
 import { useState, useTransition } from "react";
 import FileUpload from "@/components/admin/FileUpload.jsx";
 import ECard from "@/components/members/ECard.jsx";
-import { cardView, cardIsPublic } from "@/lib/members/card-view.js";
+import { cardView, cardIsPublic, platformFor, MAX_LINKS } from "@/lib/members/card-view.js";
 import { normalizePhone } from "@/lib/members/card.js";
 import { updateProfileAction } from "@/app/members/actions.js";
 
-const LINK_FIELDS = [["websiteUrl", "Website or business page"], ["facebookUrl", "Facebook"], ["linkedinUrl", "LinkedIn"], ["instagramUrl", "Instagram"]];
+// Each row keeps a key of its own so removing one doesn't shift what's typed in the others.
+let nextKey = 0;
+const linkRow = (l = {}) => ({ key: nextKey++, url: l.url ?? "", label: l.label ?? "" });
 
 export default function ProfileForm({ member, positions = [] }) {
   const [form, setForm] = useState({
@@ -18,10 +20,7 @@ export default function ProfileForm({ member, positions = [] }) {
     bio: member.bio ?? "",
     inDirectory: member.inDirectory,
     phone: member.phone ?? "",
-    websiteUrl: member.websiteUrl ?? "",
-    facebookUrl: member.facebookUrl ?? "",
-    linkedinUrl: member.linkedinUrl ?? "",
-    instagramUrl: member.instagramUrl ?? "",
+    links: member.links?.length ? member.links.map(linkRow) : [linkRow()],
     cardPublished: member.cardPublished,
     cardShowPhone: member.cardShowPhone,
     cardShowEmail: member.cardShowEmail,
@@ -31,6 +30,8 @@ export default function ProfileForm({ member, positions = [] }) {
   const [result, setResult] = useState(null);
   const [pending, start] = useTransition();
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
+  const setLinks = (fn) => setForm((f) => ({ ...f, links: fn(f.links) }));
+  const setLink = (key, field) => (e) => setLinks((ls) => ls.map((l) => (l.key === key ? { ...l, [field]: e.target.value } : l)));
 
   const save = () => start(async () => {
     try {
@@ -61,9 +62,18 @@ export default function ProfileForm({ member, positions = [] }) {
         <label className="consent"><input type="checkbox" checked={form.cardShowPhone} onChange={set("cardShowPhone")} /> Show my phone on my card</label>
         <label className="consent"><input type="checkbox" checked={form.cardShowEmail} onChange={set("cardShowEmail")} /> Show my email on my card</label>
         {member.email && <span className="count">Your email: {member.email}</span>}
-        {LINK_FIELDS.map(([key, label]) => (
-          <div className="field" key={key}><label htmlFor={`pr-${key}`}>{label}</label><input id={`pr-${key}`} type="url" value={form[key]} onChange={set(key)} placeholder="https://" /></div>
-        ))}
+        <fieldset className="links-editor">
+          <legend>Links — Facebook, Discord, TikTok, your shop or website</legend>
+          {form.links.map((l, i) => (
+            <div className="links-editor__row" key={l.key}>
+              <input aria-label={`Link ${i + 1} address`} type="url" value={l.url} onChange={setLink(l.key, "url")} placeholder="https://" />
+              <input aria-label={`Link ${i + 1} label`} value={l.label} onChange={setLink(l.key, "label")} maxLength={40} placeholder={l.url ? platformFor(l.url).label : "Label (optional)"} />
+              <button className="tool" type="button" aria-label={`Remove link ${i + 1}`} onClick={() => setLinks((ls) => ls.filter((x) => x.key !== l.key))}>Remove</button>
+            </div>
+          ))}
+          {form.links.length < MAX_LINKS && <button className="tool" type="button" onClick={() => setLinks((ls) => [...ls, linkRow()])}>+ Add a link</button>}
+          <span className="count">Leave the label blank and we&apos;ll name it from the address (e.g. Discord, Instagram).</span>
+        </fieldset>
         <label className="consent"><input type="checkbox" checked={form.cardPublished} onChange={set("cardPublished")} /> Publish my e-calling card</label>
         {form.cardPublished && (
           <label className="consent"><input type="checkbox" checked={form.cardConsent} onChange={set("cardConsent")} /> I agree to show the details I switched on to anyone with my card link.</label>

@@ -776,11 +776,21 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .ecard__qr svg { display: block; width: 100%; height: 100%; }
 .ecard__qr figcaption { font-size: 0.8rem; color: rgba(237, 232, 223, 0.6); }
 .ecard__bio { margin: 0; line-height: 1.6; white-space: pre-line; color: rgba(237, 232, 223, 0.8); overflow-wrap: anywhere; }
+.ecard__chapter { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid rgba(229, 168, 35, 0.4); border-radius: 12px; color: var(--dune); font-weight: 600; text-align: center; }
+.ecard__chapter span { font-family: var(--font-space-grotesk), monospace; font-size: 0.7rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.ecard__chapter:hover { border-color: var(--ochre); }
 .ecard-page__foot { margin: 0; text-align: center; font-size: 0.85rem; color: rgba(237, 232, 223, 0.6); }
 .admin-side__foot .tool { align-self: flex-start; }
 .profile-editor { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: start; }
 .profile-editor__preview { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 12px; }
 .profile-editor h2 { margin: 16px 0 0; }
+.links-editor { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; border: 0; }
+.links-editor legend { margin-bottom: 6px; font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.7); }
+.links-editor__row { display: grid; grid-template-columns: minmax(0, 1fr) 9rem auto; gap: 8px; }
+.links-editor input { min-width: 0; background: var(--basalt); color: var(--dune); border: 1px solid rgba(237, 232, 223, 0.2); padding: 10px 12px; font: inherit; }
+.links-editor > .tool { align-self: flex-start; }
+.links-editor .count { font-size: 0.75rem; color: rgba(237, 232, 223, 0.5); }
+@media (max-width: 560px) { .links-editor__row { grid-template-columns: minmax(0, 1fr) auto; } .links-editor__row input[type="url"] { grid-column: 1 / -1; } }
 @media (max-width: 900px) { .profile-editor { grid-template-columns: 1fr; } .profile-editor__preview { position: static; } }
 .mhome__profile { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 20px; align-items: center; }
 .mhome__avatar { position: relative; display: grid; place-items: center; width: 88px; height: 88px; overflow: hidden; border-radius: 50%; border: 2px solid var(--ochre); background: var(--canopy); font-family: var(--font-syne), sans-serif; font-size: 1.6rem; color: var(--dune); }
