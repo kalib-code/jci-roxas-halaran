@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { getDb } from "@/lib/db.js";
 import { getPublicCard } from "@/lib/members/ecard.js";
 import { qrDataUrl, cardUrl } from "@/lib/members/qr.js";
+import { SITE } from "@/lib/site.js";
 
 export async function GET(request, { params }) {
   const { slug } = await params;
@@ -22,6 +23,7 @@ export async function GET(request, { params }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 26, color: "#c9c4bb" }}>
             {contact.map((c) => <div key={c} style={{ display: "flex" }}>{c}</div>)}
+            <div style={{ display: "flex", fontSize: 22, color: "#e5a823" }}>Chapter Discord: {SITE.discordUrl.replace(/^https:\/\//, "")}</div>
           </div>
         </div>
         {qr ? <img src={qr} width={300} height={300} alt="" style={{ alignSelf: "center", borderRadius: 16 }} /> : null}

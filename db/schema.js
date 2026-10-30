@@ -20,6 +20,10 @@ export const members = sqliteTable("members", {
   inDirectory: integer("in_directory", { mode: "boolean" }).notNull().default(false),
   feePaidYear: integer("fee_paid_year"),
   phone: text("phone"),
+  // [{ label, url }] in the member's order, shown on their card.
+  links: text("links", { mode: "json" }),
+  // Legacy: copied into `links` by migration 0009 and no longer read or written.
+  // Drop them in a later migration, once the release that stopped using them is live.
   websiteUrl: text("website_url"),
   facebookUrl: text("facebook_url"),
   linkedinUrl: text("linkedin_url"),

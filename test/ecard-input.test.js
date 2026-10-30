@@ -35,17 +35,52 @@ describe("updateProfile card fields", () => {
 
   it("stores contact details and switches", async () => {
     const r = await updateProfile(db, id, {
-      phone: "0917 123 4567", websiteUrl: "https://judy.ph", facebookUrl: "https://facebook.com/judy",
+      phone: "0917 123 4567", links: [{ url: "https://judy.ph", label: "My studio" }, { url: "https://facebook.com/judy" }],
       cardPublished: true, cardConsent: true, cardShowPhone: true, cardShowEmail: false,
     });
     expect(r.ok).toBe(true);
-    expect(await row()).toMatchObject({ phone: "+639171234567", websiteUrl: "https://judy.ph/", facebookUrl: "https://facebook.com/judy", linkedinUrl: null, cardPublished: true, cardShowPhone: true, cardShowEmail: false });
+    expect(await row()).toMatchObject({
+      phone: "+639171234567",
+      links: [{ label: "My studio", url: "https://judy.ph/" }, { label: "Facebook", url: "https://facebook.com/judy" }],
+      cardPublished: true, cardShowPhone: true, cardShowEmail: false,
+    });
   });
 
   it("refuses a foreign phone, an http link, and publishing without consent", async () => {
     expect(await updateProfile(db, id, { phone: "+1 415 555 0100" })).toEqual({ ok: false, errors: ["Enter a Philippine number, e.g. 0917 123 4567"] });
-    expect(await updateProfile(db, id, { websiteUrl: "http://judy.ph" })).toEqual({ ok: false, errors: ["Use a full https:// link"] });
+    expect(await updateProfile(db, id, { links: [{ url: "https://judy.ph" }, { url: "http://judy.ph" }] })).toEqual({ ok: false, errors: ["Link 2: Use a full https:// link"] });
     expect(await updateProfile(db, id, { cardPublished: true })).toEqual({ ok: false, errors: ["Tick the consent box to publish your card"] });
+  });
+});
+
+describe("updateProfile links list", () => {
+  let db;
+  let id;
+  beforeEach(async () => {
+    db = await testDb();
+    await seed(db);
+    id = (await db.select().from(members).where(eq(members.slug, "judy-daliva")))[0].id;
+  });
+  const links = async () => (await db.select().from(members).where(eq(members.id, id)))[0].links;
+
+  it("drops blank rows and repeats, and names Discord, TikTok and others itself", async () => {
+    await updateProfile(db, id, { links: [
+      { url: "https://discord.gg/judy", label: "" },
+      { url: "", label: "half-typed" },
+      { url: "https://www.tiktok.com/@judy", label: "   " },
+      { url: "https://discord.gg/judy", label: "again" },
+    ] });
+    expect(await links()).toEqual([{ label: "Discord", url: "https://discord.gg/judy" }, { label: "TikTok", url: "https://www.tiktok.com/@judy" }]);
+  });
+
+  it("caps the list, clears it when emptied, and leaves it alone when not sent", async () => {
+    const eleven = Array.from({ length: 11 }, (_, i) => ({ url: `https://judy.ph/${i}` }));
+    expect(await updateProfile(db, id, { links: eleven })).toEqual({ ok: false, errors: ["Add up to 10 links"] });
+    await updateProfile(db, id, { links: [{ url: "https://judy.ph" }] });
+    await updateProfile(db, id, { profession: "Engineer" });
+    expect(await links()).toEqual([{ label: "Website", url: "https://judy.ph/" }]);
+    await updateProfile(db, id, { links: [{ url: "", label: "" }] });
+    expect(await links()).toBeNull();
   });
 });
 
@@ -58,16 +93,18 @@ describe("card links are parsed, not pattern-matched", () => {
     id = (await db.select().from(members).where(eq(members.slug, "judy-daliva")))[0].id;
   });
   const saved = async () => (await db.select().from(members).where(eq(members.id, id)))[0];
-  const LINK = { ok: false, errors: ["Use a full https:// link"] };
+  const LINK = { ok: false, errors: ["Link 1: Use a full https:// link"] };
+  const one = (url) => ({ links: [{ url }] });
 
   it("refuses links with credentials or without a real host", async () => {
-    expect(await updateProfile(db, id, { websiteUrl: "https://user:pass@evil.com" })).toEqual(LINK);
-    expect(await updateProfile(db, id, { websiteUrl: "https://evil" })).toEqual(LINK);
-    expect(await updateProfile(db, id, { websiteUrl: "https://" })).toEqual(LINK);
+    expect(await updateProfile(db, id, one("https://user:pass@evil.com"))).toEqual(LINK);
+    expect(await updateProfile(db, id, one("https://evil"))).toEqual(LINK);
+    expect(await updateProfile(db, id, one("https://"))).toEqual(LINK);
+    expect(await updateProfile(db, id, one("javascript:alert(1)"))).toEqual(LINK);
   });
 
   it("stores the browser's reading of the link so nothing parses it differently later", async () => {
-    expect((await updateProfile(db, id, { websiteUrl: "https://good.ph\\@evil.com" })).ok).toBe(true);
-    expect((await saved()).websiteUrl).toBe("https://good.ph/@evil.com");
+    expect((await updateProfile(db, id, one("https://good.ph\\@evil.com"))).ok).toBe(true);
+    expect((await saved()).links).toEqual([{ label: "Website", url: "https://good.ph/@evil.com" }]);
   });
 });

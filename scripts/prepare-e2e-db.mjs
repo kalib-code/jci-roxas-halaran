@@ -50,6 +50,6 @@ await recordExpense(db, { amountPesos: 400, description: "Trash bags and gloves"
 // A published e-calling card (phone shown) and an unpublished member.
 await db
   .update(members)
-  .set({ email: "lemuel@example.ph", phone: "+639171234567", websiteUrl: "https://example.ph/", cardPublished: true, cardShowPhone: true, cardShowEmail: true })
+  .set({ email: "lemuel@example.ph", phone: "+639171234567", links: [{ label: "Website", url: "https://example.ph/" }], cardPublished: true, cardShowPhone: true, cardShowEmail: true })
   .where(eq(members.slug, "lemuel-capa"));
 console.log("e2e.db ready.");

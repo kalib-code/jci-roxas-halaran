@@ -100,6 +100,6 @@ describe("schema", () => {
     const db = await testDb();
     await db.insert(members).values({ slug: "ana", name: "Ana" });
     const [row] = await db.select().from(members);
-    expect(row).toMatchObject({ phone: null, websiteUrl: null, facebookUrl: null, linkedinUrl: null, instagramUrl: null, cardPublished: false, cardShowPhone: false, cardShowEmail: true });
+    expect(row).toMatchObject({ phone: null, links: null, cardPublished: false, cardShowPhone: false, cardShowEmail: true });
   });
 });
