@@ -35,6 +35,16 @@ describe("ECard", () => {
   });
 });
 
+describe("ECard link logos", () => {
+  it("puts the site's logo beside each link without changing its name", () => {
+    render(<ECard card={{ ...card, links: [{ label: "Chat with me", url: "https://discord.gg/ana" }, { label: "LinkedIn", url: "https://linkedin.com/in/ana" }] }} />);
+    const discord = screen.getByRole("link", { name: "Chat with me" });
+    expect(discord.querySelector("svg[aria-hidden='true'] path[fill='currentColor']")).toBeTruthy();
+    // No LinkedIn mark in Simple Icons: the globe stands in.
+    expect(screen.getByRole("link", { name: "LinkedIn" }).querySelector("svg circle")).toBeTruthy();
+  });
+});
+
 describe("ECard chapter Discord", () => {
   it("links every card to the official chapter Discord", () => {
     render(<ECard card={{ ...card, links: [] }} />);
