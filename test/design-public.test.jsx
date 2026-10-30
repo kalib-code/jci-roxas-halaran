@@ -40,6 +40,11 @@ describe("SiteFooter", () => {
     expect(screen.getByRole("link", { name: "Member login" }).getAttribute("href")).toBe("/members");
   });
 
+  it("links the official chapter Discord next to Facebook", () => {
+    render(<SiteFooter cta={false} />);
+    expect(screen.getByRole("link", { name: "Discord" }).getAttribute("href")).toMatch(/^https:\/\/discord\.gg\//);
+  });
+
   it("has the column headings in both languages", () => {
     hasBoth(["footer.chapter", "footer.involved", "footer.accountability"]);
   });
