@@ -28,6 +28,7 @@ export default function CardShare({ url, slug }) {
       <button type="button" className="btn" onClick={share}>Share</button>
       <button type="button" className="tool" onClick={copy}>Copy link</button>
       <a className="tool" href={`/card/${slug}/image.png`} download>Download image</a>
+      <a className="tool" href={`/card/${slug}/qr.png`} download>Download QR code</a>
       <a className="tool" href={`/card/${slug}/vcard`}>Save contact</a>
       {message && <p role="status">{message}</p>}
     </div>
