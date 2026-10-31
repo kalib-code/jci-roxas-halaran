@@ -17,6 +17,7 @@ describe("CardShare", () => {
     expect(await screen.findByRole("status")).toHaveProperty("textContent", "Link copied");
     expect(writeText).toHaveBeenCalledWith("https://site.ph/card/ana");
     expect(screen.getByRole("link", { name: "Download image" }).getAttribute("href")).toBe("/card/ana/image.png");
+    expect(screen.getByRole("link", { name: "Download QR code" }).getAttribute("href")).toBe("/card/ana/qr.png");
   });
 
   it("uses the phone's share sheet when there is one", async () => {
