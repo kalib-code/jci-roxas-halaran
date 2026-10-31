@@ -21,6 +21,7 @@ export default function InviteAllMembers({ count }) {
         r.invited.length && `Invitation sent to ${r.invited.length}: ${names(r.invited)}.`,
         r.admins.length && `Board members given admin: ${names(r.admins)}.`,
         r.linked.length && `Already signed up, now linked with member access: ${names(r.linked)}.`,
+        r.alreadyInvited?.length && `Invitation already waiting (not sent again): ${names(r.alreadyInvited)}.`,
         r.failed.length && `Failed: ${r.failed.map((f) => `${f.name} (${f.error})`).join(", ")}.`,
         r.withoutEmail.length && `No email on file, so not invited: ${names(r.withoutEmail)}.`,
       ].filter(Boolean).join(" ") || "Nobody left to invite.");
@@ -35,7 +36,7 @@ export default function InviteAllMembers({ count }) {
     <div className="actions">
       {confirming ? (
         <>
-          <span>Email a sign-up invitation to {count} member{count === 1 ? "" : "s"}? Current board members get admin access.</span>
+          <span>Email a sign-up invitation to {count} member{count === 1 ? "" : "s"}? Officers of this year's and next year's board get admin access; anyone already invited isn't emailed again.</span>
           <button type="button" className="btn" disabled={pending} onClick={send}>Yes, send</button>
           <button type="button" className="btn btn--ghost" disabled={pending} onClick={() => setConfirming(false)}>Cancel</button>
         </>

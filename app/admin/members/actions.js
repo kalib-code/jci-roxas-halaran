@@ -6,7 +6,7 @@ import { requireArea } from "@/lib/auth.js";
 import { adminUpdateMember } from "@/lib/members/profile.js";
 import { verifyEntry, declineEntry, addVerifiedEntry } from "@/lib/members/passport.js";
 import { inviteUnlinkedMembers } from "@/lib/members/invite.js";
-import { inviteMember, raiseRole } from "@/lib/clerk-invite.js";
+import { inviteMember, raiseRole, pendingInvitationEmails } from "@/lib/clerk-invite.js";
 import { audit, changedFields } from "@/lib/audit.js";
 import { eq } from "drizzle-orm";
 import { members } from "@/db/schema.js";
@@ -30,12 +30,12 @@ export async function updateMemberAction(id, input) {
 
 export async function inviteAllMembersAction() {
   const { userId } = await requireArea("content");
-  const r = await inviteUnlinkedMembers(getDb(), { invite: inviteMember, raise: raiseRole });
+  const r = await inviteUnlinkedMembers(getDb(), { invite: inviteMember, raise: raiseRole, pending: await pendingInvitationEmails() });
   await audit(getDb(), {
     actor: userId,
     action: "member.invite_all",
     summary: `Sent ${r.invited.length} invitation${r.invited.length === 1 ? "" : "s"}, linked ${r.linked.length}, gave admin to ${r.admins.length}${r.failed.length ? `, ${r.failed.length} failed` : ""}`,
-    details: { invited: r.invited, linked: r.linked, admins: r.admins, failed: r.failed },
+    details: { invited: r.invited, linked: r.linked, admins: r.admins, failed: r.failed, alreadyInvited: r.alreadyInvited },
   });
   revalidatePath("/admin/members");
   return { ok: true, ...r };
