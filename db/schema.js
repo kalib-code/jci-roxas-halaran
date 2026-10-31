@@ -207,6 +207,11 @@ export const events = sqliteTable("events", {
   coverUrl: text("cover_url"),
   coverAlt: text("cover_alt"),
   updatedAt: text("updated_at").notNull(),
+  // QR check-in: the secret in the check-in link, and whether it's taking entries.
+  checkinOpen: integer("checkin_open", { mode: "boolean" }).notNull().default(false),
+  checkinCode: text("checkin_code").unique(),
+  // Signs the attendance sheet's certification with the LO President and Secretary.
+  chairperson: text("chairperson"),
 });
 
 export const rsvps = sqliteTable(
@@ -223,6 +228,32 @@ export const rsvps = sqliteTable(
     createdAt: text("created_at").notNull(),
   },
   (t) => [uniqueIndex("rsvps_event_email").on(t.eventId, t.email)],
+);
+
+// The JCI attendance sheet: one row per participant, whether they scanned the
+// check-in QR, an admin added them, or their RSVP was ticked as attended.
+export const attendance = sqliteTable(
+  "attendance",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    eventId: integer("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    position: text("position").notNull(),
+    // home = JCI Roxas Halaran, other_lo = another JCI chapter, guest = not a JCI member.
+    affiliation: text("affiliation", { enum: ["home", "other_lo", "guest"] }).notNull(),
+    localOrganization: text("local_organization").notNull(),
+    email: text("email"),
+    memberId: integer("member_id").references(() => members.id, { onDelete: "set null" }),
+    rsvpId: integer("rsvp_id").references(() => rsvps.id, { onDelete: "set null" }),
+    source: text("source", { enum: ["qr", "admin", "rsvp"] }).notNull(),
+    checkedInAt: text("checked_in_at").notNull(),
+    addedBy: text("added_by"),
+  },
+  (t) => [
+    index("attendance_event").on(t.eventId, t.checkedInAt),
+    uniqueIndex("attendance_event_email").on(t.eventId, t.email),
+    uniqueIndex("attendance_rsvp").on(t.rsvpId),
+  ],
 );
 
 export const volunteerSignups = sqliteTable("volunteer_signups", {

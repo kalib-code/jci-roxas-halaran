@@ -64,6 +64,12 @@ Checklist before the first deploy (and for any new environment):
 7. **Board = admin.** "Invite members" in Admin → Members gives current board members the admin role (and raises
    board members who already have an account). Admins receive alerts for applications, RSVPs, volunteers,
    pledges and passport requests. Roles are only ever raised; demote past officers in Clerk by hand.
+8. **Attendance sheets.** On an event's admin page, "Open check-in" makes a secret QR link
+   (`/check-in/<code>`) that participants scan to record name, position and Local Organization with a timestamp;
+   it stops taking entries a day after the event. "Attendance sheet" prints the JCI Philippines 2026 template
+   (A4, national letterhead in `public/assets/img/jcip/`) with the LO President, Secretary and the event's
+   Project Chairperson certifying it, or a blank paper version. Attended RSVPs and organizer-added walk-ins
+   appear on the same sheet.
 
 ## Design archive (`static/`)
 

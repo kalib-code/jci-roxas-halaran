@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { setAttendanceAction, moveToGoingAction } from "@/app/admin/events/actions.js";
 
 export default function RsvpTable({ eventId, rsvps: initial }) {
+  const router = useRouter();
   const [rsvps, setRsvps] = useState(initial);
   const [error, setError] = useState(null);
   const [pending, start] = useTransition();
@@ -12,7 +14,8 @@ export default function RsvpTable({ eventId, rsvps: initial }) {
   const attend = (r, attended) => start(async () => {
     try {
       const res = await setAttendanceAction(r.id, attended);
-      if (res.ok) update(r.id, { attended }); else setError(res.errors.join(" "));
+      // Attended RSVPs join the attendance sheet above, so reload it.
+      if (res.ok) { update(r.id, { attended }); router.refresh(); } else setError(res.errors.join(" "));
     } catch (e) { setError(`Couldn't save (${e.message}).`); }
   });
   const promote = (r) => start(async () => {

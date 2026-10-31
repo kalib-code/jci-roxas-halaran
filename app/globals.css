@@ -904,3 +904,111 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
   .past-president { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 14px; }
   .past-president__photo { width: 52px; height: 52px; }
 }
+
+/* Attendance sheet and check-in poster: A4 pages on the JCI Philippines 2026 letterhead. */
+.sheet-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 24px; }
+.sheet-toolbar__opts { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.9rem; }
+.sheet-toolbar__opts a[aria-current] { color: var(--ochre); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.sheet-scroll { overflow-x: auto; padding-bottom: 24px; }
+.sheet-print { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.sheet-page { position: relative; flex: none; overflow: hidden; background: #fff; color: #000; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 10.5pt; line-height: 1.3; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet-page--portrait { width: 210mm; height: 297mm; }
+.sheet-page--landscape { width: 297mm; height: 210mm; }
+.sheet-page__bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sheet-page__body { position: absolute; inset: 38mm 18mm 40mm; display: flex; flex-direction: column; }
+.sheet-page--landscape .sheet-page__body { inset: 37mm 26mm 39mm; }
+.sheet-head { text-align: center; }
+.sheet-head p { margin: 0; }
+.sheet-page .sheet-title { margin: 4mm 0 3mm; font-family: inherit; font-size: 11.5pt; font-weight: 700; line-height: 1.2; letter-spacing: 0; text-transform: none; text-align: center; color: #000; }
+.sheet-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.sheet-table th { padding: 2mm 2.5mm; background: #dae9f7; font-size: 10pt; font-weight: 700; text-align: center; color: #000; }
+/* Names and positions wrap (two lines fit a row) rather than being cut off. */
+.sheet-table td { height: 9mm; padding: 0.8mm 2.5mm; border-bottom: 0.3mm solid #b7c4d1; font-size: 9.5pt; line-height: 1.15; overflow-wrap: anywhere; color: #000; }
+.sheet-page--landscape .sheet-table td { height: 8.6mm; }
+.sheet-table th:last-child, .sheet-table td:last-child { width: 19%; text-align: center; }
+.sheet-table--org th:nth-child(2), .sheet-table--org td:nth-child(2) { width: 25%; }
+.sheet-cert { margin-top: auto; padding-top: 6mm; }
+.sheet-cert__note { margin: 0 0 4mm; font-size: 8.5pt; color: #333; }
+.sheet-cert__lead { margin: 0 0 12mm; font-weight: 700; }
+.sheet-cert__signs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; }
+.sheet-cert__sign { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sheet-cert__name { width: 100%; padding-bottom: 1mm; border-bottom: 0.3mm solid #000; font-weight: 700; text-transform: uppercase; }
+.sheet-cert__title { margin-top: 1mm; font-size: 9pt; }
+.sheet-page__num { position: absolute; right: 0; bottom: -6mm; margin: 0; font-size: 8pt; color: #555; }
+.sheet-poster { display: flex; flex-direction: column; align-items: center; gap: 5mm; text-align: center; }
+.sheet-page .sheet-poster .sheet-title { margin-top: 8mm; font-size: 26pt; letter-spacing: 0.02em; }
+.sheet-poster__qr { width: 120mm; height: 120mm; }
+.sheet-poster__qr svg { display: block; width: 100%; height: 100%; }
+.sheet-poster__url { margin: 0; font-size: 11pt; font-weight: 700; word-break: break-all; }
+.sheet-poster__steps { margin: 2mm 0 0; padding-left: 6mm; max-width: 140mm; text-align: left; font-size: 11pt; line-height: 1.6; }
+@media print {
+  html, body:has(.sheet-print), body:has(.sheet-print) .wrap { background: #fff !important; }
+  body:has(.sheet-print) * { animation: none !important; transition: none !important; }
+  body:has(.sheet-print) .nav, body:has(.sheet-print) .admin-side, .sheet-toolbar, .sheet-screen > .form-errors { display: none !important; }
+  body:has(.sheet-print) .wrap, body:has(.sheet-print) .admin-shell, body:has(.sheet-print) .admin-main, body:has(.sheet-print) .admin, .sheet-scroll { display: block; margin: 0 !important; padding: 0 !important; max-width: none !important; min-height: 0 !important; overflow: visible; }
+  .sheet-print { display: block; }
+  .sheet-page { box-shadow: none; break-after: page; }
+  .sheet-page:last-child { break-after: auto; }
+}
+
+/* QR check-in (participants' phones). */
+.checkin-page { display: flex; justify-content: center; padding: 32px 16px 96px; }
+.checkin { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 18px; }
+.checkin__event { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 1px solid rgba(237, 232, 223, 0.14); border-radius: 16px; background: linear-gradient(160deg, #1c3b2b 0%, #121314 80%); }
+.checkin__event p { margin: 0; color: rgba(237, 232, 223, 0.75); }
+.checkin__title { margin: 4px 0 6px; font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1.15; color: var(--dune); overflow-wrap: anywhere; }
+.checkin__choice { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; border: 0; }
+.checkin__choice legend { margin-bottom: 6px; font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.7); }
+.checkin__option { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 14px; border: 1px solid rgba(237, 232, 223, 0.2); border-radius: 12px; cursor: pointer; }
+.checkin__option:has(input:checked) { border-color: var(--ochre); background: rgba(229, 168, 35, 0.08); }
+.checkin__option input { accent-color: var(--ochre); width: 18px; height: 18px; flex: none; }
+.checkin__option span { display: flex; flex-direction: column; }
+.checkin__option small { color: rgba(237, 232, 223, 0.6); }
+.checkin .field input { min-height: 48px; font-size: 1rem; border-radius: 10px; }
+.checkin__saved { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border: 1px solid var(--ochre); border-radius: 16px; }
+.checkin__saved p { margin: 0; color: rgba(237, 232, 223, 0.75); }
+.checkin__welcome { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--dune) !important; }
+.checkin__saved dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 8px 0; }
+.checkin__saved dt { font-size: 0.8rem; color: rgba(237, 232, 223, 0.55); }
+.checkin__saved dd { margin: 0; }
+.checkin__saved-actions { display: flex; gap: 8px; }
+.checkin__submit { width: 100%; text-align: center; border: 0; cursor: pointer; }
+.checkin__submit:disabled { opacity: 0.6; cursor: default; }
+.checkin__done { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 24px 0 8px; text-align: center; }
+.checkin__tick { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: #3a6b4f; color: #fff; font-size: 2.2rem; line-height: 1; }
+.checkin__done .checkin__title { margin-top: 10px; }
+.checkin__done p { margin: 0; }
+.checkin__who { font-size: 1.1rem; font-weight: 600; }
+.checkin__stamp { font-family: var(--font-space-grotesk), monospace; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ochre); }
+.checkin__note { max-width: 32ch; color: rgba(237, 232, 223, 0.7); }
+.checkin__again { width: 100%; text-align: center; cursor: pointer; }
+
+/* Attendance panel on the admin event page. */
+.attend { display: flex; flex-direction: column; gap: 18px; margin: 48px 0; }
+.attend__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.attend__head h2 { margin: 0; }
+.attend__glance { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 12px; }
+.attend__stat, .attend__checkin { padding: 18px 20px; border: 1px solid rgba(237, 232, 223, 0.14); border-radius: 14px; background: rgba(237, 232, 223, 0.03); }
+.attend__stat { display: flex; flex-direction: column; justify-content: center; }
+.attend__stat strong { font-family: var(--font-syne), sans-serif; font-size: 2.6rem; line-height: 1; color: var(--dune); }
+.attend__stat span { color: rgba(237, 232, 223, 0.65); }
+.attend__checkin { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.attend__checkin-text { display: flex; flex-direction: column; gap: 10px; }
+.attend__checkin-text p { margin: 0; color: rgba(237, 232, 223, 0.75); }
+.attend__checkin-text > .btn { align-self: flex-start; border: 0; cursor: pointer; }
+.attend__qr { flex: none; width: 132px; height: 132px; padding: 6px; border-radius: 10px; background: var(--dune); }
+.attend__qr svg { display: block; width: 100%; height: 100%; }
+.attend__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.attend__filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.attend__filter { padding: 7px 12px; border: 1px solid rgba(237, 232, 223, 0.2); border-radius: 999px; background: transparent; color: var(--dune); font: inherit; font-size: 0.85rem; cursor: pointer; }
+.attend__filter span { margin-left: 4px; color: rgba(237, 232, 223, 0.55); }
+.attend__filter.is-on { border-color: var(--ochre); background: var(--ochre); color: var(--basalt); }
+.attend__filter.is-on span { color: var(--basalt); }
+.attend__search { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1px solid rgba(237, 232, 223, 0.2); background: var(--basalt); color: var(--dune); font: inherit; }
+.attend__form { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid rgba(229, 168, 35, 0.4); border-radius: 12px; }
+.attend-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.attend__table small { color: rgba(237, 232, 223, 0.55); }
+.attend__row-actions { white-space: nowrap; text-align: right; }
+.attend__row-actions .tool + .tool { margin-left: 6px; }
+.attend__empty { margin: 0; padding: 28px; border: 1px dashed rgba(237, 232, 223, 0.2); border-radius: 12px; text-align: center; color: rgba(237, 232, 223, 0.6); }
+@media (max-width: 720px) { .attend__glance { grid-template-columns: 1fr; } .attend__checkin { flex-direction: column-reverse; align-items: flex-start; } }
