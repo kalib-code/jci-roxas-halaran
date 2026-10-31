@@ -7,7 +7,7 @@ import { members, passportEntries } from "@/db/schema.js";
 const h = vi.hoisted(() => ({ db: null, claims: null, email: null, revalidated: [] }));
 vi.mock("@clerk/nextjs/server", () => ({
   auth: async () => ({ userId: h.claims ? "user_j" : null, sessionClaims: h.claims }),
-  clerkClient: async () => ({ users: { getUser: async () => ({ publicMetadata: {}, primaryEmailAddress: h.email ? { emailAddress: h.email } : null, emailAddresses: [] }) } }),
+  clerkClient: async () => ({ users: { getUser: async () => ({ publicMetadata: {}, primaryEmailAddress: h.email ? { emailAddress: h.email, verification: { status: "verified" } } : null, emailAddresses: [] }) } }),
 }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NEXT_NOT_FOUND"); } }));
 vi.mock("next/cache", () => ({ revalidatePath: (p) => h.revalidated.push(p) }));
