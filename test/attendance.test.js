@@ -87,7 +87,10 @@ describe("admin changes", () => {
   it("adds walk-ins, refuses duplicates, and edits details", async () => {
     const r = await addAttendee(db, event.id, { name: "Carl Tan", position: "Guest", affiliation: "guest", localOrganization: "Capiz State University" }, { userId: "user_admin" });
     expect(r.attendee).toMatchObject({ source: "admin", addedBy: "user_admin", localOrganization: "Capiz State University" });
-    expect(await addAttendee(db, event.id, { name: "carl tan", position: "Guest", affiliation: "guest" }, { userId: "user_admin" })).toEqual({ ok: false, errors: ["Carl Tan are already on this sheet"] });
+    // Organizers can add a second person who shares a name; the same email is refused.
+    expect((await addAttendee(db, event.id, { name: "carl tan", position: "Guest", affiliation: "guest" }, { userId: "user_admin" })).ok).toBe(true);
+    await updateAttendee(db, r.attendee.id, { name: "Carl Tan", position: "Guest", affiliation: "guest", email: "carl@x.ph" });
+    expect(await addAttendee(db, event.id, { name: "Carlos", position: "Guest", affiliation: "guest", email: "carl@x.ph" }, { userId: "user_admin" })).toEqual({ ok: false, errors: ["Carl Tan are already on this sheet"] });
     const edited = await updateAttendee(db, r.attendee.id, { name: "Carl Tan", position: "Member", affiliation: "other_lo", localOrganization: "JCI Capiz" });
     expect(edited.attendee).toMatchObject({ position: "Member", localOrganization: "JCI Capiz" });
   });
@@ -130,6 +133,13 @@ describe("RSVPs ticked as attended", () => {
     await syncRsvpAttendance(db, marked, true);
     expect(await listAttendance(db, event.id)).toMatchObject([{ source: "qr", rsvpId: rsvp.id }]);
     expect((await passport()).map((p) => p.refTable)).toEqual(["rsvps"]);
+  });
+
+  it("never attach to someone else's check-in just because the name matches", async () => {
+    await checkIn(db, { name: "Judy", position: "Member", affiliation: "home", consent: true, code }, { now: NOW });
+    const rsvp = (await submitRsvp(db, { eventId: event.id, name: "Judy", email: "judy@x.ph", consent: true })).rsvp;
+    await syncRsvpAttendance(db, rsvp, true);
+    expect((await listAttendance(db, event.id)).map((r) => [r.source, r.rsvpId]).sort()).toEqual([["qr", null], ["rsvp", rsvp.id]]);
   });
 
   it("guess guests' details from our records, leaving the rest for an admin", async () => {

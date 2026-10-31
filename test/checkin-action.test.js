@@ -21,7 +21,7 @@ describe("checkInAction", () => {
   it("never reveals whose row an email belongs to", async () => {
     expect((await visit("Judy Daliva", "judy@x.ph")).name).toBe("Judy Daliva");
     const again = await visit("Someone Else", "judy@x.ph");
-    expect(again).toMatchObject({ ok: true, already: true, name: "Someone Else" });
+    expect(again).toEqual({ ok: true, already: true, name: "Someone Else", at: null });
     expect(JSON.stringify(again)).not.toContain("Judy");
   });
 });

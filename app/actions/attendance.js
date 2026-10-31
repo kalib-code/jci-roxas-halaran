@@ -11,7 +11,9 @@ export async function checkInAction(input) {
   if (!(await verifyTurnstile(input?.turnstileToken))) return BOT;
   const r = await checkIn(getDb(), input);
   if (!r.ok) return r;
-  const at = TIME.format(new Date(r.attendee?.checkedInAt ?? Date.now())).replace(/\u202f/g, " ");
-  // Echo back only what they typed: a repeat match by email must not reveal whose row it is.
-  return { ok: true, already: Boolean(r.already), name: String(input?.name ?? "").trim(), at };
+  // A repeat returns nothing from the stored row (not its name, not its time), so
+  // typing someone's name or email can't tell you whether or when they arrived.
+  const name = String(input?.name ?? "").trim();
+  if (r.already) return { ok: true, already: true, name, at: null };
+  return { ok: true, already: false, name, at: TIME.format(new Date(r.attendee.checkedInAt)).replace(/\u202f/g, " ") };
 }
