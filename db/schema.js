@@ -212,6 +212,9 @@ export const events = sqliteTable("events", {
   checkinCode: text("checkin_code").unique(),
   // Signs the attendance sheet's certification with the LO President and Secretary.
   chairperson: text("chairperson"),
+  // Off when we join an event another organization chairs: the sheet then lists
+  // only our members and carries no Project Chairperson line.
+  weChair: integer("we_chair", { mode: "boolean" }).notNull().default(true),
 });
 
 export const rsvps = sqliteTable(

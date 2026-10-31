@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `we_chair` integer DEFAULT true NOT NULL;

@@ -54,6 +54,16 @@ describe("AttendanceSheet", () => {
     expect(within(page).getByText(/Total participants: 2/)).toBeTruthy();
   });
 
+  it("lists only our members, without the chairperson line, when we don't chair the event", () => {
+    const guest = { id: 9, name: "Ana", position: "Guest", affiliation: "guest", localOrganization: "Non-JCI guest", source: "qr", checkedInAt: "2027-01-15T10:05:09Z" };
+    render(<AttendanceSheet event={{ ...event, weChair: false }} rows={[...rows(2), guest]} certifiers={{ president: "Jaime Cortes M. Altavas", secretary: "Joses M. Calusay" }} />);
+    expect(screen.getAllByRole("columnheader").map((th) => th.textContent)).toEqual(["NAME", "POSITION", "TIME IN"]);
+    expect(screen.queryByText("Ana")).toBeNull();
+    expect(screen.queryByText("Project Chairperson")).toBeNull();
+    expect(screen.getByText("LO Secretary")).toBeTruthy();
+    expect(screen.getByText(/Members of JCI Roxas Halaran who attended: 2/)).toBeTruthy();
+  });
+
   it("prints a blank paper sheet with a signature column and no certification", () => {
     render(<AttendanceSheet event={event} rows={[]} certifiers={certifiers} blank />);
     expect(screen.getAllByRole("columnheader").at(-1).textContent).toBe("SIGNATURE");

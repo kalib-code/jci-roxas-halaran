@@ -33,6 +33,7 @@ export default async function CheckinPoster({ params }) {
           <LetterheadPage event={event} label="Check-in QR poster">
             <div className="sheet-poster">
               <h1 className="sheet-title">SCAN TO CHECK IN</h1>
+              {!event.weChair && <p className="sheet-poster__for">For JCI Roxas Halaran members</p>}
               {svg && <div className="sheet-poster__qr" role="img" aria-label="Check-in QR code" dangerouslySetInnerHTML={{ __html: svg }} />}
               <p className="sheet-poster__url">{url.replace(/^https?:\/\//, "")}</p>
               <ol className="sheet-poster__steps">

@@ -149,6 +149,18 @@ describe("RSVPs ticked as attended", () => {
   });
 });
 
+describe("events another organization chairs", () => {
+  it("record everyone as our member and drop the Project Chairperson line", async () => {
+    const { event: joined } = await setCheckin(db, (await saveEvent(db, { title: "Halloween Run", startAt: "2027-01-15T17:00", weChair: false, chairperson: "Someone" })).event.id, { open: true });
+    expect(joined).toMatchObject({ weChair: false, chairperson: null });
+    const r = await checkIn(db, { name: "Ana Reyes", position: "Member", affiliation: "other_lo", localOrganization: "JCI Capiz", consent: true, code: joined.checkinCode }, { now: NOW });
+    expect(r.attendee).toMatchObject({ affiliation: "home", localOrganization: HOME_LO });
+    const certifiers = await sheetCertifiers(db, joined);
+    expect(certifiers).not.toHaveProperty("chairperson");
+    expect(certifiers.president).toBeTruthy();
+  });
+});
+
 describe("sheetCertifiers", () => {
   it("names the President and Secretary for the event's year, or the latest board", async () => {
     const ga2026 = (await saveEvent(db, { title: "Induction", startAt: "2026-03-01T18:00" })).event;

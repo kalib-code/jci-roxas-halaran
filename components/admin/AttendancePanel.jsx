@@ -12,21 +12,21 @@ const EMPTY = { name: "", position: "", affiliation: "home", localOrganization: 
 const TIME = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Manila" });
 const at = (iso) => TIME.format(new Date(iso)).replace(/ /g, " ");
 
-function AttendeeFields({ value, onChange, idPrefix }) {
+function AttendeeFields({ value, onChange, idPrefix, membersOnly }) {
   const set = (k) => (e) => onChange({ ...value, [k]: e.target.value });
   return (
     <div className="attend-fields">
       <div className="field"><label htmlFor={`${idPrefix}-name`}>Name</label><input id={`${idPrefix}-name`} value={value.name} onChange={set("name")} required /></div>
       <div className="field"><label htmlFor={`${idPrefix}-pos`}>Position</label><input id={`${idPrefix}-pos`} value={value.position} onChange={set("position")} required placeholder="Member" /></div>
-      <div className="field">
+      {!membersOnly && <div className="field">
         <label htmlFor={`${idPrefix}-aff`}>From</label>
         <select id={`${idPrefix}-aff`} value={value.affiliation} onChange={set("affiliation")}>
           <option value="home">{HOME}</option>
           <option value="other_lo">Another JCI chapter</option>
           <option value="guest">Not a JCI member</option>
         </select>
-      </div>
-      {value.affiliation !== "home" && (
+      </div>}
+      {!membersOnly && value.affiliation !== "home" && (
         <div className="field">
           <label htmlFor={`${idPrefix}-lo`}>{value.affiliation === "other_lo" ? "Chapter" : "Organization (optional)"}</label>
           <input id={`${idPrefix}-lo`} value={value.localOrganization} onChange={set("localOrganization")} placeholder={value.affiliation === "other_lo" ? "JCI Capiz" : ""} />
@@ -39,6 +39,7 @@ function AttendeeFields({ value, onChange, idPrefix }) {
 
 export default function AttendancePanel({ event, rows: initial, checkin }) {
   const router = useRouter();
+  const membersOnly = event.weChair === false;
   const [rows, setRows] = useState(initial);
   const [filter, setFilter] = useState("all");
   const [q, setQ] = useState("");
@@ -136,6 +137,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
         </div>
       </div>
 
+      {membersOnly && <p className="count">Another organization chairs this event, so check-in and the attendance sheet cover only {HOME} members.</p>}
       {error && <p className="form-error" role="alert">{error}</p>}
 
       <div className="attend__bar">
@@ -150,7 +152,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
 
       {adding && (
         <form className="attend__form" onSubmit={add} aria-label="Add participant">
-          <AttendeeFields value={adding} onChange={setAdding} idPrefix="add" />
+          <AttendeeFields value={adding} onChange={setAdding} idPrefix="add" membersOnly={membersOnly} />
           <div className="actions"><button className="btn" type="submit" disabled={pending}>Add to sheet</button><button className="tool" type="button" onClick={() => setAdding(null)}>Cancel</button></div>
         </form>
       )}
@@ -164,7 +166,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
             {shown.map((r) => editing?.id === r.id ? (
               <tr key={r.id}><td colSpan={6}>
                 <form className="attend__form" onSubmit={save} aria-label={`Edit ${r.name}`}>
-                  <AttendeeFields value={editing} onChange={setEditing} idPrefix={`edit-${r.id}`} />
+                  <AttendeeFields value={editing} onChange={setEditing} idPrefix={`edit-${r.id}`} membersOnly={membersOnly} />
                   <div className="actions"><button className="btn" type="submit" disabled={pending}>Save</button><button className="tool" type="button" onClick={() => setEditing(null)}>Cancel</button></div>
                 </form>
               </td></tr>

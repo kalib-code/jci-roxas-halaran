@@ -15,6 +15,7 @@ export default function EventEditor({ event, projects }) {
     endAt: event?.endAt ?? "",
     venue: event?.venue ?? "",
     chairperson: event?.chairperson ?? "",
+    weChair: event?.weChair ?? true,
     capacity: event?.capacity ?? "",
     rsvpOpen: event?.rsvpOpen ?? true,
     projectId: event?.projectId ?? "",
@@ -59,7 +60,12 @@ export default function EventEditor({ event, projects }) {
         <div className="field"><label htmlFor="ev-start">Starts (Philippine time)</label><input id="ev-start" type="datetime-local" value={form.startAt} onChange={set("startAt")} /></div>
         <div className="field"><label htmlFor="ev-end">Ends (optional)</label><input id="ev-end" type="datetime-local" value={form.endAt} onChange={set("endAt")} /></div>
         <div className="field"><label htmlFor="ev-venue">Venue</label><input id="ev-venue" value={form.venue} onChange={set("venue")} /></div>
-        <div className="field"><label htmlFor="ev-chair">Project Chairperson (signs the attendance sheet)</label><input id="ev-chair" value={form.chairperson} onChange={set("chairperson")} /></div>
+        <label className="consent"><input type="checkbox" checked={form.weChair} onChange={set("weChair")} /> We chair this event</label>
+        {form.weChair ? (
+          <div className="field"><label htmlFor="ev-chair">Project Chairperson (signs the attendance sheet)</label><input id="ev-chair" value={form.chairperson} onChange={set("chairperson")} /></div>
+        ) : (
+          <p className="count">Joining another organization&apos;s event: check-in and the attendance sheet cover only our members, certified by the LO President and Secretary.</p>
+        )}
         <div className="field"><label htmlFor="ev-cap">Capacity (empty = unlimited)</label><input id="ev-cap" type="number" min="1" value={form.capacity} onChange={set("capacity")} /></div>
         <label className="consent"><input type="checkbox" checked={form.rsvpOpen} onChange={set("rsvpOpen")} /> RSVPs open</label>
         <div className="field">

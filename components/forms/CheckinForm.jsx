@@ -37,8 +37,8 @@ export default function CheckinForm(props) {
   return <CheckinFlow key={round} {...props} fresh={round > 0} onAgain={() => setRound((r) => r + 1)} />;
 }
 
-function CheckinFlow({ code, event, fresh, onAgain }) {
-  const [form, setForm] = useState(EMPTY);
+function CheckinFlow({ code, event, membersOnly = false, fresh, onAgain }) {
+  const [form, setForm] = useState(membersOnly ? { ...EMPTY, affiliation: "home" } : EMPTY);
   const [saved, setSaved] = useState(null);
   const [remember, setRemember] = useState(false);
   const [consent, setConsent] = useState(false);
@@ -48,7 +48,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
 
   useEffect(() => {
     const s = fresh ? null : readSaved();
-    if (s) { setSaved(s); setForm(s); setRemember(true); }
+    if (s) { setSaved(s); setForm(membersOnly ? { ...s, affiliation: "home" } : s); setRemember(true); }
   }, [fresh]);
   // The server used up the token; get a fresh one so a retry can pass.
   useEffect(() => { if (result && !result.ok) setResetKey((k) => k + 1); }, [result]);
@@ -66,7 +66,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
 
   const eventCard = (
     <div className="checkin__event">
-      <span className="label label--sm">Event check-in</span>
+      <span className="label label--sm">{membersOnly ? `${HOME} members check-in` : "Event check-in"}</span>
       <h1 className="checkin__title">{event.title}</h1>
       <p>{event.when}</p>
       {event.venue && <p>{event.venue}</p>}
@@ -100,7 +100,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
           <dl>
             <dt>Name</dt><dd>{saved.name}</dd>
             <dt>Position</dt><dd>{saved.position}</dd>
-            <dt>Local Organization</dt><dd>{saved.affiliation === "home" ? HOME : saved.localOrganization || "Not a JCI member"}</dd>
+            {!membersOnly && <><dt>Local Organization</dt><dd>{saved.affiliation === "home" ? HOME : saved.localOrganization || "Not a JCI member"}</dd></>}
           </dl>
           <div className="checkin__saved-actions">
             <button type="button" className="tool" onClick={() => setSaved(null)}>Edit details</button>
@@ -111,7 +111,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
       {editing && (
         <>
           <div className="field"><label htmlFor="ci-name">Full name</label><input id="ci-name" value={form.name} onChange={set("name")} required autoComplete="name" /></div>
-          <fieldset className="checkin__choice">
+          {!membersOnly && <fieldset className="checkin__choice">
             <legend>Local Organization</legend>
             {AFFILIATIONS.map(([value, title, hint]) => (
               <label key={value} className="checkin__option">
@@ -119,7 +119,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
                 <span><strong>{title}</strong><small>{hint}</small></span>
               </label>
             ))}
-          </fieldset>
+          </fieldset>}
           {form.affiliation === "other_lo" && (
             <div className="field"><label htmlFor="ci-lo">Which chapter?</label><input id="ci-lo" value={form.localOrganization} onChange={set("localOrganization")} required placeholder="e.g. JCI Capiz" /></div>
           )}
