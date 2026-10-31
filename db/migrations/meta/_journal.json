@@ -71,6 +71,13 @@
       "when": 1793353171394,
       "tag": "0009_member_links",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1793417977362,
+      "tag": "0010_attendance",
+      "breakpoints": true
     }
   ]
 }
