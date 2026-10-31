@@ -80,7 +80,7 @@ function CheckinFlow({ code, event, fresh, onAgain }) {
           <span className="checkin__tick" aria-hidden="true">✓</span>
           <h2 className="checkin__title">{result.already ? "Already checked in" : "You're checked in"}</h2>
           <p className="checkin__who">{result.name}</p>
-          <p className="checkin__stamp">Recorded {result.at}</p>
+          {result.at && <p className="checkin__stamp">Recorded {result.at}</p>}
           {result.already && <p className="checkin__note">If that isn&apos;t you, ask an organizer at the registration table to add you.</p>}
         </div>
         {eventCard}
