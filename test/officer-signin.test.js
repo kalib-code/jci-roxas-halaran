@@ -10,7 +10,10 @@ const raiseRole = vi.fn(async () => true);
 vi.mock("@/lib/db.js", async (importOriginal) => ({ ...(await importOriginal()), getDb: () => db }));
 vi.mock("@/lib/auth.js", () => ({ requireArea: async () => ({ userId: "user_1", role }) }));
 let verified = "verified";
-vi.mock("@/lib/clerk-user.js", () => ({ loadClerkUser: async () => ({ primaryEmailAddress: { emailAddress: "officer@x.ph", verification: { status: verified } } }) }));
+vi.mock("@/lib/clerk-user.js", async (importOriginal) => ({
+  ...(await importOriginal()),
+  loadClerkUser: async () => ({ primaryEmailAddress: { emailAddress: "officer@x.ph", verification: { status: verified } } }),
+}));
 vi.mock("@/lib/clerk-invite.js", () => ({ raiseRole: (...a) => raiseRole(...a) }));
 const { currentMember } = await import("@/lib/members/current.js");
 

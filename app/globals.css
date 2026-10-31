@@ -1024,3 +1024,9 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 @media (max-width: 560px) { .cert-page__facts { grid-template-columns: 1fr; } .cert-page__facts dd { margin-bottom: 6px; } }
 .attend__empty { margin: 0; padding: 28px; border: 1px dashed rgba(237, 232, 223, 0.2); border-radius: 12px; text-align: center; color: rgba(237, 232, 223, 0.6); }
 @media (max-width: 720px) { .attend__glance { grid-template-columns: 1fr; } .attend__checkin { flex-direction: column-reverse; align-items: flex-start; } }
+
+/* First sign-in without a matching member record. */
+.welcome { max-width: 560px; margin: 0 auto; padding: 64px 20px 120px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.welcome h1 { margin: 0; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--dune); }
+.welcome p { margin: 0; line-height: 1.6; color: rgba(237, 232, 223, 0.8); }
+.welcome .btn { cursor: pointer; }
