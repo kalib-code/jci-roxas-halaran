@@ -61,9 +61,12 @@ Checklist before the first deploy (and for any new environment):
    `email.received` event pointing at `https://www.jciroxashalaran.com/api/inbound`. Set its signing secret as
    `RESEND_WEBHOOK_SECRET`. Each email to info@ is forwarded from `forwarder@` to the current board (the latest
    year in the officer list) with Reply-To set to the original sender; `INFO_FORWARD_TO` adds extra addresses.
-7. **Board = admin.** "Invite members" in Admin → Members gives current board members the admin role (and raises
-   board members who already have an account). Admins receive alerts for applications, RSVPs, volunteers,
-   pledges and passport requests. Roles are only ever raised; demote past officers in Clerk by hand.
+7. **Officers = admin.** Officers of the board in office (the latest year up to this year) and of any board
+   already elected for a later year are admins. "Invite members" in Admin → Members invites them as admin, skips
+   anyone whose invitation is still pending, and raises officers who already have an account; an officer whose
+   invitation said "member" becomes admin on first sign-in. The public Officers page and info@ forwarding use
+   only the board in office, so next year's board appears on January 1. Admins receive alerts for applications,
+   RSVPs, volunteers, pledges and passport requests. Roles are only ever raised; demote past officers in Clerk by hand.
 8. **Attendance sheets.** On an event's admin page, "Open check-in" makes a secret QR link
    (`/check-in/<code>`) that participants scan to record name, position and Local Organization with a timestamp;
    it stops taking entries a day after the event. "Attendance sheet" prints the JCI Philippines 2026 template
