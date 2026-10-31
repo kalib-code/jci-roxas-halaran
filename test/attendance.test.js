@@ -64,9 +64,14 @@ describe("QR check-in", () => {
     expect((await ok({ name: "Bob https://x.co" })).ok).toBe(false);
     expect((await ok({ position: "Win at www.prize.ph" })).errors).toEqual(["Positions can't contain links"]);
     expect((await ok({ affiliation: "guest", localOrganization: "mail me@x.ph" })).errors).toEqual(["Organizations can't contain links"]);
+    // Any web ending, and look-alike dots, not just a list of known ones.
+    expect((await ok({ name: "Win at prize.gg" })).errors).toEqual(["Names can't contain links"]);
+    expect((await ok({ position: "Free load bit．ly" })).errors).toEqual(["Positions can't contain links"]);
+    expect((await ok({ affiliation: "guest", localOrganization: "promo.click" })).errors).toEqual(["Organizations can't contain links"]);
     for (const name of ["Eugenio N. Dalida, Jr.", "Martin Milan III", "Ma. Concepción Peña-Ñoño", "Ana O’Neil"]) {
       expect((await ok({ name })).ok).toBe(true);
     }
+    expect((await ok({ name: "Rosa Lim", affiliation: "guest", localOrganization: "U.P. Visayas", position: "Ph.D. Student" })).ok).toBe(true);
   });
 
   it("refuses a wrong code, a closed check-in, and missing consent", async () => {
