@@ -930,7 +930,7 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .sheet-cert { margin-top: auto; padding-top: 6mm; }
 .sheet-cert__note { margin: 0 0 4mm; font-size: 8.5pt; color: #333; }
 .sheet-cert__lead { margin: 0 0 12mm; font-weight: 700; }
-.sheet-cert__signs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; }
+.sheet-cert__signs { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8mm; }
 .sheet-cert__sign { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .sheet-cert__name { width: 100%; padding-bottom: 1mm; border-bottom: 0.3mm solid #000; font-weight: 700; text-transform: uppercase; }
 .sheet-cert__title { margin-top: 1mm; font-size: 9pt; }
@@ -939,6 +939,7 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .sheet-page .sheet-poster .sheet-title { margin-top: 8mm; font-size: 26pt; letter-spacing: 0.02em; }
 .sheet-poster__qr { width: 120mm; height: 120mm; }
 .sheet-poster__qr svg { display: block; width: 100%; height: 100%; }
+.sheet-poster__for { margin: -3mm 0 0; font-size: 13pt; font-weight: 700; }
 .sheet-poster__url { margin: 0; font-size: 11pt; font-weight: 700; word-break: break-all; }
 .sheet-poster__steps { margin: 2mm 0 0; padding-left: 6mm; max-width: 140mm; text-align: left; font-size: 11pt; line-height: 1.6; }
 @media print {

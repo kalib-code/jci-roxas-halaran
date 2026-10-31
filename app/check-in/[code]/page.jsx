@@ -16,7 +16,7 @@ export default async function CheckinPage({ params }) {
   return (
     <main className="checkin-page">
       {checkinIsOpen(event) ? (
-        <CheckinForm code={code} event={info} />
+        <CheckinForm code={code} event={info} membersOnly={!event.weChair} />
       ) : (
         <div className="checkin">
           <div className="checkin__event">

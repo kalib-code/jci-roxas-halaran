@@ -59,6 +59,14 @@ const rows = [
   { id: 2, name: "Ana Reyes", position: "Local President", affiliation: "other_lo", localOrganization: "JCI Capiz", email: null, source: "admin", checkedInAt: "2027-01-15T10:10:00Z" },
 ];
 
+describe("CheckinForm for our members only", () => {
+  it("skips the Local Organization question", () => {
+    render(<CheckinForm code="abc123def456" event={event} membersOnly />);
+    expect(screen.queryByLabelText(/Another JCI chapter/)).toBeNull();
+    expect(screen.getByText("JCI Roxas Halaran members check-in")).toBeTruthy();
+  });
+});
+
 describe("AttendancePanel", () => {
   it("counts, filters and searches the people on the sheet", () => {
     render(<AttendancePanel event={{ id: 7, title: "GA", startAt: "2027-01-15T18:00" }} rows={rows} checkin={{ open: false }} />);

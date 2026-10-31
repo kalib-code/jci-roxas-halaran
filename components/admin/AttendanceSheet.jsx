@@ -26,8 +26,11 @@ const SIGNERS = [["president", "LO President"], ["secretary", "LO Secretary"], [
 // The digital sheet: timestamps stand in for signatures, and the LO President,
 // Secretary and Project Chairperson certify it (JCI PH reporting guidelines).
 // `blank` prints the paper version instead: empty rows and a signature column.
-export default function AttendanceSheet({ event, rows, certifiers, layout = "portrait", blank = false }) {
-  const withOrg = blank || needsOrganizationColumn(rows);
+export default function AttendanceSheet({ event, rows: all, certifiers, layout = "portrait", blank = false }) {
+  // At an event another organization chairs, the sheet is our members' attendance only.
+  const membersOnly = event.weChair === false;
+  const rows = membersOnly ? all.filter((r) => r.affiliation === "home") : all;
+  const withOrg = !membersOnly && (blank || needsOrganizationColumn(rows));
   const pages = sheetPages(rows, { layout, certify: !blank, blankRows: blank ? ROWS_PER_PAGE[layout] : 0 });
   const day = event.startAt.slice(0, 10);
   // QR rows are the participant's own timestamp; anything else an organizer recorded.
@@ -70,12 +73,12 @@ export default function AttendanceSheet({ event, rows, certifiers, layout = "por
           {!blank && i === pages.length - 1 && (
             <div className="sheet-cert">
               <p className="sheet-cert__note">
-                Total participants: {rows.length}. Digital attendance: times are Philippine time, recorded when each participant checked in by QR code at {SITE.url.replace(/^https?:\/\//, "")}
+                {membersOnly ? `Members of ${SITE.name} who attended: ${rows.length}.` : `Total participants: ${rows.length}.`} Digital attendance: times are Philippine time, recorded when each participant checked in by QR code at {SITE.url.replace(/^https?:\/\//, "")}
                 {added ? "; † marks a participant an organizer added or marked present" : ""}.
               </p>
               <p className="sheet-cert__lead">Certified true and correct:</p>
               <div className="sheet-cert__signs">
-                {SIGNERS.map(([key, title]) => (
+                {SIGNERS.filter(([key]) => key in certifiers).map(([key, title]) => (
                   <div className="sheet-cert__sign" key={key}>
                     <span className="sheet-cert__name">{certifiers[key] ?? " "}</span>
                     <span className="sheet-cert__title">{title}</span>
