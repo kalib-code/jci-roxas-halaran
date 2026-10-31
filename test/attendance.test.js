@@ -57,6 +57,18 @@ describe("QR check-in", () => {
     expect(await checkIn(db, { name: "Cara Lim", position: "Member", affiliation: "other_lo", consent: true, code }, { now: NOW })).toEqual({ ok: false, errors: ["Enter your chapter, e.g. JCI Capiz"] });
   });
 
+  it("refuses links and odd characters in anything that ends up in an email", async () => {
+    const ok = (over) => checkIn(db, { ...judy, email: "", code, ...over }, { now: NOW });
+    expect((await ok({ name: "Visit evil.com now" })).errors).toEqual(["Names can't contain links"]);
+    expect((await ok({ name: "Win ₱1000 here!" })).errors).toEqual(["Use letters only in your name"]);
+    expect((await ok({ name: "Bob https://x.co" })).ok).toBe(false);
+    expect((await ok({ position: "Win at www.prize.ph" })).errors).toEqual(["Positions can't contain links"]);
+    expect((await ok({ affiliation: "guest", localOrganization: "mail me@x.ph" })).errors).toEqual(["Organizations can't contain links"]);
+    for (const name of ["Eugenio N. Dalida, Jr.", "Martin Milan III", "Ma. Concepción Peña-Ñoño", "Ana O’Neil"]) {
+      expect((await ok({ name })).ok).toBe(true);
+    }
+  });
+
   it("refuses a wrong code, a closed check-in, and missing consent", async () => {
     const closed = { ok: false, errors: ["Check-in for this event is closed"] };
     expect(await checkIn(db, { ...judy, code: "wrong-code-1" }, { now: NOW })).toEqual(closed);
