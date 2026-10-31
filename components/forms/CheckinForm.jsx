@@ -134,7 +134,7 @@ function CheckinFlow({ code, event, membersOnly = false, fresh, onAgain }) {
           <div className="field">
             <label htmlFor="ci-email">Email (optional)</label>
             <input id="ci-email" type="email" value={form.email} onChange={set("email")} autoComplete="email" />
-            <span className="count">Members: use the email you gave the chapter to get this activity in your JCI passport.</span>
+            <span className="count">We&apos;ll email your certificate of attendance after the event. Members: use the email you gave the chapter to get this activity in your JCI passport too.</span>
           </div>
           <label className="consent"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> Remember my details on this phone for next time</label>
         </>

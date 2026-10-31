@@ -85,6 +85,13 @@
       "when": 1793421182450,
       "tag": "0011_event_we_chair",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1793422542530,
+      "tag": "0012_attendance_certificates",
+      "breakpoints": true
     }
   ]
 }

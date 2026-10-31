@@ -9,6 +9,13 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
   },
+  // Certificates are drawn on the letterhead read from disk, so ship it with the
+  // functions that render them.
+  outputFileTracingIncludes: {
+    "/certificate/[code]/image.png": ["./public/assets/img/jcip/letterhead-2026-landscape.png"],
+    "/api/cron/certificates": ["./public/assets/img/jcip/letterhead-2026-landscape.png"],
+    "/admin/events/[id]": ["./public/assets/img/jcip/letterhead-2026-landscape.png"],
+  },
   async redirects() {
     return [...HOST_REDIRECTS, ...REDIRECTS];
   },
