@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { setCheckinAction, addAttendeeAction, updateAttendeeAction, removeAttendeeAction } from "@/app/admin/events/actions.js";
+import { setCheckinAction, addAttendeeAction, updateAttendeeAction, removeAttendeeAction, sendCertificatesAction } from "@/app/admin/events/actions.js";
 import { timeIn } from "@/lib/engagement/attendance-sheet.js";
 
 const HOME = "JCI Roxas Halaran";
@@ -48,6 +48,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [confirming, setConfirming] = useState(null);
+  const [certNote, setCertNote] = useState(null);
   const [pending, start] = useTransition();
 
   // Fresh rows from the server (a refresh, or an RSVP ticked as attended).
@@ -96,6 +97,15 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
     if (r.ok) { setRows((rs) => rs.filter((x) => x.id !== row.id)); setConfirming(null); }
     return r;
   });
+  const unsent = rows.filter((r) => r.email && !r.certificateSentAt).length;
+  const sendCerts = () => run(async () => {
+    const r = await sendCertificatesAction(event.id);
+    if (r.ok) {
+      setCertNote(`Sent ${r.sent} certificate${r.sent === 1 ? "" : "s"}.${r.failed.length ? ` Not sent: ${r.failed.map((f) => f.name).join(", ")} (they'll be retried automatically).` : ""}`);
+      router.refresh();
+    }
+    return r;
+  });
   const copy = async () => {
     try { await navigator.clipboard.writeText(checkin.url); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { setCopied(false); }
   };
@@ -138,6 +148,11 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
       </div>
 
       {membersOnly && <p className="count">Another organization chairs this event, so check-in and the attendance sheet cover only {HOME} members.</p>}
+      <div className="attend__certs">
+        <p>Certificates of attendance are emailed automatically an hour after the event ends, to everyone who gave an email.{unsent > 0 && ` ${unsent} still to send.`}</p>
+        {unsent > 0 && <button type="button" className="tool" disabled={pending} onClick={sendCerts}>Send certificates now</button>}
+        {certNote && <p className="form-ok" role="status">{certNote}</p>}
+      </div>
       {error && <p className="form-error" role="alert">{error}</p>}
 
       <div className="attend__bar">
@@ -161,10 +176,10 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
         <p className="attend__empty">No one has checked in yet.</p>
       ) : (
         <table className="admin-table attend__table">
-          <thead><tr><th>Name</th><th>Position</th><th>Local Organization</th><th>Time in</th><th>How</th><th aria-label="Actions" /></tr></thead>
+          <thead><tr><th>Name</th><th>Position</th><th>Local Organization</th><th>Time in</th><th>How</th><th>Certificate</th><th aria-label="Actions" /></tr></thead>
           <tbody>
             {shown.map((r) => editing?.id === r.id ? (
-              <tr key={r.id}><td colSpan={6}>
+              <tr key={r.id}><td colSpan={7}>
                 <form className="attend__form" onSubmit={save} aria-label={`Edit ${r.name}`}>
                   <AttendeeFields value={editing} onChange={setEditing} idPrefix={`edit-${r.id}`} membersOnly={membersOnly} />
                   <div className="actions"><button className="btn" type="submit" disabled={pending}>Save</button><button className="tool" type="button" onClick={() => setEditing(null)}>Cancel</button></div>
@@ -177,6 +192,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
                 <td>{r.localOrganization}</td>
                 <td>{timeIn(r.checkedInAt, event.startAt.slice(0, 10))}</td>
                 <td><span className={`badge ${SOURCE[r.source][1]}`}>{SOURCE[r.source][0]}</span></td>
+                <td>{r.certificateSentAt ? <a href={`/certificate/${r.certificateCode}`} target="_blank" rel="noopener noreferrer">Sent</a> : r.email ? "Pending" : <small>No email</small>}</td>
                 <td className="attend__row-actions">
                   {confirming === r.id ? (
                     <>
@@ -192,7 +208,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
                 </td>
               </tr>
             ))}
-            {shown.length === 0 && <tr><td colSpan={6}>No one matches.</td></tr>}
+            {shown.length === 0 && <tr><td colSpan={7}>No one matches.</td></tr>}
           </tbody>
         </table>
       )}

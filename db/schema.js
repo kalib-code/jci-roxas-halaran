@@ -251,6 +251,9 @@ export const attendance = sqliteTable(
     source: text("source", { enum: ["qr", "admin", "rsvp"] }).notNull(),
     checkedInAt: text("checked_in_at").notNull(),
     addedBy: text("added_by"),
+    // Certificate of attendance: its public verification ID, and when it was emailed.
+    certificateCode: text("certificate_code").unique(),
+    certificateSentAt: text("certificate_sent_at"),
   },
   (t) => [
     index("attendance_event").on(t.eventId, t.checkedInAt),

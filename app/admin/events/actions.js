@@ -8,6 +8,9 @@ import { saveEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/li
 import { syncAttendanceEntry } from "@/lib/members/passport.js";
 import { setCheckin, addAttendee, updateAttendee, removeAttendee, syncRsvpAttendance } from "@/lib/engagement/attendance.js";
 import { changedFields } from "@/lib/audit.js";
+import { sendEmail } from "@/lib/email.js";
+import { sendDueCertificates } from "@/lib/engagement/certificates.js";
+import { renderCertificate } from "@/lib/engagement/certificate-image.jsx";
 import { audit } from "@/lib/audit.js";
 
 export async function saveEventAction(input) {
@@ -87,4 +90,20 @@ export async function removeAttendeeAction(id) {
   const r = await removeAttendee(db, id);
   if (r.ok) await audit(db, { actor: userId, action: "attendance.remove", table: "attendance", id: r.attendee.id, summary: `Removed ${r.attendee.name} from the attendance sheet` });
   return r;
+}
+
+// Sends this event's certificates now instead of waiting for the hourly run
+// (anyone with an email who hasn't had one yet).
+export async function sendCertificatesAction(eventId) {
+  const { userId } = await requireArea("content");
+  const db = getDb();
+  const r = await sendDueCertificates(db, {
+    eventId,
+    limit: 25,
+    render: async (view) => (await renderCertificate(view)).arrayBuffer(),
+    send: sendEmail,
+  });
+  if (r.sent) await audit(db, { actor: userId, action: "certificates.send", table: "events", id: Number(eventId), summary: `Emailed ${r.sent} certificate${r.sent === 1 ? "" : "s"} of attendance`, details: r.failed.length ? { failed: r.failed } : null });
+  revalidatePath(`/admin/events/${eventId}`);
+  return { ok: true, ...r };
 }
