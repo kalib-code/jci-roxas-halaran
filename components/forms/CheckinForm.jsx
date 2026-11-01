@@ -5,6 +5,8 @@ import Turnstile, { turnstileEnabled } from "./Turnstile.jsx";
 import FormStatus from "./FormStatus.jsx";
 import { useSubmit } from "./useSubmit.js";
 import { checkInAction } from "@/app/actions/attendance.js";
+import { currentPosition } from "@/lib/geolocate.js";
+import { formatDistance, NEARBY_M, nearbyCheck, nearbyMessage } from "@/lib/proof/location.js";
 
 const HOME = "JCI Roxas Halaran";
 const AFFILIATIONS = [
@@ -30,14 +32,56 @@ function readSaved() {
   }
 }
 
+const PROBLEMS = {
+  denied: "Location is blocked for this page. Allow location for this site in your browser settings, then try again.",
+  timeout: "Finding you took too long. Turn on location (GPS), step near a window or outside, and try again.",
+  unavailable: "Your phone couldn't find your location. Turn on location (GPS) and try again.",
+  unsupported: "This browser can't share a location. Open the link in Chrome or Safari, or ask an organizer at the registration table to add you.",
+};
+
 // "Check in someone else" starts a fresh form (a shared phone at the door),
-// without showing the last person's saved details.
+// without showing the last person's saved details. The phone hasn't moved, so
+// its venue check carries over.
 export default function CheckinForm(props) {
   const [round, setRound] = useState(0);
-  return <CheckinFlow key={round} {...props} fresh={round > 0} onAgain={() => setRound((r) => r + 1)} />;
+  const [where, setWhere] = useState({ state: "idle" });
+  return <CheckinFlow key={round} {...props} where={where} setWhere={setWhere} fresh={round > 0} onAgain={() => setRound((r) => r + 1)} />;
 }
 
-function CheckinFlow({ code, event, membersOnly = false, fresh, onAgain }) {
+// Asks for the phone's location (only when tapped, so the browser's prompt makes
+// sense) and says right away whether it's close enough. The server checks again.
+function VenueCheck({ venue, venueName, where, setWhere }) {
+  const locate = async () => {
+    setWhere({ state: "locating" });
+    try {
+      const at = await currentPosition();
+      const check = nearbyCheck(venue, at);
+      setWhere({ state: check.ok ? "ok" : check.reason, at, message: nearbyMessage(check, venueName) });
+    } catch (e) {
+      setWhere({ state: e.message, message: PROBLEMS[e.message] ?? PROBLEMS.unavailable });
+    }
+  };
+  const ok = where.state === "ok";
+  return (
+    <section className={`checkin__where${ok ? " checkin__where--ok" : where.message ? " checkin__where--problem" : ""}`} aria-live="polite">
+      <span className="checkin__pin" aria-hidden="true">
+        {ok ? "✓" : <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" /></svg>}
+      </span>
+      <div className="checkin__where-text">
+        <p className="checkin__where-title">{ok ? "You're at the venue" : "Confirm you're at the venue"}</p>
+        <p>{where.message ?? `Check-in for this event works only within ${formatDistance(NEARBY_M)} of ${venueName || "the venue"}.`}</p>
+        {!ok && (
+          <button type="button" className="btn checkin__locate" onClick={locate} disabled={where.state === "locating"}>
+            {where.state === "locating" ? "Finding you…" : where.state === "idle" ? "Share my location" : "Try again"}
+          </button>
+        )}
+        <p className="checkin__where-note">Your location is used once, for this check. We keep how far you were from the venue, never where you were.</p>
+      </div>
+    </section>
+  );
+}
+
+function CheckinFlow({ code, event, membersOnly = false, nearby = null, where, setWhere, fresh, onAgain }) {
   const [form, setForm] = useState(membersOnly ? { ...EMPTY, affiliation: "home" } : EMPTY);
   const [saved, setSaved] = useState(null);
   const [remember, setRemember] = useState(false);
@@ -54,14 +98,14 @@ function CheckinFlow({ code, event, membersOnly = false, fresh, onAgain }) {
   useEffect(() => { if (result && !result.ok) setResetKey((k) => k + 1); }, [result]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const waitingForCheck = turnstileEnabled() && !token;
+  const waitingForCheck = (turnstileEnabled() && !token) || (nearby && where.state !== "ok");
   const send = (e) => {
     e.preventDefault();
     try {
       if (remember) localStorage.setItem(SAVED, JSON.stringify(form));
       else localStorage.removeItem(SAVED);
     } catch { /* private browsing: nothing to remember */ }
-    submit({ ...form, consent, code, turnstileToken: token });
+    submit({ ...form, consent, code, turnstileToken: token, location: nearby ? where.at : null });
   };
 
   const eventCard = (
@@ -93,6 +137,7 @@ function CheckinFlow({ code, event, membersOnly = false, fresh, onAgain }) {
   return (
     <form className="checkin" onSubmit={send}>
       {eventCard}
+      {nearby && <VenueCheck venue={nearby} venueName={event.venue} where={where} setWhere={setWhere} />}
       {saved ? (
         <div className="checkin__saved">
           <p className="checkin__welcome">Welcome back, {saved.name.split(" ")[0]}</p>

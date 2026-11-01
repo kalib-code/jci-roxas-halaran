@@ -3,7 +3,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
 
 const checkInAction = vi.fn();
-const actions = { setCheckinAction: vi.fn(async () => ({ ok: true })), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
+const actions = { setCheckinAction: vi.fn(async () => ({ ok: true })), setCheckinNearbyAction: vi.fn(async () => ({ ok: true })), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
 vi.mock("@/app/actions/attendance.js", () => ({ checkInAction: (...a) => checkInAction(...a) }));
 vi.mock("@/app/admin/events/actions.js", () => actions);
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
@@ -21,7 +21,16 @@ vi.stubGlobal("localStorage", {
 
 const event = { title: "General Assembly", when: "January 15, 2027 · 6:00 PM", venue: "Roxas City Hall" };
 beforeEach(() => localStorage.clear());
-afterEach(() => { cleanup(); vi.clearAllMocks(); });
+afterEach(() => { cleanup(); vi.clearAllMocks(); delete navigator.geolocation; });
+
+// A phone whose location answers with these coordinates (or an error code).
+const phoneAt = (where) => {
+  Object.defineProperty(navigator, "geolocation", {
+    configurable: true,
+    value: { getCurrentPosition: (ok, fail) => (typeof where === "number" ? fail({ code: where }) : ok({ coords: { latitude: where.lat, longitude: where.lng, accuracy: where.accuracy } })) },
+  });
+};
+const PARK = { lat: 11.6047, lng: 122.7339 };
 
 describe("CheckinForm", () => {
   it("asks which chapter only for visitors from another LO, then sends the details", async () => {
@@ -51,6 +60,66 @@ describe("CheckinForm", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Check in someone else" }));
     expect(screen.queryByText("Welcome back, Judy")).toBeNull();
     expect(screen.getByLabelText("Full name").value).toBe("");
+  });
+});
+
+describe("CheckinForm venue check", () => {
+  const fill = () => {
+    fireEvent.change(screen.getByLabelText("Full name"), { target: { value: "Ana Reyes" } });
+    fireEvent.click(screen.getByLabelText(/^JCI Roxas Halaran/));
+    fireEvent.change(screen.getByLabelText("Position or designation"), { target: { value: "Member" } });
+    fireEvent.click(screen.getByLabelText(/I agree that JCI Roxas Halaran may record/));
+  };
+
+  it("keeps Check in off until the phone is near the venue, then sends the reading", async () => {
+    checkInAction.mockResolvedValue({ ok: true, name: "Ana Reyes", at: "5:10 PM" });
+    render(<CheckinForm code="abc123def456" event={{ ...event, venue: "People's Park" }} nearby={PARK} />);
+    fill();
+    const submit = screen.getByRole("button", { name: "Check in" });
+    expect(submit.disabled).toBe(true);
+    phoneAt({ lat: 11.5853, lng: 122.7511, accuracy: 20 });
+    fireEvent.click(screen.getByRole("button", { name: "Share my location" }));
+    expect(await screen.findByText(/You're about 2\.9 km from People's Park/)).toBeTruthy();
+    expect(submit.disabled).toBe(true);
+    phoneAt({ lat: 11.605, lng: 122.7345, accuracy: 25 });
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByText("You're at the venue")).toBeTruthy();
+    expect(submit.disabled).toBe(false);
+    fireEvent.click(submit);
+    await waitFor(() => expect(checkInAction).toHaveBeenCalled());
+    expect(checkInAction.mock.calls[0][0].location).toEqual({ lat: 11.605, lng: 122.7345, accuracy: 25 });
+  });
+
+  it("explains a blocked location and points to the registration table", async () => {
+    render(<CheckinForm code="abc123def456" event={event} nearby={PARK} />);
+    phoneAt(1);
+    fireEvent.click(screen.getByRole("button", { name: "Share my location" }));
+    expect(await screen.findByText(/Location is blocked for this page/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Check in" }).disabled).toBe(true);
+  });
+
+  it("doesn't ask for a location when the event has no venue check", () => {
+    render(<CheckinForm code="abc123def456" event={event} />);
+    expect(screen.queryByRole("button", { name: "Share my location" })).toBeNull();
+  });
+});
+
+describe("VenueCheck settings", () => {
+  const base = { id: 7, title: "GA", startAt: "2027-01-15T18:00" };
+  it("asks for a pin before turning the check on", async () => {
+    render(<AttendancePanel event={base} rows={[]} checkin={{ open: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Turn on venue check" }));
+    fireEvent.change(screen.getByLabelText("Venue location"), { target: { value: "https://maps.app.goo.gl/abc123" } });
+    fireEvent.click(screen.getByRole("button", { name: "Pin and turn on" }));
+    await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: true, place: "https://maps.app.goo.gl/abc123" }));
+  });
+
+  it("shows the pin and turns off without asking again", async () => {
+    render(<AttendancePanel event={{ ...base, ...PARK, checkinNearby: true }} rows={[]} checkin={{ open: false }} />);
+    expect(screen.getByText("Venue check on")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "11.60470, 122.73390" }).getAttribute("href")).toBe("https://www.google.com/maps?q=11.6047,122.7339");
+    fireEvent.click(screen.getByRole("button", { name: "Turn off" }));
+    await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: false }));
   });
 });
 

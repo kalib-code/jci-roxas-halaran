@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db.js";
-import { getCheckinEvent, checkinIsOpen } from "@/lib/engagement/attendance.js";
+import { getCheckinEvent, checkinIsOpen, checksNearby } from "@/lib/engagement/attendance.js";
 import { eventWhen } from "@/lib/engagement/attendance-sheet.js";
 import CheckinForm from "@/components/forms/CheckinForm.jsx";
 
@@ -16,7 +16,7 @@ export default async function CheckinPage({ params }) {
   return (
     <main className="checkin-page">
       {checkinIsOpen(event) ? (
-        <CheckinForm code={code} event={info} membersOnly={!event.weChair} />
+        <CheckinForm code={code} event={info} membersOnly={!event.weChair} nearby={checksNearby(event) ? { lat: event.lat, lng: event.lng } : null} />
       ) : (
         <div className="checkin">
           <div className="checkin__event">

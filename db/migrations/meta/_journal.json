@@ -92,6 +92,13 @@
       "when": 1793422542530,
       "tag": "0012_attendance_certificates",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1793499604319,
+      "tag": "0013_checkin_nearby",
+      "breakpoints": true
     }
   ]
 }

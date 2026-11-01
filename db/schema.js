@@ -215,6 +215,11 @@ export const events = sqliteTable("events", {
   // Off when we join an event another organization chairs: the sheet then lists
   // only our members and carries no Project Chairperson line.
   weChair: integer("we_chair", { mode: "boolean" }).notNull().default(true),
+  // The venue's pin. With checkinNearby on, QR check-in only works within a
+  // kilometre of it.
+  lat: real("lat"),
+  lng: real("lng"),
+  checkinNearby: integer("checkin_nearby", { mode: "boolean" }).notNull().default(false),
 });
 
 export const rsvps = sqliteTable(
@@ -251,6 +256,9 @@ export const attendance = sqliteTable(
     source: text("source", { enum: ["qr", "admin", "rsvp"] }).notNull(),
     checkedInAt: text("checked_in_at").notNull(),
     addedBy: text("added_by"),
+    // How far from the venue a location-checked QR check-in was, in metres.
+    // Where the person stood is never stored.
+    distanceM: integer("distance_m"),
     // Certificate of attendance: its public verification ID, and when it was emailed.
     certificateCode: text("certificate_code").unique(),
     certificateSentAt: text("certificate_sent_at"),

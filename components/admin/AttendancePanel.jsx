@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setCheckinAction, addAttendeeAction, updateAttendeeAction, removeAttendeeAction, sendCertificatesAction } from "@/app/admin/events/actions.js";
 import { timeIn } from "@/lib/engagement/attendance-sheet.js";
+import { formatDistance } from "@/lib/proof/location.js";
+import VenueCheck from "./VenueCheck.jsx";
 
 const HOME = "JCI Roxas Halaran";
 const FILTERS = [["all", "All"], ["home", HOME], ["other_lo", "Other chapters"], ["guest", "Guests"]];
@@ -147,6 +149,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
         </div>
       </div>
 
+      <VenueCheck event={event} />
       {membersOnly && <p className="count">Another organization chairs this event, so check-in and the attendance sheet cover only {HOME} members.</p>}
       <div className="attend__certs">
         <p>Certificates of attendance are emailed automatically an hour after the event ends, to everyone who gave an email.{unsent > 0 && ` ${unsent} still to send.`}</p>
@@ -191,7 +194,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
                 <td>{r.position}</td>
                 <td>{r.localOrganization}</td>
                 <td>{timeIn(r.checkedInAt, event.startAt.slice(0, 10))}</td>
-                <td><span className={`badge ${SOURCE[r.source][1]}`}>{SOURCE[r.source][0]}</span></td>
+                <td><span className={`badge ${SOURCE[r.source][1]}`}>{SOURCE[r.source][0]}</span>{r.distanceM != null && <><br /><small>{formatDistance(r.distanceM)} from venue</small></>}</td>
                 <td>{r.certificateSentAt ? <a href={`/certificate/${r.certificateCode}`} target="_blank" rel="noopener noreferrer">Sent</a> : r.email ? "Pending" : <small>No email</small>}</td>
                 <td className="attend__row-actions">
                   {confirming === r.id ? (

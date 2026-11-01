@@ -27,7 +27,7 @@ export default async function EditEvent({ params }) {
     <div className="admin">
       <h1>Edit event</h1>
       <EventEditor event={event} projects={projects} />
-      <AttendancePanel event={{ id: event.id, title: event.title, startAt: event.startAt, weChair: event.weChair }} rows={attendance} checkin={checkin} />
+      <AttendancePanel event={{ id: event.id, title: event.title, startAt: event.startAt, weChair: event.weChair, lat: event.lat, lng: event.lng, checkinNearby: event.checkinNearby }} rows={attendance} checkin={checkin} />
       <RsvpTable eventId={event.id} rsvps={rsvps} />
     </div>
   );
