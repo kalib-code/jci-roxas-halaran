@@ -973,6 +973,18 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .checkin__saved dt { font-size: 0.8rem; color: rgba(237, 232, 223, 0.55); }
 .checkin__saved dd { margin: 0; }
 .checkin__saved-actions { display: flex; gap: 8px; }
+.checkin__where { display: flex; gap: 14px; padding: 18px 20px; border: 1px solid rgba(237, 232, 223, 0.2); border-radius: 16px; }
+.checkin__where--ok { border-color: #3a6b4f; background: rgba(58, 107, 79, 0.14); }
+.checkin__where--problem { border-color: rgba(242, 184, 162, 0.55); }
+.checkin__pin { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: rgba(229, 168, 35, 0.14); color: var(--ochre); font-size: 1.2rem; }
+.checkin__where--ok .checkin__pin { background: #3a6b4f; color: #fff; }
+.checkin__where-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.checkin__where-text p { margin: 0; color: rgba(237, 232, 223, 0.8); }
+.checkin__where--problem .checkin__where-text p:nth-child(2) { color: #f2b8a2; }
+.checkin__where-title { font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--dune) !important; }
+.checkin__where-note { font-size: 0.8rem; color: rgba(237, 232, 223, 0.55) !important; }
+.checkin__locate { align-self: flex-start; min-height: 44px; border: 0; cursor: pointer; }
+.checkin__locate:disabled { opacity: 0.6; cursor: default; }
 .checkin__submit { width: 100%; text-align: center; border: 0; cursor: pointer; }
 .checkin__submit:disabled { opacity: 0.6; cursor: default; }
 .checkin__done { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 24px 0 8px; text-align: center; }
@@ -1011,6 +1023,8 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .attend__table small { color: rgba(237, 232, 223, 0.55); }
 .attend__row-actions { white-space: nowrap; text-align: right; }
 .attend__row-actions .tool + .tool { margin-left: 6px; }
+.attend__nearby { display: flex; flex-direction: column; gap: 8px; }
+.attend__nearby p { margin: 0; color: rgba(237, 232, 223, 0.75); font-size: 0.9rem; }
 .attend__certs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .attend__certs p { margin: 0; color: rgba(237, 232, 223, 0.7); font-size: 0.9rem; }
 .cert-page { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 48px 16px 96px; }
