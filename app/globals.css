@@ -1025,6 +1025,15 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .attend__row-actions .tool + .tool { margin-left: 6px; }
 .attend__nearby { display: flex; flex-direction: column; gap: 8px; }
 .attend__nearby p { margin: 0; color: rgba(237, 232, 223, 0.75); font-size: 0.9rem; }
+.venue-pin__search { display: flex; gap: 8px; }
+.venue-pin__search input { flex: 1; min-width: 0; }
+.venue-pin__places { display: flex; flex-wrap: wrap; gap: 6px; }
+.venue-pin__places .attend__filter { text-align: left; }
+.venue-pin__places .attend__filter span { display: block; margin: 2px 0 0; font-size: 0.75rem; }
+.venue-map { position: relative; }
+.venue-map__map { height: clamp(260px, 50vw, 380px); width: 100%; isolation: isolate; border: 1px solid rgba(237, 232, 223, 0.15); border-radius: 10px; }
+.venue-map__pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -92%); color: var(--ochre); pointer-events: none; z-index: 1; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4)); }
+.venue-map__hint { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: rgba(18, 19, 20, 0.85); color: var(--dune); font-size: 0.78rem; white-space: nowrap; pointer-events: none; z-index: 1; }
 .attend__certs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .attend__certs p { margin: 0; color: rgba(237, 232, 223, 0.7); font-size: 0.9rem; }
 .cert-page { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 48px 16px 96px; }

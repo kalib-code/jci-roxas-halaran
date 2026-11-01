@@ -4,7 +4,7 @@ import { seed } from "@/db/seed.js";
 import { saveEvent } from "@/lib/engagement/events.js";
 import { setCheckin, setCheckinNearby, checkIn, listAttendance, checksNearby } from "@/lib/engagement/attendance.js";
 import { parseCoordinates, distanceMeters, nearbyCheck, nearbyMessage, formatDistance } from "@/lib/proof/location.js";
-import { coordinatesFrom } from "@/lib/maps-link.js";
+import { coordinatesFrom, searchPlaces, findPlaces } from "@/lib/maps-link.js";
 
 const PARK = { lat: 11.6047, lng: 122.7339 }; // People's Park, Baybay
 const CITY_HALL = { lat: 11.5853, lng: 122.7511 }; // about 2.9 km away
@@ -50,6 +50,38 @@ describe("reading a venue pin", () => {
     expect(await coordinatesFrom("https://maps.app.goo.gl/abc123", { fetchImpl: offsite })).toBeNull();
     expect(offsite).toHaveBeenCalledTimes(1);
     expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("finding the venue by name on OpenStreetMap", () => {
+  const hit = (name, lat, lon, address) => ({ name, lat: String(lat), lon: String(lon), display_name: `${name}, somewhere`, address });
+  const answer = (rows) => ({ ok: true, json: async () => rows });
+
+  it("searches around Capiz first and says which town each place is in", async () => {
+    const fetchImpl = vi.fn(async () => answer([hit("Kalan-an sa People's Park", 11.6069, 122.7376, { city: "Roxas City", state: "Capiz" })]));
+    expect(await searchPlaces("People's Park", { fetchImpl })).toEqual([{ name: "Kalan-an sa People's Park", area: "Roxas City, Capiz", lat: 11.6069, lng: 122.7376 }]);
+    const [url, init] = fetchImpl.mock.calls[0];
+    const params = new URL(url).searchParams;
+    expect([params.get("q"), params.get("countrycodes"), params.get("bounded")]).toEqual(["People's Park", "ph", "1"]);
+    expect(init.headers["User-Agent"]).toMatch(/^JCI Roxas Halaran website/);
+  });
+
+  it("looks across the Philippines, a second later, when nothing near Capiz matches", async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce(answer([]))
+      .mockResolvedValueOnce(answer([hit("Rizal Park", 14.5831, 120.9794, { city: "Manila", state: "Metro Manila" }), hit("Far away", 35.68, 139.76, {})]));
+    const wait = vi.fn(async () => {});
+    const places = await searchPlaces("Rizal Park", { fetchImpl, wait });
+    expect(places.map((p) => `${p.name} (${p.area})`)).toEqual(["Rizal Park (Manila, Metro Manila)"]);
+    expect(wait).toHaveBeenCalledWith(1000);
+    expect(new URL(fetchImpl.mock.calls[1][0]).searchParams.has("bounded")).toBe(false);
+  });
+
+  it("goes straight to pasted coordinates, and reports a search that fails", async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: false, status: 429 }));
+    expect(await findPlaces("11.6069, 122.7376", { fetchImpl })).toEqual([{ name: "11.6069, 122.7376", area: "", lat: 11.6069, lng: 122.7376 }]);
+    expect(fetchImpl).not.toHaveBeenCalled();
+    await expect(findPlaces("Villareal Stadium", { fetchImpl })).rejects.toThrow(/429/);
   });
 });
 
