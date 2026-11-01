@@ -7,7 +7,7 @@ import { pathsForEvent, revalidateAll } from "@/lib/revalidate.js";
 import { saveEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/lib/engagement/events.js";
 import { syncAttendanceEntry } from "@/lib/members/passport.js";
 import { setCheckin, setCheckinNearby, addAttendee, updateAttendee, removeAttendee, syncRsvpAttendance } from "@/lib/engagement/attendance.js";
-import { coordinatesFrom } from "@/lib/maps-link.js";
+import { findPlaces } from "@/lib/maps-link.js";
 import { formatDistance, NEARBY_M } from "@/lib/proof/location.js";
 import { changedFields } from "@/lib/audit.js";
 import { sendEmail } from "@/lib/email.js";
@@ -69,15 +69,23 @@ export async function setCheckinAction(eventId, { open, newCode = false }) {
 
 // Turns the venue check on or off. `place` is what the organizer pasted (a Google
 // Maps link or "lat, lng"), or the coordinates their phone gave.
+// Places on the map matching what an organizer typed, for pinning the venue.
+export async function findVenueAction(text) {
+  await requireArea("content");
+  const query = String(text ?? "").trim().slice(0, 200);
+  if (query.length < 3) return { ok: false, errors: ["Type at least 3 letters of the venue's name."] };
+  try {
+    return { ok: true, places: await findPlaces(query) };
+  } catch {
+    return { ok: false, errors: ["The map search isn't answering right now. Drag the map to the venue instead."] };
+  }
+}
+
+// `place` is the pin from the map: { lat, lng }.
 export async function setCheckinNearbyAction(eventId, { nearby, place = null }) {
   const { userId } = await requireArea("content");
   const db = getDb();
-  let pin = {};
-  if (place) {
-    const found = typeof place === "object" ? place : await coordinatesFrom(place);
-    if (!found) return { ok: false, errors: ["Couldn't read a location from that. In Google Maps, press and hold the venue, then copy the numbers shown (e.g. 11.5853, 122.7511)."] };
-    pin = { lat: Number(found.lat), lng: Number(found.lng) };
-  }
+  const pin = place ? { lat: Number(place.lat), lng: Number(place.lng) } : {};
   const r = await setCheckinNearby(db, eventId, { nearby, ...pin });
   if (r.ok) {
     const what = nearby ? `Limited check-in to within ${formatDistance(NEARBY_M)} of the venue` : "Turned off the venue check";

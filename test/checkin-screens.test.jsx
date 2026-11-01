@@ -3,10 +3,20 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
 
 const checkInAction = vi.fn();
-const actions = { setCheckinAction: vi.fn(async () => ({ ok: true })), setCheckinNearbyAction: vi.fn(async () => ({ ok: true })), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
+const actions = { setCheckinAction: vi.fn(async () => ({ ok: true })), setCheckinNearbyAction: vi.fn(async () => ({ ok: true })), findVenueAction: vi.fn(), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
 vi.mock("@/app/actions/attendance.js", () => ({ checkInAction: (...a) => checkInAction(...a) }));
 vi.mock("@/app/admin/events/actions.js", () => actions);
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+// The real map needs a browser; this one puts the pin wherever it's sent.
+vi.mock("@/components/admin/VenueMap.jsx", async () => {
+  const { useEffect } = await import("react");
+  return {
+    default: function VenueMap({ goTo, onMove }) {
+      useEffect(() => onMove(goTo ? { lat: goTo.lat, lng: goTo.lng } : { lat: 11.5853, lng: 122.7511 }), [goTo]);
+      return <p>Map</p>;
+    },
+  };
+});
 const { default: CheckinForm } = await import("@/components/forms/CheckinForm.jsx");
 const { default: AttendancePanel } = await import("@/components/admin/AttendancePanel.jsx");
 
@@ -105,21 +115,50 @@ describe("CheckinForm venue check", () => {
 });
 
 describe("VenueCheck settings", () => {
-  const base = { id: 7, title: "GA", startAt: "2027-01-15T18:00" };
-  it("asks for a pin before turning the check on", async () => {
+  const base = { id: 7, title: "GA", startAt: "2027-01-15T18:00", venue: "Villareal Stadium" };
+  const STADIUM = { name: "Villareal Stadium", area: "Roxas City, Capiz", lat: 11.5754, lng: 122.7584 };
+
+  it("finds the venue by its name, then pins it and turns the check on", async () => {
+    actions.findVenueAction.mockResolvedValue({ ok: true, places: [STADIUM, { name: "Villareal Stadium", area: "Iloilo City, Iloilo", lat: 10.72, lng: 122.56 }] });
     render(<AttendancePanel event={base} rows={[]} checkin={{ open: false }} />);
     fireEvent.click(screen.getByRole("button", { name: "Turn on venue check" }));
-    fireEvent.change(screen.getByLabelText("Venue location"), { target: { value: "https://maps.app.goo.gl/abc123" } });
+    expect(actions.findVenueAction).toHaveBeenCalledWith("Villareal Stadium");
+    await waitFor(() => expect(screen.getByRole("button", { name: /Roxas City, Capiz/ }).getAttribute("aria-pressed")).toBe("true"));
+    expect(screen.getByText("Pin at 11.57540, 122.75840. The shaded circle is the 1 km check-in area.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Pin and turn on" }));
-    await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: true, place: "https://maps.app.goo.gl/abc123" }));
+    await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: true, place: { lat: 11.5754, lng: 122.7584 } }));
   });
 
-  it("shows the pin and turns off without asking again", async () => {
+  it("says when nothing on the map matches", async () => {
+    actions.findVenueAction.mockResolvedValue({ ok: true, places: [] });
+    render(<AttendancePanel event={base} rows={[]} checkin={{ open: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Turn on venue check" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/^Nothing on the map matches "Villareal Stadium"/));
+    fireEvent.change(screen.getByLabelText("Find the venue"), { target: { value: "Nowhere Hall" } });
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/^Nothing on the map matches "Nowhere Hall"/));
+  });
+
+  it("shows the pin on OpenStreetMap and turns off without asking again", async () => {
     render(<AttendancePanel event={{ ...base, ...PARK, checkinNearby: true }} rows={[]} checkin={{ open: false }} />);
     expect(screen.getByText("Venue check on")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "11.60470, 122.73390" }).getAttribute("href")).toBe("https://www.google.com/maps?q=11.6047,122.7339");
+    expect(screen.getByRole("link", { name: "11.60470, 122.73390" }).getAttribute("href")).toBe("https://www.openstreetmap.org/?mlat=11.6047&mlon=122.7339#map=17/11.6047/122.7339");
     fireEvent.click(screen.getByRole("button", { name: "Turn off" }));
     await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: false }));
+  });
+
+  it("moves the pin to where the organizer stands, if the phone is precise enough", async () => {
+    render(<AttendancePanel event={{ ...base, ...PARK, checkinNearby: true }} rows={[]} checkin={{ open: false }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Move pin" }));
+    expect(actions.findVenueAction).not.toHaveBeenCalled();
+    phoneAt({ lat: 11.6069, lng: 122.7376, accuracy: 900 });
+    fireEvent.click(screen.getByRole("button", { name: "Use where I am now" }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toMatch(/too rough to pin the venue \(within 900 m\)/));
+    phoneAt({ lat: 11.6069, lng: 122.7376, accuracy: 15 });
+    fireEvent.click(screen.getByRole("button", { name: "Use where I am now" }));
+    await waitFor(() => expect(screen.getByText(/^Pin at 11\.60690, 122\.73760\./)).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Save pin" }));
+    await waitFor(() => expect(actions.setCheckinNearbyAction).toHaveBeenCalledWith(7, { nearby: true, place: { lat: 11.6069, lng: 122.7376 } }));
   });
 });
 
