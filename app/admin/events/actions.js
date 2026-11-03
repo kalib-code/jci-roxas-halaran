@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/lib/db.js";
 import { requireArea } from "@/lib/auth.js";
 import { pathsForEvent, revalidateAll } from "@/lib/revalidate.js";
-import { saveEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/lib/engagement/events.js";
+import { saveEvent, deleteEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/lib/engagement/events.js";
 import { syncAttendanceEntry } from "@/lib/members/passport.js";
 import { setCheckin, setCheckinNearby, showEndCode, countAsStayed, addAttendee, updateAttendee, removeAttendee, syncRsvpAttendance } from "@/lib/engagement/attendance.js";
 import { findPlaces } from "@/lib/maps-link.js";
@@ -21,6 +21,18 @@ export async function saveEventAction(input) {
   if (r.ok) {
     revalidateAll(pathsForEvent(r.event.slug));
     await audit(getDb(), { actor: userId, action: input?.id ? "event.update" : "event.create", table: "events", id: r.event.id, summary: `${input?.id ? "Edited" : "Created"} event "${r.event.title}"` });
+  }
+  return r;
+}
+
+export async function deleteEventAction(eventId) {
+  const { userId } = await requireArea("content");
+  const db = getDb();
+  const r = await deleteEvent(db, eventId);
+  if (r.ok) {
+    revalidateAll(pathsForEvent(r.event.slug));
+    revalidatePath("/admin/events");
+    await audit(db, { actor: userId, action: "event.delete", table: "events", id: r.event.id, summary: `Deleted event "${r.event.title}"`, details: { slug: r.event.slug, startAt: r.event.startAt } });
   }
   return r;
 }
