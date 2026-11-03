@@ -7,9 +7,11 @@ import Contours from "@/components/Contours.jsx";
 import { SafeHtml } from "@/components/SafeHtml.jsx";
 import RsvpForm from "@/components/forms/RsvpForm.jsx";
 import VolunteerForm from "@/components/forms/VolunteerForm.jsx";
+import VolunteerCalls from "@/components/VolunteerCalls.jsx";
 import { spotsBadge } from "@/components/EventRow.jsx";
 import { getDb } from "@/lib/db.js";
 import { getEventBySlug, listEvents } from "@/lib/engagement/events.js";
+import { listOpenDrivesFor } from "@/lib/engagement/volunteers.js";
 import { formatDateTime, phNow } from "@/lib/format.js";
 import { eventDateParts, mapsUrl } from "@/lib/eventDates.js";
 import { pageMetadata, breadcrumbLd, eventLd } from "@/lib/seo.js";
@@ -43,6 +45,7 @@ export default async function EventPage({ params }) {
   const badge = isPast ? null : spotsBadge(event);
   const map = mapsUrl(event.venue);
   const canRsvp = !isPast && event.rsvpOpen;
+  const drives = isPast ? [] : await listOpenDrivesFor(getDb(), { eventId: event.id });
   return (
     <>
       <JsonLd data={eventLd(event)} />
@@ -102,7 +105,7 @@ export default async function EventPage({ params }) {
       {!isPast && (
         <section className="section" id="volunteer">
           <div className="section__bar"><h2>Volunteer</h2><span className="label">Help out</span></div>
-          <VolunteerForm eventId={event.id} />
+          {drives.length > 0 ? <VolunteerCalls drives={drives} /> : <VolunteerForm eventId={event.id} />}
         </section>
       )}
       <p className="section"><Link className="btn" href="/events">All events</Link></p>

@@ -7,6 +7,7 @@ import { phToday } from "../lib/format.js";
 import { seed } from "../db/seed.js";
 import { saveArticle, publishArticle } from "../lib/content/articles.js";
 import { saveEvent } from "../lib/engagement/events.js";
+import { saveDrive, draftFromEvent } from "../lib/engagement/volunteers.js";
 import { saveCampaign, submitPledge, confirmPayment, recordExpense } from "../lib/engagement/money.js";
 
 rmSync("e2e.db", { force: true });
@@ -28,7 +29,9 @@ const ready = await saveArticle(
 );
 await publishArticle(db, ready.article.id, { expectedUpdatedAt: ready.article.updatedAt }, ctx);
 console.log(`e2e articles: published ${ready.article.slug}, draft ${draft.article.slug}`);
-await saveEvent(db, { title: "General Assembly 2027", startAt: "2099-01-15T18:00", venue: "Capiz Provincial Gym", capacity: 1 });
+const { event: ga } = await saveEvent(db, { title: "General Assembly 2027", startAt: "2099-01-15T18:00", venue: "Capiz Provincial Gym", capacity: 1 });
+// A volunteer registration for it: one role with a single spot, one without a limit.
+await saveDrive(db, { ...draftFromEvent(ga), description: "Call time is 4 pm.\nWear your JCI shirt.", roles: [{ label: "Registration desk", slots: 1 }, { label: "Photographer", description: "Bring a camera" }] });
 const { campaign } = await saveCampaign(db, {
   title: "Coastal Cleanup Fund",
   goalPesos: 20000,

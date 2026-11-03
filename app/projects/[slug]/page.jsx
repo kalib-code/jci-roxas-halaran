@@ -7,6 +7,8 @@ import { SafeHtml } from "@/components/SafeHtml.jsx";
 import ProgressBar from "@/components/ProgressBar.jsx";
 import ProjectMedia from "@/components/ProjectMedia.jsx";
 import VolunteerForm from "@/components/forms/VolunteerForm.jsx";
+import VolunteerCalls from "@/components/VolunteerCalls.jsx";
+import { listOpenDrivesFor } from "@/lib/engagement/volunteers.js";
 import { getCampaignForProject } from "@/lib/engagement/money.js";
 import SiteFooter from "@/components/SiteFooter.jsx";
 import JsonLd from "@/components/JsonLd.jsx";
@@ -42,7 +44,11 @@ export default async function ProjectPage({ params }) {
   const db = getDb();
   const project = await getProjectBySlug(db, slug);
   if (!project) notFound();
-  const [stories, campaign] = await Promise.all([listArticlesForProject(db, project.id), getCampaignForProject(db, project.id)]);
+  const [stories, campaign, drives] = await Promise.all([
+    listArticlesForProject(db, project.id),
+    getCampaignForProject(db, project.id),
+    listOpenDrivesFor(db, { projectId: project.id }),
+  ]);
   const pillar = PILLARS[project.pillar] ? project.pillar : "community";
   const start = formatDate(project.startDate);
   const end = project.endDate && project.endDate !== project.startDate ? formatDate(project.endDate) : null;
@@ -108,7 +114,7 @@ export default async function ProjectPage({ params }) {
           <p>Want to help with {project.title} or the next one like it? Leave your details and a chapter officer will reach out.</p>
           <p><Link href="/projects">← All projects</Link></p>
         </div>
-        <VolunteerForm projectId={project.id} />
+        {drives.length > 0 ? <VolunteerCalls drives={drives} /> : <VolunteerForm projectId={project.id} />}
       </section>
       <SiteFooter />
     </>

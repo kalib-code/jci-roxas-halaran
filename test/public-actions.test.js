@@ -10,7 +10,8 @@ vi.mock("@/lib/email.js", () => ({ sendEmail: async (m) => { h.emails.push(m); r
 vi.mock("@/lib/notify-admins.js", () => ({ notifyAdmins: async (m) => { h.emails.push({ ...m, to: "admins" }); return { sent: true }; } }));
 vi.mock("next/cache", () => ({ revalidatePath: (p) => h.revalidated.push(p) }));
 
-const { applyAction, rsvpAction, pledgeAction } = await import("@/app/actions/engagement.js");
+const { applyAction, rsvpAction, pledgeAction, driveSignupAction } = await import("@/app/actions/engagement.js");
+const { saveDrive, draftFromEvent } = await import("@/lib/engagement/volunteers.js");
 
 let ga;
 beforeEach(async () => {
@@ -54,5 +55,16 @@ describe("public actions", () => {
   it("acknowledge a pledge without counting it yet", async () => {
     const r = await pledgeAction({ payerName: "Ana Cruz", payerEmail: "a@x.ph", amountPesos: 500, method: "gcash", referenceNo: "ABC12345", consent: true });
     expect(r).toEqual({ ok: true, message: "Thank you! Our team will confirm your payment within a few days." });
+  });
+
+  it("confirm a volunteer registration sign-up to the volunteer and alert the admins", async () => {
+    const { drive } = await saveDrive(h.db, { ...draftFromEvent(ga), roles: [{ label: "Photographer", slots: 2 }] });
+    const r = await driveSignupAction({ driveId: drive.id, roleId: drive.roles[0].id, name: "Ana Cruz", email: "a@x.ph", consent: true });
+    expect(r).toEqual({ ok: true, message: "Thank you, Ana! You're signed up as Photographer. We'll contact you with details." });
+    const [toVolunteer, alert] = h.emails;
+    expect(toVolunteer).toMatchObject({ to: "a@x.ph", subject: "You're volunteering: Volunteers for General Assembly" });
+    expect(toVolunteer.text).toContain("/volunteer/volunteers-for-general-assembly");
+    expect(alert.subject).toBe("New volunteer: Photographer — Volunteers for General Assembly");
+    expect(alert.text).toContain(`/admin/volunteers/${drive.id}`);
   });
 });

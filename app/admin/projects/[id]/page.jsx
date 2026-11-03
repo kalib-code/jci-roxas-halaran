@@ -4,6 +4,8 @@ import { getDb } from "@/lib/db.js";
 import { getProject, getProjectBySlug } from "@/lib/content/projects.js";
 import { listProjectMetrics } from "@/lib/proof/metrics.js";
 import ProjectEditor from "@/components/admin/ProjectEditor.jsx";
+import LinkedDrives from "@/components/admin/LinkedDrives.jsx";
+import { listDrivesFor } from "@/lib/engagement/volunteers.js";
 
 export const metadata = { title: "Edit project — Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -15,11 +17,12 @@ export default async function EditProject({ params }) {
   const row = await getProject(db, id);
   if (!row) notFound();
   const project = await getProjectBySlug(db, row.slug);
-  const metrics = await listProjectMetrics(db, row.id);
+  const [metrics, drives] = await Promise.all([listProjectMetrics(db, row.id), listDrivesFor(db, { projectId: row.id })]);
   return (
     <div className="admin">
       <h1>Edit project</h1>
       <ProjectEditor project={project} metrics={metrics} />
+      <LinkedDrives drives={drives} newHref={`/admin/volunteers/new?project=${row.id}`} />
     </div>
   );
 }
