@@ -2,11 +2,12 @@ import { rmSync } from "node:fs";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { eq } from "drizzle-orm";
 import { createDb } from "../lib/db.js";
-import { members } from "../db/schema.js";
+import { events, members } from "../db/schema.js";
 import { phToday } from "../lib/format.js";
 import { seed } from "../db/seed.js";
 import { saveArticle, publishArticle } from "../lib/content/articles.js";
 import { saveEvent } from "../lib/engagement/events.js";
+import { setCheckin } from "../lib/engagement/attendance.js";
 import { saveDrive, draftFromEvent } from "../lib/engagement/volunteers.js";
 import { saveCampaign, submitPledge, confirmPayment, recordExpense } from "../lib/engagement/money.js";
 
@@ -32,6 +33,10 @@ console.log(`e2e articles: published ${ready.article.slug}, draft ${draft.articl
 const { event: ga } = await saveEvent(db, { title: "General Assembly 2027", startAt: "2099-01-15T18:00", venue: "Capiz Provincial Gym", capacity: 1 });
 // A volunteer registration for it: one role with a single spot, one without a limit.
 await saveDrive(db, { ...draftFromEvent(ga), description: "Call time is 4 pm.\nWear your JCI shirt.", roles: [{ label: "Registration desk", slots: 1 }, { label: "Photographer", description: "Bring a camera" }] });
+// An online webinar with check-in open, known codes, and the end code already shown.
+const { event: webinar } = await saveEvent(db, { title: "Leadership Webinar", format: "online", startAt: "2099-02-01T19:00", venue: "Zoom" });
+await setCheckin(db, webinar.id, { open: true });
+await db.update(events).set({ onlineCode: "e2e-online-link", startCode: "482917", endCode: "731004", endCodeShownAt: new Date().toISOString() }).where(eq(events.id, webinar.id));
 const { campaign } = await saveCampaign(db, {
   title: "Coastal Cleanup Fund",
   goalPesos: 20000,

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Turnstile, { turnstileEnabled } from "./Turnstile.jsx";
 import FormStatus from "./FormStatus.jsx";
 import { useSubmit } from "./useSubmit.js";
-import { checkInAction } from "@/app/actions/attendance.js";
+import { checkInAction, checkOutAction } from "@/app/actions/attendance.js";
 import { currentPosition } from "@/lib/geolocate.js";
 import { formatDistance, NEARBY_M, nearbyCheck, nearbyMessage } from "@/lib/proof/location.js";
 
@@ -45,7 +45,68 @@ const PROBLEMS = {
 export default function CheckinForm(props) {
   const [round, setRound] = useState(0);
   const [where, setWhere] = useState({ state: "idle" });
-  return <CheckinFlow key={round} {...props} where={where} setWhere={setWhere} fresh={round > 0} onAgain={() => setRound((r) => r + 1)} />;
+  const [ending, setEnding] = useState(false);
+  if (props.online && ending) return <EndCodeForm {...props} onBack={() => setEnding(false)} />;
+  return <CheckinFlow key={round} {...props} where={where} setWhere={setWhere} fresh={round > 0} onAgain={() => setRound((r) => r + 1)} onEnding={() => setEnding(true)} />;
+}
+
+function EventCard({ event, membersOnly, online }) {
+  return (
+    <div className="checkin__event">
+      <span className="label label--sm">{membersOnly ? `${HOME} members ${online ? "online " : ""}check-in` : online ? "Online check-in" : "Event check-in"}</span>
+      <h1 className="checkin__title">{event.title}</h1>
+      <p>{event.when}</p>
+      {event.venue && <p>{event.venue}</p>}
+    </div>
+  );
+}
+
+// The second code, given near the end of the meeting. Entering it is what
+// earns an online attendee their certificate.
+function EndCodeForm({ code, event, membersOnly, email: knownEmail = "", onBack, inline = false }) {
+  const [email, setEmail] = useState(knownEmail);
+  const [spokenCode, setSpokenCode] = useState("");
+  const [token, setToken] = useState("");
+  const [resetKey, setResetKey] = useState(0);
+  const { submit, pending, result } = useSubmit(checkOutAction);
+  useEffect(() => { if (result && !result.ok) setResetKey((k) => k + 1); }, [result]);
+
+  if (result?.ok) {
+    return (
+      <div className={inline ? "checkin__end" : "checkin"}>
+        <div className="checkin__done" role="status">
+          <span className="checkin__tick" aria-hidden="true">✓</span>
+          <h2 className="checkin__title">{result.already ? "Already done" : "You stayed to the end"}</h2>
+          <p className="checkin__note">Thank you for joining. Your certificate of attendance will be emailed to you after the event.</p>
+        </div>
+        {!inline && <EventCard event={event} membersOnly={membersOnly} online />}
+      </div>
+    );
+  }
+  const send = (e) => {
+    e.preventDefault();
+    submit({ code, email, spokenCode, turnstileToken: token });
+  };
+  return (
+    <form className={inline ? "checkin__end" : "checkin"} onSubmit={send} aria-label="Enter the end code">
+      {!inline && <EventCard event={event} membersOnly={membersOnly} online />}
+      <div className="checkin__end-head">
+        <h2 className="checkin__end-title">{inline ? "Stay until the end" : "Enter the end code"}</h2>
+        <p>{inline ? "Near the close, the host will give an end code. Enter it here to get your certificate. Keep this page open, or come back to this link." : "Use the same email you checked in with."}</p>
+      </div>
+      {!inline && (
+        <div className="field"><label htmlFor="ci-out-email">Email</label><input id="ci-out-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></div>
+      )}
+      <div className="field">
+        <label htmlFor="ci-end">End code</label>
+        <input id="ci-end" className="checkin__digits" value={spokenCode} onChange={(e) => setSpokenCode(e.target.value)} required inputMode="numeric" autoComplete="one-time-code" placeholder="6 digits" maxLength={9} />
+      </div>
+      <Turnstile onToken={setToken} resetKey={resetKey} />
+      <FormStatus result={result} />
+      <button className="btn btn--lg checkin__submit" type="submit" disabled={pending || (turnstileEnabled() && !token)}>{pending ? "Sending…" : "Send end code"}</button>
+      {onBack && <button type="button" className="tool" onClick={onBack}>Back to check-in</button>}
+    </form>
+  );
 }
 
 // Asks for the phone's location (only when tapped, so the browser's prompt makes
@@ -81,18 +142,24 @@ function VenueCheck({ venue, venueName, where, setWhere }) {
   );
 }
 
-function CheckinFlow({ code, event, membersOnly = false, nearby = null, where, setWhere, fresh, onAgain }) {
+function CheckinFlow({ code, event, membersOnly = false, online = false, nearby = null, where, setWhere, fresh, onAgain, onEnding }) {
   const [form, setForm] = useState(membersOnly ? { ...EMPTY, affiliation: "home" } : EMPTY);
   const [saved, setSaved] = useState(null);
   const [remember, setRemember] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [spokenCode, setSpokenCode] = useState("");
   const [token, setToken] = useState("");
   const [resetKey, setResetKey] = useState(0);
   const { submit, pending, result } = useSubmit(checkInAction);
 
   useEffect(() => {
     const s = fresh ? null : readSaved();
-    if (s) { setSaved(s); setForm(membersOnly ? { ...s, affiliation: "home" } : s); setRemember(true); }
+    if (s) {
+      // Online check-in needs an email: without one saved, show the fields to add it.
+      if (!online || s.email) setSaved(s);
+      setForm(membersOnly ? { ...s, affiliation: "home" } : s);
+      setRemember(true);
+    }
   }, [fresh]);
   // The server used up the token; get a fresh one so a retry can pass.
   useEffect(() => { if (result && !result.ok) setResetKey((k) => k + 1); }, [result]);
@@ -105,17 +172,25 @@ function CheckinFlow({ code, event, membersOnly = false, nearby = null, where, s
       if (remember) localStorage.setItem(SAVED, JSON.stringify(form));
       else localStorage.removeItem(SAVED);
     } catch { /* private browsing: nothing to remember */ }
-    submit({ ...form, consent, code, turnstileToken: token, location: nearby ? where.at : null });
+    submit({ ...form, consent, code, spokenCode, turnstileToken: token, location: nearby ? where.at : null });
   };
 
-  const eventCard = (
-    <div className="checkin__event">
-      <span className="label label--sm">{membersOnly ? `${HOME} members check-in` : "Event check-in"}</span>
-      <h1 className="checkin__title">{event.title}</h1>
-      <p>{event.when}</p>
-      {event.venue && <p>{event.venue}</p>}
-    </div>
-  );
+  const eventCard = <EventCard event={event} membersOnly={membersOnly} online={online} />;
+
+  if (result?.ok && online) {
+    return (
+      <div className="checkin">
+        <div className="checkin__done" role="status">
+          <span className="checkin__tick" aria-hidden="true">✓</span>
+          <h2 className="checkin__title">{result.already ? "Already checked in" : "You're checked in"}</h2>
+          <p className="checkin__who">{result.name}</p>
+          {result.at && <p className="checkin__stamp">Recorded {result.at}</p>}
+        </div>
+        <EndCodeForm code={code} event={event} membersOnly={membersOnly} email={form.email} inline />
+        {eventCard}
+      </div>
+    );
+  }
 
   if (result?.ok) {
     return (
@@ -137,6 +212,16 @@ function CheckinFlow({ code, event, membersOnly = false, nearby = null, where, s
   return (
     <form className="checkin" onSubmit={send}>
       {eventCard}
+      {online && (
+        <div className="checkin__start">
+          <div className="field">
+            <label htmlFor="ci-start">Start code</label>
+            <input id="ci-start" className="checkin__digits" value={spokenCode} onChange={(e) => setSpokenCode(e.target.value)} required inputMode="numeric" autoComplete="one-time-code" placeholder="6 digits" maxLength={9} />
+            <span className="count">The host says or shows it in the meeting. Near the end there&apos;s a second code — you need both for your certificate.</span>
+          </div>
+          <button type="button" className="tool" onClick={onEnding}>Already checked in? Enter the end code</button>
+        </div>
+      )}
       {nearby && <VenueCheck venue={nearby} venueName={event.venue} where={where} setWhere={setWhere} />}
       {saved ? (
         <div className="checkin__saved">
@@ -177,8 +262,8 @@ function CheckinFlow({ code, event, membersOnly = false, nearby = null, where, s
             <datalist id="ci-positions">{(POSITIONS[form.affiliation] ?? POSITIONS.home).map((p) => <option key={p} value={p} />)}</datalist>
           </div>
           <div className="field">
-            <label htmlFor="ci-email">Email (optional)</label>
-            <input id="ci-email" type="email" value={form.email} onChange={set("email")} autoComplete="email" />
+            <label htmlFor="ci-email">{online ? "Email" : "Email (optional)"}</label>
+            <input id="ci-email" type="email" value={form.email} onChange={set("email")} autoComplete="email" required={online} />
             <span className="count">We&apos;ll email your certificate of attendance after the event. Members: use the email you gave the chapter to get this activity in your JCI passport too.</span>
           </div>
           <label className="consent"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /> Remember my details on this phone for next time</label>

@@ -13,6 +13,7 @@ export default function EventEditor({ event, projects }) {
     slug: "",
     startAt: event?.startAt ?? "",
     endAt: event?.endAt ?? "",
+    format: event?.format ?? "in_person",
     venue: event?.venue ?? "",
     chairperson: event?.chairperson ?? "",
     weChair: event?.weChair ?? true,
@@ -59,7 +60,19 @@ export default function EventEditor({ event, projects }) {
         {!event && <div className="field"><label htmlFor="ev-slug">Address (optional)</label><input id="ev-slug" value={form.slug} onChange={set("slug")} placeholder="made from the title" /></div>}
         <div className="field"><label htmlFor="ev-start">Starts (Philippine time)</label><input id="ev-start" type="datetime-local" value={form.startAt} onChange={set("startAt")} /></div>
         <div className="field"><label htmlFor="ev-end">Ends (optional)</label><input id="ev-end" type="datetime-local" value={form.endAt} onChange={set("endAt")} /></div>
-        <div className="field"><label htmlFor="ev-venue">Venue</label><input id="ev-venue" value={form.venue} onChange={set("venue")} /></div>
+        <div className="field">
+          <label htmlFor="ev-format">Where it happens</label>
+          <select id="ev-format" value={form.format} onChange={set("format")}>
+            <option value="in_person">In person</option>
+            <option value="online">Online (Zoom, Discord, Meet…)</option>
+            <option value="hybrid">Hybrid: in person and online</option>
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="ev-venue">{form.format === "online" ? "Platform" : "Venue"}</label>
+          <input id="ev-venue" value={form.venue} onChange={set("venue")} placeholder={form.format === "online" ? "Zoom" : ""} />
+          {form.format !== "in_person" && <span className="count">Put the meeting link in the description. Online check-in uses a start code and an end code you give in the meeting.</span>}
+        </div>
         <label className="consent"><input type="checkbox" checked={form.weChair} onChange={set("weChair")} /> We chair this event</label>
         {form.weChair ? (
           <div className="field"><label htmlFor="ev-chair">Project Chairperson (signs the attendance sheet)</label><input id="ev-chair" value={form.chairperson} onChange={set("chairperson")} /></div>

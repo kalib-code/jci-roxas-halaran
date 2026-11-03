@@ -90,6 +90,18 @@ describe("articleLd", () => {
   });
 });
 
+describe("eventLd for online and hybrid events", () => {
+  it("marks the attendance mode and points online people at the event page", () => {
+    const base = { slug: "ga", title: "GA", startAt: "2027-01-15T18:00", venue: "Capiz Gym" };
+    const online = eventLd({ ...base, format: "online", venue: "Zoom" });
+    expect(online.eventAttendanceMode).toBe("https://schema.org/OnlineEventAttendanceMode");
+    expect(online.location).toMatchObject({ "@type": "VirtualLocation", url: expect.stringMatching(/\/events\/ga$/) });
+    const hybrid = eventLd({ ...base, format: "hybrid" });
+    expect(hybrid.eventAttendanceMode).toBe("https://schema.org/MixedEventAttendanceMode");
+    expect(hybrid.location.map((l) => l["@type"])).toEqual(["Place", "VirtualLocation"]);
+  });
+});
+
 describe("eventLd", () => {
   it("describes an in-person event in Roxas City with PH times", () => {
     const ld = eventLd({ slug: "ga", title: "General Assembly", description: "<p>Hi</p>", startAt: "2027-01-15T18:00", endAt: null, venue: "Capiz Gym", coverUrl: null });

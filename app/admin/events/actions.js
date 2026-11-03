@@ -6,7 +6,7 @@ import { requireArea } from "@/lib/auth.js";
 import { pathsForEvent, revalidateAll } from "@/lib/revalidate.js";
 import { saveEvent, setAttendance, moveToGoing, getEvent, listRsvps } from "@/lib/engagement/events.js";
 import { syncAttendanceEntry } from "@/lib/members/passport.js";
-import { setCheckin, setCheckinNearby, addAttendee, updateAttendee, removeAttendee, syncRsvpAttendance } from "@/lib/engagement/attendance.js";
+import { setCheckin, setCheckinNearby, showEndCode, countAsStayed, addAttendee, updateAttendee, removeAttendee, syncRsvpAttendance } from "@/lib/engagement/attendance.js";
 import { findPlaces } from "@/lib/maps-link.js";
 import { formatDistance, NEARBY_M } from "@/lib/proof/location.js";
 import { changedFields } from "@/lib/audit.js";
@@ -55,15 +55,36 @@ export async function rsvpsForEvent(eventId) {
   return listRsvps(getDb(), eventId);
 }
 
-export async function setCheckinAction(eventId, { open, newCode = false }) {
+export async function setCheckinAction(eventId, { open, newCode = false, newOnlineCode = false }) {
   const { userId } = await requireArea("content");
   const db = getDb();
-  const r = await setCheckin(db, eventId, { open, newCode });
+  const r = await setCheckin(db, eventId, { open, newCode, newOnlineCode });
   if (r.ok) {
-    const what = newCode ? "Made a new check-in QR for" : `${open ? "Opened" : "Closed"} check-in for`;
-    await audit(db, { actor: userId, action: newCode ? "checkin.new_code" : open ? "checkin.open" : "checkin.close", table: "events", id: r.event.id, summary: `${what} "${r.event.title}"` });
+    const what = newCode ? "Made a new check-in QR for" : newOnlineCode ? "Made a new online check-in link for" : `${open ? "Opened" : "Closed"} check-in for`;
+    const action = newCode ? "checkin.new_code" : newOnlineCode ? "checkin.new_online_link" : open ? "checkin.open" : "checkin.close";
+    await audit(db, { actor: userId, action, table: "events", id: r.event.id, summary: `${what} "${r.event.title}"` });
     revalidatePath(`/admin/events/${r.event.id}`);
   }
+  return r;
+}
+
+// Starts taking the end code; showing it again restarts its hour.
+export async function showEndCodeAction(eventId) {
+  const { userId } = await requireArea("content");
+  const db = getDb();
+  const r = await showEndCode(db, eventId);
+  if (r.ok) {
+    await audit(db, { actor: userId, action: "checkin.end_code", table: "events", id: r.event.id, summary: `Showed the end code for "${r.event.title}"` });
+    revalidatePath(`/admin/events/${r.event.id}`);
+  }
+  return r;
+}
+
+export async function countAsStayedAction(attendeeId) {
+  const { userId } = await requireArea("content");
+  const db = getDb();
+  const r = await countAsStayed(db, attendeeId, { userId });
+  if (r.ok) await audit(db, { actor: userId, action: "attendance.count_stayed", table: "attendance", id: r.attendee.id, summary: `Counted ${r.attendee.name} as attending to the end` });
   return r;
 }
 

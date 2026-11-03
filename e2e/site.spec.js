@@ -218,6 +218,25 @@ test("volunteer registration: the event links to it, a role fills up, and the sa
   await expect(again.getByRole("alert")).toContainText("already signed up");
 });
 
+test("online check-in: the start code gets you in, the end code gets you the certificate", async ({ page }) => {
+  await page.goto("/check-in/e2e-online-link");
+  await expect(page.getByText("Online check-in")).toBeVisible();
+  await page.getByLabel("Start code").fill("111111");
+  await page.getByLabel("Full name").fill("Rina Lopez");
+  await page.getByRole("radio", { name: /Not a JCI member/ }).check();
+  await page.getByLabel("Position or designation").fill("Guest");
+  await page.getByLabel("Email").fill("rina.e2e@example.ph");
+  await page.getByRole("checkbox", { name: /I agree/ }).check();
+  await page.getByRole("button", { name: "Check in" }).click();
+  await expect(page.locator(".form-errors")).toContainText("isn't the start code");
+  await page.getByLabel("Start code").fill("482 917");
+  await page.getByRole("button", { name: "Check in" }).click();
+  await expect(page.getByText("Stay until the end")).toBeVisible();
+  await page.getByLabel("End code", { exact: true }).fill("731004");
+  await page.getByRole("button", { name: "Send end code" }).click();
+  await expect(page.getByText("You stayed to the end")).toBeVisible();
+});
+
 test("membership application shows a confirmation", async ({ page }) => {
   await page.goto("/join");
   const form = page.locator("#apply");
@@ -243,7 +262,7 @@ test("pledge form shows the campaign and a confirmation", async ({ page }) => {
 });
 
 test("engagement admin screens require sign-in", async ({ page }) => {
-  for (const path of ["/admin/applications", "/admin/events", "/admin/payments", "/admin/campaigns", "/admin/expenses", "/admin/volunteers", "/admin/volunteers/new", "/admin/volunteers/1"]) {
+  for (const path of ["/admin/applications", "/admin/events", "/admin/payments", "/admin/campaigns", "/admin/expenses", "/admin/volunteers", "/admin/volunteers/new", "/admin/volunteers/1", "/admin/events/1/codes"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/sign-in/);
   }

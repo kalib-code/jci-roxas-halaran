@@ -220,6 +220,15 @@ export const events = sqliteTable("events", {
   lat: real("lat"),
   lng: real("lng"),
   checkinNearby: integer("checkin_nearby", { mode: "boolean" }).notNull().default(false),
+  // in_person: the QR at the venue. online: Zoom, Discord, Meet… hybrid: both.
+  format: text("format", { enum: ["in_person", "online", "hybrid"] }).notNull().default("in_person"),
+  // Online check-in: its own secret link, plus a start code and an end code the
+  // host says or shows in the meeting. The end code works only once shown, so a
+  // forwarded link alone never earns a certificate.
+  onlineCode: text("online_code").unique(),
+  startCode: text("start_code"),
+  endCode: text("end_code"),
+  endCodeShownAt: text("end_code_shown_at"),
 });
 
 export const rsvps = sqliteTable(
@@ -253,8 +262,11 @@ export const attendance = sqliteTable(
     email: text("email"),
     memberId: integer("member_id").references(() => members.id, { onDelete: "set null" }),
     rsvpId: integer("rsvp_id").references(() => rsvps.id, { onDelete: "set null" }),
-    source: text("source", { enum: ["qr", "admin", "rsvp"] }).notNull(),
+    source: text("source", { enum: ["qr", "admin", "rsvp", "online"] }).notNull(),
     checkedInAt: text("checked_in_at").notNull(),
+    // When an online attendee entered the end code (or an organizer counted them
+    // as staying). Online rows without it don't count as attended.
+    checkedOutAt: text("checked_out_at"),
     addedBy: text("added_by"),
     // How far from the venue a location-checked QR check-in was, in metres.
     // Where the person stood is never stored.

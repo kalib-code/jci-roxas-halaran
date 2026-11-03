@@ -43,7 +43,9 @@ export default async function EventPage({ params }) {
   const full = Boolean(event.capacity) && event.going >= event.capacity;
   const d = eventDateParts(event.startAt, event.endAt);
   const badge = isPast ? null : spotsBadge(event);
-  const map = mapsUrl(event.venue);
+  const online = event.format === "online";
+  const map = online ? null : mapsUrl(event.venue);
+  const where = online ? `Online${event.venue ? ` · ${event.venue}` : ""}` : event.format === "hybrid" ? `${event.venue ?? "In person"} and online` : event.venue;
   const canRsvp = !isPast && event.rsvpOpen;
   const drives = isPast ? [] : await listOpenDrivesFor(getDb(), { eventId: event.id });
   return (
@@ -75,11 +77,11 @@ export default async function EventPage({ params }) {
                 </span>
               </li>
             )}
-            {event.venue && (
+            {where && (
               <li>
                 <span className="event-facts__k">Where</span>
                 <span className="event-facts__v">
-                  {event.venue}
+                  {where}
                   {map && <><br /><a href={map} target="_blank" rel="noopener noreferrer">Open in Google Maps</a></>}
                 </span>
               </li>
