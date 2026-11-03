@@ -1128,3 +1128,10 @@ form.checkin > .tool { align-self: center; }
 .codes-screen__qr svg { display: block; width: 100%; height: auto; }
 .codes-screen__url { margin: 0; font-family: var(--font-space-grotesk), monospace; font-size: 1rem; overflow-wrap: anywhere; }
 @media (max-width: 800px) { .codes-screen__grid { grid-template-columns: 1fr; } }
+
+/* Delete an event: kept apart at the bottom of its admin page. */
+.delete-zone { margin: 48px 0 32px; padding: 20px; border: 1px solid rgba(214, 92, 70, 0.45); border-radius: 12px; }
+.delete-zone h2 { margin-top: 0; }
+.delete-zone__confirm ul { margin: 4px 0 12px; }
+.btn--danger { background: #c4452f; color: #fff; }
+.btn--danger:hover { background: #d65c46; color: #fff; }

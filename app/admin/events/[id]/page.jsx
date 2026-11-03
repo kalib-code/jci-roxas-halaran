@@ -8,6 +8,7 @@ import EventEditor from "@/components/admin/EventEditor.jsx";
 import RsvpTable from "@/components/admin/RsvpTable.jsx";
 import AttendancePanel from "@/components/admin/AttendancePanel.jsx";
 import LinkedDrives from "@/components/admin/LinkedDrives.jsx";
+import DeleteEvent from "@/components/admin/DeleteEvent.jsx";
 import { listDrivesFor } from "@/lib/engagement/volunteers.js";
 import { listAttendance } from "@/lib/engagement/attendance.js";
 import { checkinPanel } from "@/lib/engagement/checkin-panel.js";
@@ -31,6 +32,10 @@ export default async function EditEvent({ params }) {
       <LinkedDrives drives={drives} newHref={`/admin/volunteers/new?event=${event.id}`} />
       <AttendancePanel event={{ id: event.id, title: event.title, startAt: event.startAt, venue: event.venue, weChair: event.weChair, format: event.format, lat: event.lat, lng: event.lng, checkinNearby: event.checkinNearby }} rows={attendance} checkin={checkin} />
       <RsvpTable eventId={event.id} rsvps={rsvps} />
+      <DeleteEvent
+        event={{ id: event.id, title: event.title }}
+        counts={{ rsvps: rsvps.length, attendance: attendance.length, certificates: attendance.filter((a) => a.certificateSentAt).length, drives: drives.length }}
+      />
     </div>
   );
 }
