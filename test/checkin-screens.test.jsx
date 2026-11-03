@@ -3,8 +3,9 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
 
 const checkInAction = vi.fn();
-const actions = { setCheckinAction: vi.fn(async () => ({ ok: true })), setCheckinNearbyAction: vi.fn(async () => ({ ok: true })), findVenueAction: vi.fn(), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
-vi.mock("@/app/actions/attendance.js", () => ({ checkInAction: (...a) => checkInAction(...a) }));
+const checkOutAction = vi.fn();
+const actions = { showEndCodeAction: vi.fn(async () => ({ ok: true })), countAsStayedAction: vi.fn(), setCheckinAction: vi.fn(async () => ({ ok: true })), setCheckinNearbyAction: vi.fn(async () => ({ ok: true })), findVenueAction: vi.fn(), addAttendeeAction: vi.fn(), updateAttendeeAction: vi.fn(), removeAttendeeAction: vi.fn(async () => ({ ok: true })) };
+vi.mock("@/app/actions/attendance.js", () => ({ checkInAction: (...a) => checkInAction(...a), checkOutAction: (...a) => checkOutAction(...a) }));
 vi.mock("@/app/admin/events/actions.js", () => actions);
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 // The real map needs a browser; this one puts the pin wherever it's sent.
@@ -190,7 +191,7 @@ describe("AttendancePanel", () => {
   it("opens check-in, and removes someone only on the second click", async () => {
     render(<AttendancePanel event={{ id: 7, title: "GA", startAt: "2027-01-15T18:00" }} rows={rows} checkin={{ open: false }} />);
     fireEvent.click(screen.getByRole("button", { name: "Open check-in" }));
-    await waitFor(() => expect(actions.setCheckinAction).toHaveBeenCalledWith(7, { open: true, newCode: false }));
+    await waitFor(() => expect(actions.setCheckinAction).toHaveBeenCalledWith(7, { open: true }));
     fireEvent.click(screen.getByRole("button", { name: "Remove Ana Reyes" }));
     expect(actions.removeAttendeeAction).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Yes, remove" }));
@@ -203,5 +204,74 @@ describe("AttendancePanel", () => {
     expect(screen.getByRole("img", { name: "Check-in QR code" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Show QR poster" }).getAttribute("href")).toBe("/admin/events/7/check-in-qr");
     expect(within(screen.getByRole("region", { name: "Attendance" })).getByText("No one has checked in yet.")).toBeTruthy();
+  });
+});
+
+describe("CheckinForm on an online link", () => {
+  const fill = () => {
+    fireEvent.change(screen.getByLabelText("Start code"), { target: { value: "482 917" } });
+    fireEvent.change(screen.getByLabelText("Full name"), { target: { value: "Ana Reyes" } });
+    fireEvent.click(screen.getByLabelText(/^JCI Roxas Halaran/));
+    fireEvent.change(screen.getByLabelText("Position or designation"), { target: { value: "Member" } });
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "ana@x.ph" } });
+    fireEvent.click(screen.getByLabelText(/I agree/));
+  };
+
+  it("asks for the start code and an email, then for the end code with the same email", async () => {
+    checkInAction.mockResolvedValue({ ok: true, online: true, name: "Ana Reyes", at: "7:10 PM" });
+    checkOutAction.mockResolvedValue({ ok: true, already: false });
+    render(<CheckinForm code="abc123def456" event={event} online />);
+    expect(screen.getByLabelText("Email").required).toBe(true);
+    fill();
+    fireEvent.click(screen.getByRole("button", { name: "Check in" }));
+    expect(await screen.findByText("Stay until the end")).toBeTruthy();
+    expect(checkInAction).toHaveBeenCalledWith(expect.objectContaining({ code: "abc123def456", spokenCode: "482 917", email: "ana@x.ph" }));
+    fireEvent.change(screen.getByLabelText("End code"), { target: { value: "731004" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send end code" }));
+    expect(await screen.findByText("You stayed to the end")).toBeTruthy();
+    expect(checkOutAction).toHaveBeenCalledWith(expect.objectContaining({ code: "abc123def456", email: "ana@x.ph", spokenCode: "731004" }));
+  });
+
+  it("lets someone who closed the page come back for the end code", async () => {
+    render(<CheckinForm code="abc123def456" event={event} online />);
+    fireEvent.click(screen.getByRole("button", { name: "Already checked in? Enter the end code" }));
+    expect(screen.getByLabelText("Email")).toBeTruthy();
+    expect(screen.getByLabelText("End code")).toBeTruthy();
+    expect(screen.queryByLabelText("Start code")).toBeNull();
+  });
+
+  it("asks for the email again when the saved details have none", async () => {
+    localStorage.setItem("jci-checkin-details", JSON.stringify({ name: "Judy Daliva", position: "Director", affiliation: "home" }));
+    render(<CheckinForm code="abc123def456" event={event} online />);
+    await waitFor(() => expect(screen.getByLabelText("Full name").value).toBe("Judy Daliva"));
+    expect(screen.queryByText("Welcome back, Judy")).toBeNull();
+  });
+});
+
+describe("AttendancePanel for an online event", () => {
+  const online = { url: "https://x.ph/check-in/online123456", startCode: "482917", endCode: null, endCodeOpen: false, endCodeUntil: null };
+  const rows = [
+    { id: 1, name: "Ana Reyes", position: "Member", affiliation: "home", localOrganization: "JCI Roxas Halaran", email: "ana@x.ph", source: "online", checkedInAt: "2027-01-15T11:10:00Z", checkedOutAt: null },
+    { id: 2, name: "Ben Cruz", position: "Member", affiliation: "home", localOrganization: "JCI Roxas Halaran", email: "ben@x.ph", source: "online", checkedInAt: "2027-01-15T11:12:00Z", checkedOutAt: "2027-01-15T12:55:00Z" },
+  ];
+
+  it("shows the link and start code, keeps the end code hidden until shown, and has no QR poster", async () => {
+    render(<AttendancePanel event={{ id: 7, title: "Webinar", startAt: "2027-01-15T19:00", format: "online" }} rows={rows} checkin={{ open: true, url: null, online }} />);
+    expect(screen.getByText("482 917")).toBeTruthy();
+    expect(screen.getByText(online.url)).toBeTruthy();
+    expect(screen.queryByText("Show QR poster")).toBeNull();
+    expect(screen.getByText("stayed online to the end")).toBeTruthy();
+    expect(screen.getByText("Needs end code")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Show end code" }));
+    await waitFor(() => expect(actions.showEndCodeAction).toHaveBeenCalledWith(7));
+  });
+
+  it("lets the organizer count someone as stayed", async () => {
+    actions.countAsStayedAction.mockResolvedValue({ ok: true, attendee: { ...rows[0], checkedOutAt: "2027-01-15T13:00:00Z" } });
+    render(<AttendancePanel event={{ id: 7, title: "Webinar", startAt: "2027-01-15T19:00", format: "online" }} rows={rows} checkin={{ open: true, url: null, online }} />);
+    expect(screen.queryByRole("button", { name: "Count Ben Cruz as stayed" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Count Ana Reyes as stayed" }));
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Count Ana Reyes as stayed" })).toBeNull());
+    expect(actions.countAsStayedAction).toHaveBeenCalledWith(1);
   });
 });

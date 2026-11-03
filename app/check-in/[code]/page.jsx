@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db.js";
-import { getCheckinEvent, checkinIsOpen, checksNearby } from "@/lib/engagement/attendance.js";
+import { getCheckinEvent, checkinIsOpen, checksNearby, isOnlineLink } from "@/lib/engagement/attendance.js";
 import { eventWhen } from "@/lib/engagement/attendance-sheet.js";
 import CheckinForm from "@/components/forms/CheckinForm.jsx";
 
@@ -12,11 +12,12 @@ export default async function CheckinPage({ params }) {
   const { code } = await params;
   const event = await getCheckinEvent(getDb(), code);
   if (!event) notFound();
-  const info = { title: event.title, when: eventWhen(event), venue: event.venue };
+  const online = isOnlineLink(event, code);
+  const info = { title: event.title, when: eventWhen(event), venue: online ? `Online${event.venue && event.format === "online" ? ` · ${event.venue}` : ""}` : event.venue };
   return (
     <main className="checkin-page">
       {checkinIsOpen(event) ? (
-        <CheckinForm code={code} event={info} membersOnly={!event.weChair} nearby={checksNearby(event) ? { lat: event.lat, lng: event.lng } : null} />
+        <CheckinForm code={code} event={info} membersOnly={!event.weChair} online={online} nearby={!online && checksNearby(event) ? { lat: event.lat, lng: event.lng } : null} />
       ) : (
         <div className="checkin">
           <div className="checkin__event">
@@ -24,7 +25,7 @@ export default async function CheckinPage({ params }) {
             <h1 className="checkin__title">{info.title}</h1>
             <p>{info.when}</p>
           </div>
-          <p className="form-errors">Check-in for this event is closed. If you&apos;re at the event, ask an organizer at the registration table to add you.</p>
+          <p className="form-errors">{online ? "Check-in for this event is closed. If you attended, message the organizers to be added." : <>Check-in for this event is closed. If you&apos;re at the event, ask an organizer at the registration table to add you.</>}</p>
         </div>
       )}
     </main>

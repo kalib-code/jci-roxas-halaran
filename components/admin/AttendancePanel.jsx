@@ -2,14 +2,17 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { setCheckinAction, addAttendeeAction, updateAttendeeAction, removeAttendeeAction, sendCertificatesAction } from "@/app/admin/events/actions.js";
+import { setCheckinAction, showEndCodeAction, countAsStayedAction, addAttendeeAction, updateAttendeeAction, removeAttendeeAction, sendCertificatesAction } from "@/app/admin/events/actions.js";
 import { timeIn } from "@/lib/engagement/attendance-sheet.js";
 import { formatDistance } from "@/lib/proof/location.js";
 import VenueCheck from "./VenueCheck.jsx";
 
 const HOME = "JCI Roxas Halaran";
 const FILTERS = [["all", "All"], ["home", HOME], ["other_lo", "Other chapters"], ["guest", "Guests"]];
-const SOURCE = { qr: ["QR", "badge--ok"], admin: ["Organizer", "badge--neutral"], rsvp: ["RSVP", "badge--wait"] };
+const SOURCE = { qr: ["QR", "badge--ok"], admin: ["Organizer", "badge--neutral"], rsvp: ["RSVP", "badge--wait"], online: ["Online", "badge--ok"] };
+const stayed = (r) => r.source !== "online" || Boolean(r.checkedOutAt);
+// "482917" read out as "482 917".
+const spaced = (code) => (code ? `${code.slice(0, 3)} ${code.slice(3)}` : "");
 const EMPTY = { name: "", position: "", affiliation: "home", localOrganization: "", email: "" };
 const TIME = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Manila" });
 const at = (iso) => TIME.format(new Date(iso)).replace(/ /g, " ");
@@ -78,9 +81,19 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
   const term = q.trim().toLowerCase();
   const shown = rows.filter((r) => (filter === "all" || r.affiliation === filter) && (!term || `${r.name} ${r.position} ${r.localOrganization}`.toLowerCase().includes(term)));
 
-  const toggle = (open, newCode = false) => run(async () => {
-    const r = await setCheckinAction(event.id, { open, newCode });
+  const toggle = (open, more = {}) => run(async () => {
+    const r = await setCheckinAction(event.id, { open, ...more });
     if (r.ok) router.refresh();
+    return r;
+  });
+  const revealEnd = () => run(async () => {
+    const r = await showEndCodeAction(event.id);
+    if (r.ok) router.refresh();
+    return r;
+  });
+  const countStayed = (row) => run(async () => {
+    const r = await countAsStayedAction(row.id);
+    if (r.ok) setRows((rs) => rs.map((x) => (x.id === r.attendee.id ? r.attendee : x)));
     return r;
   });
   const add = (e) => { e.preventDefault(); run(async () => {
@@ -99,7 +112,10 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
     if (r.ok) { setRows((rs) => rs.filter((x) => x.id !== row.id)); setConfirming(null); }
     return r;
   });
-  const unsent = rows.filter((r) => r.email && !r.certificateSentAt).length;
+  const unsent = rows.filter((r) => r.email && !r.certificateSentAt && stayed(r)).length;
+  const onlineRows = rows.filter((r) => r.source === "online");
+  const room = event.format !== "online";
+  const online = checkin.online;
   const sendCerts = () => run(async () => {
     const r = await sendCertificatesAction(event.id);
     if (r.ok) {
@@ -108,8 +124,8 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
     }
     return r;
   });
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(checkin.url); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { setCopied(false); }
+  const copy = async (text, which) => {
+    try { await navigator.clipboard.writeText(text); setCopied(which); setTimeout(() => setCopied(false), 2000); } catch { setCopied(false); }
   };
   const editRow = (r) => setEditing({ ...r, email: r.email ?? "", localOrganization: r.affiliation === "home" ? "" : r.localOrganization === "Non-JCI guest" ? "" : r.localOrganization });
 
@@ -125,22 +141,25 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
 
       <div className="attend__glance">
         <div className="attend__stat"><strong>{rows.length}</strong><span>checked in</span></div>
+        {onlineRows.length > 0 && <div className="attend__stat"><strong>{onlineRows.filter(stayed).length}</strong><span>stayed online to the end</span></div>}
         <div className="attend__checkin">
           <div className="attend__checkin-text">
             <p><span className={`badge ${checkin.open ? "badge--ok" : "badge--neutral"}`}>{checkin.open ? "Check-in open" : "Check-in closed"}</span></p>
             {checkin.open ? (
               <>
-                <p>Participants scan the QR to sign in. It stops taking entries a day after the event.</p>
+                {room && <p>{online ? "In the room, participants scan the QR to sign in." : "Participants scan the QR to sign in."} It stops taking entries a day after the event.</p>}
                 <div className="actions">
-                  <a className="tool" href={`/admin/events/${event.id}/check-in-qr`}>Show QR poster</a>
-                  <button type="button" className="tool" onClick={copy}>{copied ? "Copied" : "Copy link"}</button>
-                  <button type="button" className="tool" disabled={pending} onClick={() => toggle(true, true)} title="Use if the QR was shared somewhere it shouldn't be">New QR code</button>
+                  {room && <>
+                    <a className="tool" href={`/admin/events/${event.id}/check-in-qr`}>Show QR poster</a>
+                    <button type="button" className="tool" onClick={() => copy(checkin.url, "room")}>{copied === "room" ? "Copied" : online ? "Copy room link" : "Copy link"}</button>
+                    <button type="button" className="tool" disabled={pending} onClick={() => toggle(true, { newCode: true })} title="Use if the QR was shared somewhere it shouldn't be">New QR code</button>
+                  </>}
                   <button type="button" className="tool" disabled={pending} onClick={() => toggle(false)}>Close check-in</button>
                 </div>
               </>
             ) : (
               <>
-                <p>Open check-in at the start of the event to get a QR code for the registration table.</p>
+                <p>{room ? "Open check-in at the start of the event to get a QR code for the registration table." : "Open check-in at the start of the meeting to get the link and codes."}</p>
                 <button type="button" className="btn" disabled={pending} onClick={() => toggle(true)}>Open check-in</button>
               </>
             )}
@@ -149,7 +168,43 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
         </div>
       </div>
 
-      <VenueCheck event={event} />
+      {online && (
+        <div className="attend__online" aria-label="Online check-in">
+          <div className="attend__online-link">
+            <h3>Online check-in</h3>
+            <p>Paste this link in the meeting chat. People also need the two codes below, so a forwarded link alone won&apos;t get anyone a certificate.</p>
+            <p className="attend__online-url"><code>{online.url}</code></p>
+            <div className="actions">
+              <button type="button" className="tool" onClick={() => copy(online.url, "online")}>{copied === "online" ? "Copied" : "Copy online link"}</button>
+              <a className="tool" href={`/admin/events/${event.id}/codes`} target="_blank" rel="noopener noreferrer">Present codes</a>
+              <button type="button" className="tool" disabled={pending} onClick={() => toggle(true, { newOnlineCode: true })} title="Use if the link was posted somewhere it shouldn't be">New online link</button>
+            </div>
+          </div>
+          <div className="attend__code">
+            <span className="label label--sm">1 · Start code</span>
+            <strong className="attend__code-digits">{spaced(online.startCode)}</strong>
+            <p>Say it or show it near the start. It works until check-in closes.</p>
+          </div>
+          <div className="attend__code">
+            <span className="label label--sm">2 · End code</span>
+            {online.endCode ? (
+              <>
+                <strong className="attend__code-digits">{spaced(online.endCode)}</strong>
+                <p>{online.endCodeOpen ? `Taking it until ${online.endCodeUntil}.` : "No longer taking it."} Only people who enter it get a certificate.</p>
+                <button type="button" className="tool" disabled={pending} onClick={revealEnd}>{online.endCodeOpen ? "Restart its hour" : "Take it for another hour"}</button>
+              </>
+            ) : (
+              <>
+                <strong className="attend__code-digits attend__code-digits--hidden" aria-label="Hidden">••• •••</strong>
+                <p>Show it near the close. It works for an hour from then; until you show it, nobody can enter it.</p>
+                <button type="button" className="btn" disabled={pending} onClick={revealEnd}>Show end code</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {room && <VenueCheck event={event} />}
       {membersOnly && <p className="count">Another organization chairs this event, so check-in and the attendance sheet cover only {HOME} members.</p>}
       <div className="attend__certs">
         <p>Certificates of attendance are emailed automatically an hour after the event ends, to everyone who gave an email.{unsent > 0 && ` ${unsent} still to send.`}</p>
@@ -194,8 +249,12 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
                 <td>{r.position}</td>
                 <td>{r.localOrganization}</td>
                 <td>{timeIn(r.checkedInAt, event.startAt.slice(0, 10))}</td>
-                <td><span className={`badge ${SOURCE[r.source][1]}`}>{SOURCE[r.source][0]}</span>{r.distanceM != null && <><br /><small>{formatDistance(r.distanceM)} from venue</small></>}</td>
-                <td>{r.certificateSentAt ? <a href={`/certificate/${r.certificateCode}`} target="_blank" rel="noopener noreferrer">Sent</a> : r.email ? "Pending" : <small>No email</small>}</td>
+                <td>
+                  <span className={`badge ${SOURCE[r.source][1]}`}>{SOURCE[r.source][0]}</span>
+                  {r.distanceM != null && <><br /><small>{formatDistance(r.distanceM)} from venue</small></>}
+                  {r.source === "online" && <><br /><small>{r.checkedOutAt ? `Out ${timeIn(r.checkedOutAt, event.startAt.slice(0, 10))}` : "No end code yet"}</small></>}
+                </td>
+                <td>{r.certificateSentAt ? <a href={`/certificate/${r.certificateCode}`} target="_blank" rel="noopener noreferrer">Sent</a> : !stayed(r) ? <small>Needs end code</small> : r.email ? "Pending" : <small>No email</small>}</td>
                 <td className="attend__row-actions">
                   {confirming === r.id ? (
                     <>
@@ -204,6 +263,7 @@ export default function AttendancePanel({ event, rows: initial, checkin }) {
                     </>
                   ) : (
                     <>
+                      {!stayed(r) && <button type="button" className="tool" disabled={pending} aria-label={`Count ${r.name} as stayed`} title="They stayed but couldn't enter the end code" onClick={() => countStayed(r)}>Count as stayed</button>}
                       <button type="button" className="tool" aria-label={`Edit ${r.name}`} onClick={() => editRow(r)}>Edit</button>
                       <button type="button" className="tool" aria-label={`Remove ${r.name}`} onClick={() => setConfirming(r.id)}>Remove</button>
                     </>

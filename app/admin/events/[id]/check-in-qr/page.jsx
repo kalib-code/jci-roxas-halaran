@@ -19,6 +19,9 @@ export default async function CheckinPoster({ params }) {
   const event = await getEvent(getDb(), id);
   if (!event) notFound();
   const back = <Link href={`/admin/events/${event.id}#attendance`}>← Back to {event.title}</Link>;
+  if (event.format === "online") {
+    return <div className="admin">{back}<h1>This is an online event</h1><p>Online events don&apos;t use a printed QR. Use <Link href={`/admin/events/${event.id}/codes`}>Present codes</Link> to share the link and codes in the meeting.</p></div>;
+  }
   if (!checkinIsOpen(event)) {
     return <div className="admin">{back}<h1>Check-in is closed</h1><p>Open check-in on the event page to get its QR code.</p></div>;
   }
