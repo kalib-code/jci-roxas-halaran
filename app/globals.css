@@ -1053,3 +1053,32 @@ input[type="checkbox"] { accent-color: var(--ochre); width: 18px; height: 18px; 
 .welcome h1 { margin: 0; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--dune); }
 .welcome p { margin: 0; line-height: 1.6; color: rgba(237, 232, 223, 0.8); }
 .welcome .btn { cursor: pointer; }
+
+/* Volunteer registrations: the public sign-up page (/volunteer/<slug>). */
+.drive-hero { display: flex; flex-direction: column; gap: 20px; max-width: 760px; padding-top: 120px; }
+.drive-desc { max-width: 64ch; line-height: 1.7; white-space: pre-line; color: rgba(237, 232, 223, 0.85); }
+.checkin__option--off { opacity: 0.5; cursor: not-allowed; }
+.volunteer-calls { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; max-width: 720px; }
+.volunteer-call { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border: 1px solid rgba(237, 232, 223, 0.14); border-radius: 16px; background: linear-gradient(160deg, #1c3b2b 0%, #121314 80%); }
+.volunteer-call h3 { margin: 0; font-family: var(--font-syne), sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--dune); }
+.volunteer-call p { margin: 4px 0 0; color: rgba(237, 232, 223, 0.7); }
+@media (max-width: 600px) { .volunteer-call { flex-direction: column; align-items: flex-start; } }
+
+/* Volunteer registrations: admin. */
+.drive-editor__main { display: flex; flex-direction: column; gap: 20px; }
+.drive-roles { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 16px; border: 1px solid rgba(237, 232, 223, 0.12); }
+.drive-roles legend { padding: 0 6px; font-family: var(--font-space-grotesk), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(237, 232, 223, 0.7); }
+.drive-roles > .tool { align-self: flex-start; }
+.drive-role { display: grid; grid-template-columns: minmax(0, 3fr) 90px minmax(0, 3fr) auto; gap: 10px; align-items: end; }
+.drive-role__remove:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (max-width: 700px) { .drive-role { grid-template-columns: minmax(0, 1fr) 90px; } .drive-role__desc { grid-column: 1 / -1; } }
+.drive-share { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 32px; padding: 20px; background: rgba(237, 232, 223, 0.04); }
+.drive-share__body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.drive-share__body h2, .drive-share__body p { margin: 0; }
+.drive-share__url { overflow-wrap: anywhere; }
+.drive-share__url a { color: var(--ochre); }
+.drive-signups { margin-top: 40px; }
+.drive-signups__group { margin-top: 24px; }
+.drive-signups__group h3 { display: flex; gap: 12px; align-items: baseline; margin: 0 0 8px; font-size: 1.05rem; }
+.linked-drives { margin: 32px 0; padding: 20px; background: rgba(237, 232, 223, 0.04); }
+.linked-drives ul { list-style: none; margin: 8px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }

@@ -270,17 +270,62 @@ export const attendance = sqliteTable(
   ],
 );
 
-export const volunteerSignups = sqliteTable("volunteer_signups", {
+// A volunteer registration an organizer makes for an event, a project or any
+// other activity: its own sign-up page at /volunteer/<slug>, with optional roles.
+export const volunteerDrives = sqliteTable("volunteer_drives", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
   eventId: integer("event_id").references(() => events.id, { onDelete: "set null" }),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  phone: text("phone"),
-  skills: text("skills"),
-  consent: integer("consent", { mode: "boolean" }).notNull(),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+  // When volunteers are needed, Philippine local time "YYYY-MM-DDTHH:mm".
+  startsAt: text("starts_at"),
+  venue: text("venue"),
+  // Sign-ups close at the end of this Philippine date.
+  closesOn: text("closes_on"),
+  open: integer("open", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
+
+// The jobs on a registration ("Registration desk", "Photographer"), each with
+// an optional number of spots.
+export const volunteerRoles = sqliteTable(
+  "volunteer_roles",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    driveId: integer("drive_id")
+      .notNull()
+      .references(() => volunteerDrives.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    description: text("description"),
+    slots: integer("slots"),
+    sort: integer("sort").notNull().default(0),
+  },
+  (t) => [index("volunteer_roles_drive").on(t.driveId, t.sort)],
+);
+
+export const volunteerSignups = sqliteTable(
+  "volunteer_signups",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
+    eventId: integer("event_id").references(() => events.id, { onDelete: "set null" }),
+    // Set when they signed up through a volunteer registration.
+    driveId: integer("drive_id").references(() => volunteerDrives.id, { onDelete: "cascade" }),
+    roleId: integer("role_id").references(() => volunteerRoles.id, { onDelete: "set null" }),
+    status: text("status", { enum: ["confirmed", "waitlist"] }).notNull().default("confirmed"),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    skills: text("skills"),
+    consent: integer("consent", { mode: "boolean" }).notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  // One sign-up per person per registration. General sign-ups (no registration) aren't limited.
+  (t) => [uniqueIndex("volunteer_signups_drive_email").on(t.driveId, t.email)],
+);
 
 export const campaigns = sqliteTable("campaigns", {
   id: integer("id").primaryKey({ autoIncrement: true }),

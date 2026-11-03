@@ -7,6 +7,8 @@ import { getEvent, listRsvps } from "@/lib/engagement/events.js";
 import EventEditor from "@/components/admin/EventEditor.jsx";
 import RsvpTable from "@/components/admin/RsvpTable.jsx";
 import AttendancePanel from "@/components/admin/AttendancePanel.jsx";
+import LinkedDrives from "@/components/admin/LinkedDrives.jsx";
+import { listDrivesFor } from "@/lib/engagement/volunteers.js";
 import { listAttendance, checkinIsOpen } from "@/lib/engagement/attendance.js";
 import { qrSvg, checkinUrl, originFrom } from "@/lib/members/qr.js";
 
@@ -19,7 +21,7 @@ export default async function EditEvent({ params }) {
   const db = getDb();
   const event = await getEvent(db, id);
   if (!event) notFound();
-  const [projects, rsvps, attendance] = await Promise.all([listProjects(db), listRsvps(db, event.id), listAttendance(db, event.id)]);
+  const [projects, rsvps, attendance, drives] = await Promise.all([listProjects(db), listRsvps(db, event.id), listAttendance(db, event.id), listDrivesFor(db, { eventId: event.id })]);
   const open = checkinIsOpen(event);
   const url = open ? checkinUrl(originFrom(await headers()), event.checkinCode) : null;
   const checkin = { open, url, qrSvg: open ? await qrSvg(url) : null };
@@ -27,6 +29,7 @@ export default async function EditEvent({ params }) {
     <div className="admin">
       <h1>Edit event</h1>
       <EventEditor event={event} projects={projects} />
+      <LinkedDrives drives={drives} newHref={`/admin/volunteers/new?event=${event.id}`} />
       <AttendancePanel event={{ id: event.id, title: event.title, startAt: event.startAt, venue: event.venue, weChair: event.weChair, lat: event.lat, lng: event.lng, checkinNearby: event.checkinNearby }} rows={attendance} checkin={checkin} />
       <RsvpTable eventId={event.id} rsvps={rsvps} />
     </div>

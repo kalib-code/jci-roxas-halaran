@@ -195,6 +195,29 @@ test("RSVP: first person goes, the same email is a duplicate, the next joins the
   await expect(page.locator("#rsvp").getByRole("status")).toContainText("waitlist");
 });
 
+test("volunteer registration: the event links to it, a role fills up, and the same email can't sign up twice", async ({ page }) => {
+  await page.goto(EVENT);
+  await page.locator("#volunteer").getByRole("link", { name: "Sign up" }).click();
+  await expect(page).toHaveURL(/\/volunteer\/volunteers-for-general-assembly-2027$/);
+  await expect(page.locator("h1")).toHaveText("Volunteers for General Assembly 2027");
+  const signUp = async (role, name, email) => {
+    await page.goto("/volunteer/volunteers-for-general-assembly-2027");
+    const form = page.locator("#sign-up");
+    await form.getByRole("radio", { name: new RegExp(role) }).check();
+    await form.getByLabel("Name").fill(name);
+    await form.getByLabel("Email").fill(email);
+    await form.getByRole("checkbox").check();
+    await form.getByRole("button", { name: "Sign up to volunteer" }).click();
+    return form;
+  };
+  const form = await signUp("Registration desk", "Ana Cruz", "ana.vol@example.ph");
+  await expect(form.getByRole("status")).toContainText("You're signed up as Registration desk");
+  await page.goto("/volunteer/volunteers-for-general-assembly-2027");
+  await expect(page.getByRole("radio", { name: /Registration desk/ })).toBeDisabled();
+  const again = await signUp("Photographer", "Ana Cruz", "ANA.vol@example.ph");
+  await expect(again.getByRole("alert")).toContainText("already signed up");
+});
+
 test("membership application shows a confirmation", async ({ page }) => {
   await page.goto("/join");
   const form = page.locator("#apply");
@@ -220,7 +243,7 @@ test("pledge form shows the campaign and a confirmation", async ({ page }) => {
 });
 
 test("engagement admin screens require sign-in", async ({ page }) => {
-  for (const path of ["/admin/applications", "/admin/events", "/admin/payments", "/admin/campaigns", "/admin/expenses"]) {
+  for (const path of ["/admin/applications", "/admin/events", "/admin/payments", "/admin/campaigns", "/admin/expenses", "/admin/volunteers", "/admin/volunteers/new", "/admin/volunteers/1"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/sign-in/);
   }
